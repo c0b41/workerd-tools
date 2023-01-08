@@ -1,15 +1,6 @@
 import childProcess from 'child_process'
-import got from 'got'
 import workerdPath from 'workerd'
 import { Observer, waitForExit, pipeOutput } from './lib/utils'
-
-type ServerOptions = {
-  dist?: string
-  config?: string
-  pwd?: string
-  inspectorPort?: number | undefined
-  verbose?: boolean
-}
 
 export class devServer {
   #options: ServerOptions = {}

@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
+import { cachePluginOptions } from '../../../../types/main'
 import cacheService from './service'
 
 let defaults = {
-  path: 'trafik',
+  path: undefined,
   gateway: null,
 }
 

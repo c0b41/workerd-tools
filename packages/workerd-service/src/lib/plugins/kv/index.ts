@@ -4,7 +4,7 @@ import { kvPluginOptions } from '../../../../types/main'
 import kvService from './service'
 
 let defaults = {
-  path: 'trafik',
+  path: undefined,
   gateway: null,
 }
 
@@ -21,7 +21,7 @@ export default fp(async (app: FastifyInstance, opts: kvPluginOptions = defaults)
   app.register(
     async (service: FastifyInstance) => {
       //service.decorate('kv', { gateway })
-      service.get('/kv/:ns', routes.ListKv)
+      service.get('/kv/:ns', routes.listKv)
       service.get('/kv/:ns/:key', routes.getKv)
 
       service.put('/kv/:ns/:key', routes.putKv)
