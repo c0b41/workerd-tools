@@ -10,6 +10,11 @@ type cachePluginOptions = {
   gateway?: Function | null
 }
 
+type d1PluginOptions = {
+  path?: string | undefined
+  gateway?: Function | null
+}
+
 interface KvServiceRoutes {
   listKv: RouteHandler
   getKv: RouteHandler
@@ -21,6 +26,12 @@ interface CacheServiceRoutes {
   getCache: RouteHandler
   putCache: RouteHandler
   deleteCache: RouteHandler
+}
+
+interface D1ServiceRoutes {
+  getDump: RouteHandler
+  getQuery: RouteHandler
+  getExecute: RouteHandler
 }
 
 interface requestKvParams {
