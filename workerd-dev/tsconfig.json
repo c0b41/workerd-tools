@@ -1,0 +1,16 @@
+{
+   "compilerOptions": {
+      "module": "ES2020",
+      "target": "ESNext",
+      "declaration": true,
+      "declarationMap": true,
+      "emitDeclarationOnly": true,
+      "esModuleInterop": true,
+      "moduleResolution":"Node16"
+   },
+   "include": [
+      "src/**/*.ts",
+      "types/**/*.d.ts"
+   ],
+   "exclude": ["node_modules", "dist"]
+}

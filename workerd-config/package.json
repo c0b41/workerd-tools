@@ -1,0 +1,24 @@
+{
+  "name": "@c0b41/workerd-config",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "capnp:workerd": "./node_modules/.bin/capnpc-js ./lib/config/workerd.capnp",
+    "patch": "patch-package",
+    "build": "node ./scripts/build"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "dependencies": {
+    "docker-names": "^1.2.1"
+  },
+  "devDependencies": {
+    "capnpc-js": "^0.5.1",
+    "esbuild": "^0.16.10",
+    "npm-dts": "^1.3.12",
+    "patch-package": "^6.5.0"
+  }
+}
