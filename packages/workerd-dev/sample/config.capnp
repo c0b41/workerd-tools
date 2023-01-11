@@ -13,12 +13,18 @@ const helloWorldExample :Workerd.Config = (
   # is a type of service. Other types of services can include external servers, the
   # ability to talk to a network, or accessing a disk directory. Here we create a single
   # worker service. The configuration details for the worker are defined below.
-  services = [ (name = "main", worker = .helloWorld) ],
+  services = [ 
+    (name = "main", worker = .helloWorld),
+    (name = "foo", worker = .helloWorld2) 
+    ],
 
   # Every configuration defines the one or more sockets on which the server will listene.
   # Here, we create a single socket that will listen on localhost port 8080, and will
   # dispatch to the "main" service that we defined above.
-  sockets = [ ( name = "http", address = "*:8080", http = (), service = "main" ) ]
+  sockets = [ 
+    ( name = "http", address = "*:8080", http = (), service = "main" ),
+    ( name = "http", address = "*:8081", http = (), service = "foo" ) 
+  ]
 );
 
 # The definition of the actual helloWorld worker exposed using the "main" service.
@@ -27,6 +33,13 @@ const helloWorldExample :Workerd.Config = (
 #   https://developers.cloudflare.com/workers/platform/compatibility-dates/
 
 const helloWorld :Workerd.Worker = (
+  modules = [
+    (name = "worker", esModule = embed "worker.js")
+  ],
+  compatibilityDate = "2022-09-16",
+);
+
+const helloWorld2 :Workerd.Worker = (
   modules = [
     (name = "worker", esModule = embed "worker.js")
   ],

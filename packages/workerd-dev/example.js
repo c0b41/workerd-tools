@@ -6,5 +6,12 @@ let runtime = new devServer({
     config: './sample/config.capnp',
     //pwd: './sample',
     verbose: true,
-    inspectorPort: 9229
+    inspector: {
+        port: 9229,
+        excludes: ['loop']
+    },
+    logs: {
+        workerd: true,
+        worker: true
+    }
 })

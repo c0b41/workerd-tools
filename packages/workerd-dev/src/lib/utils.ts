@@ -4,15 +4,22 @@ import rl from 'readline'
 
 export class Observer extends EventEmitter {
   #dist: string
-  constructor(dist) {
+  #log: boolean
+  constructor(dist, log) {
     super()
     this.#dist = dist
+    this.#log = log
     this.#watchFile()
   }
 
+  #message(message) {
+    if (this.#log) {
+      console.log(`[${new Date().toLocaleString()}] ${message}`)
+    }
+  }
   #watchFile() {
     try {
-      console.log(`[${new Date().toLocaleString()}] Watching for file changes on: ${this.#dist}`)
+      this.#message(`Watching for file changes on: ${this.#dist}`)
 
       var watcher = chokidar.watch(this.#dist, {
         persistent: true,
@@ -21,15 +28,11 @@ export class Observer extends EventEmitter {
       })
 
       watcher.on('change', async (filePath) => {
-        console.log(`[${new Date().toLocaleString()}] ${filePath} has been updated.`)
-
-        // Get update content of file, in this case is one line
-
-        // emit an event when the file has been updated
+        this.#message(`${filePath} has been updated.`)
         this.emit('restart', null)
       })
 
-      watcher.on('error', (error) => console.log(`Watcher error: ${error}`))
+      watcher.on('error', (error) => this.#message(`Watcher error: ${error}`))
     } catch (error) {
       console.log(error)
     }
@@ -40,6 +43,10 @@ export function waitForExit(process) {
   return new Promise((resolve) => {
     process.once('exit', () => resolve(null))
   })
+}
+
+export function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export function pipeOutput(runtime) {

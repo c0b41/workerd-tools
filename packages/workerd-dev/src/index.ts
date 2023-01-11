@@ -1,15 +1,16 @@
 import childProcess from 'child_process'
 import workerdPath from 'workerd'
-import { Observer, waitForExit, pipeOutput } from './lib/utils'
+import { Inspector } from './lib/inspector'
+import { Observer, waitForExit, pipeOutput, sleep } from './lib/utils'
 
 export class devServer {
   #options: ServerOptions = {}
   #obs = null
   #process: childProcess.ChildProcess = null
-  #processExitPromise: Promise<any> = null
+  #inspector: Inspector | null = null
   constructor(options: ServerOptions) {
     this.#options = options
-    this.#obs = new Observer(this.#options.dist)
+    this.#obs = new Observer(this.#options.dist, false)
 
     this.#obs.on('restart', () => {
       this.#startProcess()
@@ -48,22 +49,45 @@ export class devServer {
 
     const [command, ...args] = this.#getCommand()
 
-    console.log(`Workerd process started.`)
     const runtimeProcess = childProcess.spawn(command, args, {
       cwd: this.#options.pwd ?? process.cwd(),
       stdio: 'pipe',
     })
     this.#process = runtimeProcess
-    this.#processExitPromise = waitForExit(runtimeProcess)
-    pipeOutput(runtimeProcess)
+    await this.#pipeOut()
+    await this.#cleanUp()
   }
 
-  #exitPromise() {
-    return this.#processExitPromise
+  async #pipeOut() {
+    console.log(`Workerd process started.`)
+    if (this.#process && this.#options.logs.workerd) {
+      pipeOutput(this.#process)
+    }
+
+    await sleep(3000)
+    if (this.#options.inspector.port !== undefined && this.#options.logs.worker) {
+      this.#inspector = new Inspector(this.#options.inspector)
+    }
   }
 
-  #dispose() {
-    this.#process?.kill()
-    return this.#processExitPromise
+  async #cleanUp() {
+    await process.on('exit', async () => {
+      await this.#dispose()
+    })
+
+    await process.on('uncaughtException', async () => {
+      await this.#dispose()
+    })
+  }
+
+  async #dispose() {
+    if (this.#process) {
+      this.#process.kill()
+      this.#process = null
+    }
+    if (this.#inspector) {
+      this.#inspector.close()
+      this.#inspector = null
+    }
   }
 }
