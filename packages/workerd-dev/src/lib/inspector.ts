@@ -1,6 +1,7 @@
-import { time } from 'console'
 import type Protocol from 'devtools-protocol'
 import WebSocket from 'ws'
+import pino, { LoggerOptions } from 'pino'
+import got from 'got'
 
 export const mapConsoleAPIMessageTypeToConsoleMethod: {
   [key in Protocol.Runtime.ConsoleAPICalledEvent['type']]: Exclude<keyof Console, 'Console'>
@@ -160,45 +161,86 @@ function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
 }
 
 export class Inspector {
-  #ws: WebSocket[] = []
-  #id: number = 1
-  #options: InspectorOptions = {}
+  private sockets: WebSocket[] = []
+  private options: InspectorOptions = {}
   constructor(options: InspectorOptions) {
-    this.#options = options
-    this.#preConnect()
+    this.options = options
+    this.preConnect()
   }
 
-  async #preConnect() {
-    // fetch worker list and connect them localhost:9229/json/list
-    let workers = ['main', 'foo']
+  private async preConnect() {
     // Filter out excludes worker names
     // this.#options.excludes
-
+    let workers = await this.fetchActiveWorkers()
     console.log(workers)
 
-    workers.forEach((worker) => {
-      let socket = new WebSocket(`ws://localhost:${this.#options.port}/${worker}`)
-      this.#ws.push(socket)
-      this.#connect(socket)
-      this.#events(socket)
+    this.sockets = workers.map((worker) => {
+      return new InspectorSocket({
+        name: worker,
+        port: this.options.port,
+      })
     })
   }
 
-  #connect(ws: WebSocket) {
-    ws.addEventListener('open', () => {
-      this.#send(ws, { method: 'Runtime.enable', id: this.#id })
-      this.#send(ws, { method: 'Network.enable', id: this.#id++ })
+  private async fetchActiveWorkers() {
+    try {
+      let response = await got(`http://localhost:${this.options.port}/json/list`)
+      if (response.body) {
+        let list = JSON.parse(response.body)
+        return list.map((worker) => {
+          return worker.id
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
+  closeAll() {
+    this.sockets.forEach((socket) => {
+      socket.close()
+    })
+  }
+}
+
+class InspectorSocket {
+  private ws: WebSocket | null = null
+  private port: number | null = null
+  private name: string | null = null
+  private logger: LoggerOptions | null = null
+  constructor(options: InspectorSocketOptions) {
+    if (options.name && options.name) {
+      this.name = options.name
+      this.port = options.port
+      this.ws = new WebSocket(`ws://localhost:${options.port}/${options.name}`)
+      this.logger = pino({
+        transport: {
+          target: 'pino-pretty',
+        },
+        name: `worker:${options.name}`,
+      })
+      this.connect()
+    }
+  }
+
+  private connect() {
+    let id = 0
+    this.ws.addEventListener('open', () => {
+      this.send({ method: 'Runtime.enable', id: this.name })
+      this.send({ method: 'Network.enable', id: this.name })
 
       let keepAliveInterval: NodeJS.Timer = setInterval(() => {
-        this.#send(ws, {
+        this.send({
           method: 'Runtime.getIsolateId',
-          id: this.#id++,
+          id: this.name,
         })
       }, 10_000)
+      this.logger.info(`Inspector connected.`)
     })
 
-    ws.on('unexpected-response', () => {
-      console.log('Waiting for connection...')
+    this.ws.on('unexpected-response', () => {
+      this.logger.info('Waiting for connection...')
       /**
        * This usually means the worker is not "ready" yet
        * so we'll just retry the connection process
@@ -206,8 +248,9 @@ export class Inspector {
       //retryRemoteWebSocketConnection()
     })
   }
-  #events(ws: WebSocket) {
-    ws.addEventListener('message', async (event: MessageEvent) => {
+
+  private events() {
+    this.ws.addEventListener('message', async (event: MessageEvent) => {
       const evt = JSON.parse(event.data)
       switch (evt.method) {
         case 'Runtime.exceptionThrown':
@@ -223,26 +266,27 @@ export class Inspector {
       }
     })
   }
-  #isClosed(ws: WebSocket) {
-    return ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING
-  }
-  #send(ws: WebSocket, event: Record<string, unknown>): void {
-    if (!this.#isClosed(ws)) {
-      ws.send(JSON.stringify(event))
+
+  public close() {
+    if (!this.isClosed()) {
+      try {
+        this.ws.removeAllListeners('open')
+        this.ws.removeAllListeners('message')
+        this.ws.removeAllListeners('close')
+        this.ws.removeAllListeners('error')
+        this.ws.terminate()
+        this.ws.close()
+      } catch (err) {}
     }
   }
-  close() {
-    this.#ws.forEach((ws) => {
-      if (!this.#isClosed(ws)) {
-        try {
-          ws.removeAllListeners('open')
-          ws.removeAllListeners('message')
-          ws.removeAllListeners('close')
-          ws.removeAllListeners('error')
-          ws.terminate()
-          ws.close()
-        } catch (err) {}
-      }
-    })
+
+  private send(event: Record<string, unknown>): void {
+    if (!this.isClosed()) {
+      this.ws.send(JSON.stringify(event))
+    }
+  }
+
+  private isClosed() {
+    return this.ws.readyState === WebSocket.CLOSED || this.ws.readyState === WebSocket.CLOSING
   }
 }

@@ -1,29 +1,36 @@
 import childProcess from 'child_process'
 import workerdPath from 'workerd'
 import { Inspector } from './lib/inspector'
-import { Observer, waitForExit, pipeOutput, sleep } from './lib/utils'
+import { Observer } from './lib/observer'
+import { waitForExit, pipeOutput, sleep } from './lib/utils'
 
 export class devServer {
-  #options: ServerOptions = {}
-  #obs = null
-  #process: childProcess.ChildProcess = null
-  #inspector: Inspector | null = null
+  private options: ServerOptions = {
+    logs: {
+      workerd: false,
+      worker: false,
+    },
+  }
+  private obs = null
+  private process: childProcess.ChildProcess = null
+  private inspector: Inspector | null = null
   constructor(options: ServerOptions) {
-    this.#options = options
-    this.#obs = new Observer(this.#options.dist, false)
+    this.options = options
+    this.options.bin = this.options.bin ? this.options.bin : workerdPath
+    this.obs = new Observer(this.options.dist)
 
-    this.#obs.on('restart', () => {
-      this.#startProcess()
+    this.obs.on('restart', () => {
+      this.startProcess()
     })
 
-    this.#startProcess()
+    this.startProcess()
   }
 
-  #getCommand(): string[] {
-    return [workerdPath, ...this.#getCommonArgs(), this.#options.config]
+  private getCommand(): string[] {
+    return [this.options.bin, ...this.getCommonArgs(), this.options.config]
   }
 
-  #getCommonArgs(): string[] {
+  private getCommonArgs(): string[] {
     const args = [
       'serve',
       //"--external-addr=SERVICE_LOOPBACK=localhost:3030",
@@ -33,61 +40,54 @@ export class devServer {
       // (e.g. "streams_enable_constructors"), see https://github.com/cloudflare/workerd/pull/21
       '--experimental',
     ]
-    if (this.#options.inspectorPort !== undefined) {
+    if (this.options.inspector.port !== undefined) {
       // Required to enable the V8 inspector
-      args.push(`--inspector-addr=localhost:${this.#options.inspectorPort}`)
+      args.push(`--inspector-addr=localhost:${this.options.inspector.port}`)
     }
-    if (this.#options.verbose) {
+    if (this.options.verbose) {
       args.push('--verbose')
     }
     return args
   }
 
-  async #startProcess() {
-    await this.#dispose()
+  private async startProcess() {
+    await this.dispose()
     // 2. Start new process
 
-    const [command, ...args] = this.#getCommand()
+    const [command, ...args] = this.getCommand()
 
     const runtimeProcess = childProcess.spawn(command, args, {
-      cwd: this.#options.pwd ?? process.cwd(),
+      cwd: this.options.pwd ?? process.cwd(),
       stdio: 'pipe',
     })
-    this.#process = runtimeProcess
-    await this.#pipeOut()
-    await this.#cleanUp()
+    this.process = runtimeProcess
+    await this.pipeOut()
+    await this.cleanUp()
   }
 
-  async #pipeOut() {
-    console.log(`Workerd process started.`)
-    if (this.#process && this.#options.logs.workerd) {
-      pipeOutput(this.#process)
+  private async pipeOut() {
+    if (this.process && this.options.logs.workerd) {
+      pipeOutput(this.process)
     }
 
     await sleep(3000)
-    if (this.#options.inspector.port !== undefined && this.#options.logs.worker) {
-      this.#inspector = new Inspector(this.#options.inspector)
+    if (this.options.inspector.port !== undefined && this.options.logs.worker) {
+      this.inspector = new Inspector(this.options.inspector)
     }
   }
 
-  async #cleanUp() {
-    await process.on('exit', async () => {
-      await this.#dispose()
-    })
-
-    await process.on('uncaughtException', async () => {
-      await this.#dispose()
-    })
+  private async cleanUp() {
+    waitForExit(this.process)
   }
 
-  async #dispose() {
-    if (this.#process) {
-      this.#process.kill()
-      this.#process = null
+  private async dispose() {
+    if (this.process) {
+      this.process.kill()
+      this.process = null
     }
-    if (this.#inspector) {
-      this.#inspector.close()
-      this.#inspector = null
+    if (this.inspector) {
+      this.inspector.closeAll()
+      this.inspector = null
     }
   }
 }

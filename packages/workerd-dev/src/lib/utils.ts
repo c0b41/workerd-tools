@@ -1,43 +1,10 @@
-import chokidar from 'chokidar'
-import { EventEmitter } from 'events'
 import rl from 'readline'
+import pino from 'pino'
 
-export class Observer extends EventEmitter {
-  #dist: string
-  #log: boolean
-  constructor(dist, log) {
-    super()
-    this.#dist = dist
-    this.#log = log
-    this.#watchFile()
-  }
+const errorReg =
+  /(?<logpath>.*?)\s(?<level>.*?):(?<message>\s(.*?));\s(?<extra>.*)=\s(?<message2>.*?)\n/gm
 
-  #message(message) {
-    if (this.#log) {
-      console.log(`[${new Date().toLocaleString()}] ${message}`)
-    }
-  }
-  #watchFile() {
-    try {
-      this.#message(`Watching for file changes on: ${this.#dist}`)
-
-      var watcher = chokidar.watch(this.#dist, {
-        persistent: true,
-        usePolling: true,
-        ignoreInitial: false,
-      })
-
-      watcher.on('change', async (filePath) => {
-        this.#message(`${filePath} has been updated.`)
-        this.emit('restart', null)
-      })
-
-      watcher.on('error', (error) => this.#message(`Watcher error: ${error}`))
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
+const infoReg = /(?<path>(.*?)\d+):\s(?<level>.*?):\s(?<func>.*?;)(.*?\s=\s)(?<message>.*)/gm
 
 export function waitForExit(process) {
   return new Promise((resolve) => {
@@ -50,16 +17,22 @@ export function sleep(ms) {
 }
 
 export function pipeOutput(runtime) {
-  // TODO: may want to proxy these and prettify ✨
-  // We can't just pipe() to `process.stdout/stderr` here, as Ink (used by
-  // wrangler), only patches the `console.*` methods:
-  // https://github.com/vadimdemedes/ink/blob/5d24ed8ada593a6c36ea5416f452158461e33ba5/readme.md#patchconsole
-  // Writing directly to `process.stdout/stderr` would result in graphical
-  // glitches.
+  const processLogger = pino({
+    transport: {
+      target: 'pino-pretty',
+    },
+    name: 'workerd',
+  })
   const stdout = rl.createInterface(runtime.stdout)
   const stderr = rl.createInterface(runtime.stderr)
-  stdout.on('line', (data) => console.log(data))
-  stderr.on('line', (data) => console.error(data))
-  // runtime.stdout.pipe(process.stdout);
-  // runtime.stderr.pipe(process.stderr);
+  stdout.on('line', (data) => {
+    let matches = data.match(infoReg)
+    console.log(data)
+    //processLogger.info(matches)
+  })
+  stderr.on('line', (data) => {
+    let matches = data.match(errorReg)
+    console.log(data)
+    //processLogger.error(matches)
+  })
 }

@@ -11,7 +11,7 @@ let runtime = new devServer({
         excludes: ['loop']
     },
     logs: {
-        workerd: true,
+        workerd: false,
         worker: true
     }
 })
