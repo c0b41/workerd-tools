@@ -1,27 +1,33 @@
 import * as dockerNames from 'docker-names'
-import { serializeConfig } from './config'
-import * as fs from 'fs'
+import ConfigOutput from './output'
 import { generateWorkerScript } from './utils'
-import preConfig from './pre'
 
-export default class WorkerdConfig {
-  private services: Array<Service> = []
-  private pre_services: Array<Service> = []
-  private sockets: Array<Socket> = []
-  private readonly loopback: LoopBackOptions | null = null
+class WorkerdConfig {
+  public services: Array<Service> = []
+  public pre_services: Array<Service> = []
+  public sockets: Array<Socket> = []
+  private options: WorkerdConfigOptions | null
   constructor(options: WorkerdConfigOptions) {
-    this.loopback = options.loopback
+    this.options = options
     this.preInitServices()
   }
 
   private preInitServices() {
-    if (this.loopback) {
+    if (this.options.loopback) {
       this.pre_services.push({
         name: 'loop',
         external: {
-          address: this.loopback.address,
+          address: this.options.loopback.address,
         },
       })
+    }
+
+    if (this.options.prettyErrors) {
+      // TODO
+    }
+
+    if (this.options.autoReload) {
+      // TODO
     }
 
     return this
@@ -106,6 +112,11 @@ export default class WorkerdConfig {
     return _service
   }
 
+  extendConfig(options) {
+    this.options = Object.assign({}, this.options, options)
+    this.preInitServices()
+  }
+
   Service(service: Service) {
     let _service: Service = {
       name: service.name,
@@ -142,18 +153,6 @@ export default class WorkerdConfig {
     this.sockets.push(socket)
     return this
   }
-
-  Generate(dist: String, type: 'bin' | 'json' = 'bin') {
-    let buffer = serializeConfig(preConfig)
-    let json = this.toJson()
-    let result = type === 'bin' ? buffer : JSON.stringify(json, null, 2)
-    fs.writeFileSync(`${dist}config.${type}`, result, 'utf-8')
-  }
-
-  toJson(): toJson {
-    return {
-      services: [...this.services, ...this.pre_services],
-      sockets: [...this.sockets],
-    }
-  }
 }
+
+export { WorkerdConfig, ConfigOutput }

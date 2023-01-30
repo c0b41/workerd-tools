@@ -163,14 +163,14 @@ function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
 export class Inspector {
   private sockets: WebSocket[] = []
   private options: InspectorOptions = {}
+  private excludes: RegExp[] = [] // workerd-config internal services
   constructor(options: InspectorOptions) {
     this.options = options
+    this.excludes = [/loop:/, /dev:/, ...this.options.excludes]
     this.preConnect()
   }
 
   private async preConnect() {
-    // Filter out excludes worker names
-    // this.#options.excludes
     let workers = await this.fetchActiveWorkers()
     console.log(workers)
 
@@ -183,17 +183,24 @@ export class Inspector {
   }
 
   private async fetchActiveWorkers() {
+    let workers = new Set()
     try {
       let response = await got(`http://localhost:${this.options.port}/json/list`)
       if (response.body) {
         let list = JSON.parse(response.body)
-        return list.map((worker) => {
-          return worker.id
+
+        this.excludes.forEach((reg) => {
+          list.forEach((worker) => {
+            if (!workers.has(worker) && !new RegExp(reg).test(worker)) {
+              workers.add(worker)
+            }
+          })
         })
       }
     } catch (error) {
       console.log(error)
-      return []
+    } finally {
+      return Array.from(workers)
     }
   }
 

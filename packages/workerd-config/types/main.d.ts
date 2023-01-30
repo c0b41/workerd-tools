@@ -5,6 +5,8 @@ interface LoopBackOptions {
 
 interface WorkerdConfigOptions {
   loopback: LoopBackOptions | null
+  prettyErrors?: boolean
+  autoReload?: boolean
 }
 
 interface ServiceModules {

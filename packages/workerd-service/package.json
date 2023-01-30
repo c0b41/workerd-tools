@@ -1,6 +1,6 @@
 {
   "name": "@c0b41/workerd-fastify-service",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "build": "node ./scripts/build"

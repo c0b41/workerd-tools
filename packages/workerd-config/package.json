@@ -1,6 +1,6 @@
 {
   "name": "@c0b41/workerd-config",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "capnp:workerd": "./node_modules/.bin/capnpc-js ./lib/config/workerd.capnp",
@@ -10,10 +10,12 @@
   "files": [
     "dist/*"
   ],
+  "bin": "./bin/workerd-config",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "docker-names": "^1.2.1"
+    "docker-names": "^1.2.1",
+    "minimist": "^1.2.7"
   },
   "devDependencies": {
     "capnpc-js": "^0.5.1",

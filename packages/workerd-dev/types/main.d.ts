@@ -1,11 +1,23 @@
 interface ServerOptions {
   dist?: string
   config?: string
+  inspector?: InspectorOptions
+  workerd?: WorkerdOptions
+  worker?: WorkersOptions
+}
+
+type WorkerdOptions = {
   pwd?: string
   bin?: string
-  inspector?: InspectorOptions
   verbose?: boolean
-  logs: ServerOptionsLoggin
+  args?: string[]
+  logs?: boolean
+}
+
+type WorkersOptions = {
+  logs?: boolean
+  prettyErrors?: boolean
+  autoReload?: boolean
 }
 
 type ServerOptionsLoggin = {
@@ -15,7 +27,7 @@ type ServerOptionsLoggin = {
 
 interface InspectorOptions {
   port?: number
-  excludes?: string[]
+  excludes?: RegExp[]
 }
 
 interface InspectorSocketOptions {
