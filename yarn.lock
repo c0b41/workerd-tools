@@ -1663,20 +1663,18 @@ capnp-ts@^0.5.0:
     tslib "^2.2.0"
     utf8-encoding "^0.1.2"
 
-capnpc-js@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/capnpc-js/-/capnpc-js-0.5.1.tgz#68f84ce449df63830a2fb737659c7aa87de6dd0c"
-  integrity sha512-sWVYizfhyL2eRJW6xjQpm+igzukTv8ly+gl0K/vAf5GIzuV2CImGo0+DlnWeI7gzuRUQB804FtW9YuJNQHeT8Q==
+capnp-ts@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/capnp-ts/-/capnp-ts-0.7.0.tgz#16fd8e76b667d002af8fcf4bf92bf15d1a7b54a9"
+  integrity sha512-XKxXAC3HVPv7r674zP0VC3RTXz+/JKhfyw94ljvF80yynK6VkTnqE3jMuN8b3dUVmmc43TjyxjW4KTsmB3c86g==
   dependencies:
-    capnpc-ts "^0.5.0"
     debug "^4.3.1"
     tslib "^2.2.0"
-    typescript "^4.2.4"
 
-capnpc-ts@^0.5.0:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/capnpc-ts/-/capnpc-ts-0.5.1.tgz#a9d6f7c9c740232cf65f3590ffb95fb36404953c"
-  integrity sha512-xOivJ99sZndGOX7JW+p55EmyTrR7ngeRPrAHFBv1De932teKTkqeQxBUnJmOBfL/dAqVeiZT4fUKHL+EjZETNQ==
+capnpc-ts@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/capnpc-ts/-/capnpc-ts-0.7.0.tgz#d0a22e1f693986a17e40755297b7472e02a30df6"
+  integrity sha512-aIvGuLQJMEqRYeT92Lr3rzRyyb2hPePg7XpjIKfGLa/whaZ582IU8W4VqFvbbjKimlNE41ISCorX6kv4lSFk4A==
   dependencies:
     capnp-ts "^0.5.0"
     debug "^4.3.1"

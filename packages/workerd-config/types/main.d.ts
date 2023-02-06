@@ -73,6 +73,7 @@ interface Socket {
 interface toJson {
   services: Service[]
   sockets: Socket[]
+  pre_services: Service[]
 }
 
 type LoopBackServiceType = 'kv' | 'cache'

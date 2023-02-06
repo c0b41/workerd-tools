@@ -123,19 +123,19 @@ class WorkerdConfig {
       ...service,
     }
 
-    if (this.loopback && service.worker?.cache && service.worker?.cache?.id) {
+    if (this.options.loopback && service.worker?.cache && service.worker?.cache?.id) {
       let cache_service = this.createLoopBackService(
         'cache',
         service.worker.cache.id,
         service,
-        this.loopback
+        this.options.loopback
       )
       _service.worker.cacheApiOutbound = cache_service.name
     }
 
-    if (this.loopback && service.worker?.kv && Array.isArray(service.worker?.kv)) {
+    if (this.options.loopback && service.worker?.kv && Array.isArray(service.worker?.kv)) {
       service.worker.kv.forEach((bind) => {
-        let kv_service = this.createLoopBackService('kv', bind.id, service, this.loopback)
+        let kv_service = this.createLoopBackService('kv', bind.id, service, this.options.loopback)
         _service.worker.bindings.push({
           name: bind.name,
           type: 'kvNamespace',
