@@ -10,6 +10,150 @@ export default class ConfigOutput {
     this.config = config
   }
 
+  private generateWorker(service: Service, struct: Struct) {
+    // @ts-ignore
+    let structServiceWorker = struct.initWorker()
+
+    if (service.worker.compatibilityDate) {
+      structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
+    }
+
+    if (service.worker.cacheApiOutbound) {
+      let structServiceWorkerCacheApiOut = structServiceWorker.initCacheApiOutbound()
+      structServiceWorkerCacheApiOut.setName(service.worker.cacheApiOutbound)
+      structServiceWorker.setCacheApiOutbound(structServiceWorkerCacheApiOut)
+    }
+
+    if (service.worker.globalOutbound) {
+      let structServiceWorkerGlobalOut = structServiceWorker.initGlobalOutbound()
+      structServiceWorkerGlobalOut.setName(service.worker.globalOutbound)
+      structServiceWorker.setGlobalOutbound(structServiceWorkerGlobalOut)
+    }
+
+    if (service.worker.bindings) {
+      let bindingSize = service.worker.bindings.length ?? 0
+      let structServiceWorkerBindings = structServiceWorker.initBindings(bindingSize)
+      service.worker.bindings.forEach((binding: ServiceBindings, index: number) => {
+        // @ts-ignore
+        let structServiceWorkerBinding = struct.Worker_Binding()
+
+        if ('type' in binding) {
+          switch (binding.type) {
+            case 'text':
+              structServiceWorkerBinding.setText(binding.value)
+              break
+            case 'data':
+              structServiceWorkerBinding.setData(binding.value)
+              break
+            case 'json':
+              structServiceWorkerBinding.setJson(binding.value)
+              break
+            case 'wasm':
+              structServiceWorkerBinding.setWasm(binding.value)
+            default:
+              break
+          }
+        }
+
+        if ('service' in binding) {
+          let structServiceWorkerBindingService = structServiceWorkerBinding.initService()
+          structServiceWorkerBindingService.setName(binding.service)
+          structServiceWorkerBinding.setService(structServiceWorkerBindingService)
+        }
+
+        if ('kvNamespace' in binding) {
+          let structServiceWorkerBindingKV = structServiceWorkerBinding.initKvNamespace()
+          structServiceWorkerBindingKV.setName(binding.kvNamespace)
+          structServiceWorkerBinding.setKvNamespace(structServiceWorkerBindingKV)
+        }
+
+        if ('r2Bucket' in binding) {
+          let structServiceWorkerBindingR2 = structServiceWorkerBinding.initR2Bucket()
+          structServiceWorkerBindingR2.setName(binding.r2Bucket)
+          structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
+        }
+
+        if ('cryptoKey' in binding) {
+          let structServiceWorkerBindingCrypto = structServiceWorkerBinding.initCryptoKey()
+
+          if (binding.cryptoKey.raw) {
+            structServiceWorkerBindingCrypto.setRaw(binding.cryptoKey.raw)
+          }
+
+          if (binding.cryptoKey.base64) {
+            structServiceWorkerBindingCrypto.setBase64(binding.cryptoKey.base64)
+          }
+
+          if (binding.cryptoKey.hex) {
+            structServiceWorkerBindingCrypto.setHex(binding.cryptoKey.hex)
+          }
+
+          if (binding.cryptoKey.jwk) {
+            structServiceWorkerBindingCrypto.setJwk(binding.cryptoKey.jwk)
+          }
+
+          if (binding.cryptoKey.pkcs8) {
+            structServiceWorkerBindingCrypto.setPkcs8(binding.cryptoKey.pkcs8)
+          }
+
+          if (binding.cryptoKey.spki) {
+            structServiceWorkerBindingCrypto.setSpki(binding.cryptoKey.spki)
+          }
+
+          if (binding.cryptoKey.algorithm && binding.cryptoKey.algorithm.json) {
+            let structServiceWorkerBindingCryptoAlgo =
+              structServiceWorkerBindingCrypto.initAlgorithm()
+            structServiceWorkerBindingCryptoAlgo.setJson(binding.cryptoKey.algorithm.json)
+          }
+
+          if (binding.cryptoKey.usages && binding.cryptoKey.usages.length > 0) {
+            let usagesSize = binding.cryptoKey.usages.length ?? 0
+            let structServiceWorkerBindingCryptoUsages =
+              structServiceWorkerBindingCrypto.initUsages(usagesSize)
+
+            binding.cryptoKey.usages.forEach((usage: string, index: number) => {
+              structServiceWorkerBindingCryptoUsages.set(index, usage)
+            })
+          }
+
+          if (binding.cryptoKey.extractable) {
+            structServiceWorkerBindingCrypto.setExtractable(binding.cryptoKey.extractable)
+          }
+
+          structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
+        }
+
+        structServiceWorkerBinding.setName(binding.name)
+        structServiceWorkerBindings.set(index, structServiceWorkerBinding)
+      })
+    }
+
+    if (service.worker.serviceWorkerScript) {
+      structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
+    }
+
+    if (service.worker.modules) {
+      let modulesSize = service.worker.modules.length ?? 0
+      let structServiceWorkerModules = structServiceWorker.initModules(modulesSize)
+      service.worker.modules.forEach((module: ServiceModules, index: number) => {
+        let moduleStruct = structServiceWorkerModules.get(index)
+        if (module.name) {
+          moduleStruct.setName(module.name)
+        }
+
+        if (module.esModule) {
+          moduleStruct.setEsModule(module.esModule)
+        }
+
+        if (module.commonJs) {
+          moduleStruct.setCommonJsModule(module.commonJs)
+        }
+      })
+
+      structServiceWorker.setModules(structServiceWorkerModules)
+    }
+  }
+
   private generateServices(struct: Struct) {
     let size = this.config.services.length ?? 0
     // @ts-ignore
@@ -36,21 +180,7 @@ export default class ConfigOutput {
       }
 
       if (service.worker) {
-        let structServiceWorker = structService.initWorker()
-
-        if (service.worker.compatibilityDate) {
-          structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
-        }
-
-        if (service.worker.modules) {
-          let modulesSize = service.worker.modules.length ?? 0
-          let structServiceWorkerModules = structServiceWorker.initModules(modulesSize)
-          service.worker.modules.forEach((module, index) => {
-            // Todo
-          })
-
-          structServiceWorker.setModules(structServiceWorkerModules)
-        }
+        this.generateWorker(service, structService)
       }
     })
   }
@@ -77,42 +207,7 @@ export default class ConfigOutput {
       }
 
       if (service.worker) {
-        let structServiceWorker = structService.initWorker()
-
-        if (service.worker.compatibilityDate) {
-          structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
-        }
-
-        if (service.worker.serviceWorkerScript) {
-          structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
-        }
-
-        if (service.worker.bindings) {
-          let bindingSize = service.worker.bindings.length ?? 0
-          let structServiceWorkerBindings = structServiceWorker.initBindings(bindingSize)
-          service.worker.bindings.forEach((binding, index) => {
-            // @ts-ignore
-            let structServiceWorkerBinding = struct.Worker_Binding()
-            switch (binding.type) {
-              case 'text':
-                structServiceWorkerBinding.isText(true)
-                structServiceWorkerBinding.setText(binding.value)
-                break
-              case 'service':
-                let structServiceWorkerBindingService = structService.initService()
-                structServiceWorkerBindingService.setName(binding.value)
-                structServiceWorkerBinding.setService(structServiceWorkerBindingService)
-
-              case 'json':
-                structServiceWorkerBinding.isJson(true)
-                structServiceWorkerBinding.setJson(binding.value)
-              default:
-                break
-            }
-
-            structServiceWorkerBindings.set(index, structServiceWorkerBinding)
-          })
-        }
+        this.generateWorker(service, structService)
       }
     })
   }
@@ -159,7 +254,7 @@ export default class ConfigOutput {
     const struct = message.initRoot(CapnpConfig)
 
     this.generatePreServices(struct)
-    //this.generateServices(struct)
+    this.generateServices(struct)
     this.generateSockets(struct)
 
     if (type == 'buffer') {
@@ -182,6 +277,7 @@ export default class ConfigOutput {
       services: [...this.config.services],
       pre_services: [...this.config.pre_services],
       sockets: [...this.config.sockets],
+      dev_services: [...this.config.dev_services],
     }
   }
 }

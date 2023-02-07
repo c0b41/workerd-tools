@@ -1,6 +1,7 @@
 addEventListener("fetch", (event) => {
     let request = event.request;
     const url = new URL(request.url);
-    url.pathname = `/${BINDING_PLUGIN}/${BINDING_NAMESPACE}/${url.pathname}`;
-    event.respondWith(BINDING_LOOPBACK.fetch(url, request));
+    const LoopBackPath = LOOP_PLUGIN_PATH ? LOOP_PLUGIN_PATH : '';
+    url.pathname = `${LoopBackPath}/${LOOP_PLUGIN}/${LOOP_NAMESPACE}/${url.pathname}`;
+    event.respondWith(LOOP_SERVICE.fetch(url, request));
 });

@@ -5,6 +5,7 @@ import { generateWorkerScript } from './utils'
 class WorkerdConfig {
   public services: Array<Service> = []
   public pre_services: Array<Service> = []
+  public dev_services: Array<Service> = []
   public sockets: Array<Socket> = []
   private options: WorkerdConfigOptions | null
   constructor(options: WorkerdConfigOptions) {
@@ -33,12 +34,7 @@ class WorkerdConfig {
     return this
   }
 
-  private createLoopBackService(
-    type: LoopBackServiceType,
-    id: String,
-    service: Service,
-    loopback: LoopBackOptions
-  ) {
+  private createLoopBackService(type: LoopBackServiceType, id: String, service: Service) {
     let compatibilityDate = service.worker?.compatibilityDate ?? '2022-09-16'
 
     let script = generateWorkerScript(type)
@@ -54,27 +50,26 @@ class WorkerdConfig {
     if (type == 'kv') {
       _service.worker.bindings = [
         {
-          name: 'BINDING_PLUGIN',
+          name: 'LOOP_PLUGIN',
           type: 'text',
           value: 'kv',
         },
         {
-          name: 'BINDING_NAMESPACE',
+          name: 'LOOP_NAMESPACE',
           type: 'text',
           value: id,
         },
         {
-          name: 'BINDING_LOOPBACK',
-          type: 'service',
-          value: 'loop',
+          name: 'LOOP_SERVICE',
+          service: 'loop',
         },
       ]
 
-      if (loopback.path) {
+      if (this.options.loopback.path) {
         _service.worker.bindings.push({
-          name: 'BINDING_LOOPBACK_PATH',
+          name: 'LOOP_PLUGIN_PATH',
           type: 'text',
-          value: loopback.path,
+          value: this.options.loopback.path,
         })
       }
     }
@@ -82,27 +77,26 @@ class WorkerdConfig {
     if (type == 'cache') {
       _service.worker.bindings = [
         {
-          name: 'BINDING_PLUGIN',
+          name: 'LOOP_PLUGIN',
           type: 'text',
           value: 'cache',
         },
         {
-          name: 'BINDING_NAMESPACE',
+          name: 'LOOP_NAMESPACE',
           type: 'text',
           value: id,
         },
         {
-          name: 'BINDING_LOOPBACK',
-          type: 'service',
-          value: 'loop',
+          name: 'LOOP_SERVICE',
+          service: 'loop',
         },
       ]
 
-      if (loopback.path) {
+      if (this.options.loopback.path) {
         _service.worker.bindings.push({
-          name: 'BINDING_LOOPBACK_PATH',
+          name: 'LOOP_PLUGIN_PATH',
           type: 'text',
-          value: loopback.path,
+          value: this.options.loopback.path,
         })
       }
     }
@@ -123,23 +117,21 @@ class WorkerdConfig {
       ...service,
     }
 
-    if (this.options.loopback && service.worker?.cache && service.worker?.cache?.id) {
-      let cache_service = this.createLoopBackService(
-        'cache',
-        service.worker.cache.id,
-        service,
-        this.options.loopback
-      )
+    if (this.options.loopback && service.worker?.loop?.cache && service.worker?.loop?.cache?.id) {
+      let cache_service = this.createLoopBackService('cache', service.worker.loop.cache.id, service)
       _service.worker.cacheApiOutbound = cache_service.name
     }
 
-    if (this.options.loopback && service.worker?.kv && Array.isArray(service.worker?.kv)) {
-      service.worker.kv.forEach((bind) => {
-        let kv_service = this.createLoopBackService('kv', bind.id, service, this.options.loopback)
+    if (
+      this.options.loopback &&
+      service.worker?.loop?.kv &&
+      Array.isArray(service.worker?.loop?.kv)
+    ) {
+      service.worker.loop.kv.forEach((bind) => {
+        let kv_service = this.createLoopBackService('kv', bind.id, service)
         _service.worker.bindings.push({
           name: bind.name,
-          type: 'kvNamespace',
-          value: kv_service.name,
+          kvNamespace: kv_service.name,
         })
       })
     }

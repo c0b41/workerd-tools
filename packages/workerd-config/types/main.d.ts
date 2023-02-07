@@ -11,15 +11,46 @@ interface WorkerdConfigOptions {
 
 interface ServiceModules {
   name: String
-  esModule?: boolean
-  embed: String
+  esModule?: String
+  commonJs?: String
 }
 
-interface ServiceBindings {
+// TODO: WASM, TEXT, JSON, DATA, https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B#L526
+
+type ServiceBindingCrypto = {
   name: String
-  type: String
+  cryptoKey: {
+    raw?: String
+    hex?: string
+    base64?: String
+    jwk?: String
+    pkcs8?: String
+    spki?: String
+    algorithm?: {
+      json: JSON
+    }
+    usages?: string[]
+    extractable: boolean
+  }
+}
+
+type ServiceBindingService = {
+  name: String
+  service?: String
+  kvNamespace?: String
+  r2Bucket?: String
+}
+
+type ServiceBindingBasic = {
+  name: String
+  type: 'text' | 'json' | 'wasm' | 'data'
   value: any
 }
+
+type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService
+
+// https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B
+// TODO: durable object namespace
 
 interface ServicedExternal {
   address: String
@@ -44,11 +75,15 @@ interface ServicedWorker {
   compatibilityFlags?: string[]
   modules?: ServiceModules[]
   serviceWorkerScript?: String
-  cache?: ServiceCache
-  kv?: ServiceKv[]
+  loop?: LoopServices
   bindings?: ServiceBindings[]
   cacheApiOutbound?: String
   globalOutbound?: string
+}
+
+interface LoopServices {
+  cache?: ServiceCache
+  kv?: ServiceKv[]
 }
 
 interface Service {
@@ -74,6 +109,7 @@ interface toJson {
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]
+  dev_services: Service[]
 }
 
 type LoopBackServiceType = 'kv' | 'cache'

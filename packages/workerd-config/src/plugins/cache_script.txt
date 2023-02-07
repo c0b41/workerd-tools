@@ -1,9 +1,9 @@
 addEventListener("fetch", (event) => {
     const request = new Request(event.request);
     const url = new URL(request.url);
-    const LoopBackPath = BINDING_LOOPBACK_PATH ? BINDING_LOOPBACK_PATH : '';
-    url.pathname = `${LoopBackPath}/${BINDING_PLUGIN}/${encodeURIComponent(request.url)}`;
-    if (globalThis.BINDING_NAMESPACE !== undefined) request.headers.set("SRK-ID", BINDING_NAMESPACE);
+    const LoopBackPath = LOOP_PLUGIN_PATH ? LOOP_PLUGIN_PATH : '';
+    url.pathname = `${LoopBackPath}/${LOOP_PLUGIN}/${encodeURIComponent(request.url)}`;
+    if (globalThis.LOOP_NAMESPACE !== undefined) request.headers.set("LOOP-NS", LOOP_NAMESPACE);
 
-    event.respondWith(BINDING_LOOPBACK.fetch(url, request));
+    event.respondWith(LOOP_SERVICE.fetch(url, request));
 });
