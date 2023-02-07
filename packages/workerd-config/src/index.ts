@@ -7,28 +7,22 @@ class WorkerdConfig {
   public pre_services: Array<Service> = []
   public dev_services: Array<Service> = []
   public sockets: Array<Socket> = []
-  private options: WorkerdConfigOptions | null
+  private options: WorkerdConfigOptions | null = {
+    loopback: null,
+  }
   constructor(options: WorkerdConfigOptions) {
     this.options = options
     this.preInitServices()
   }
 
   private preInitServices() {
-    if (this.options.loopback) {
+    if (this.options?.loopback && this.options?.loopback?.address) {
       this.pre_services.push({
         name: 'loop',
         external: {
           address: this.options.loopback.address,
         },
       })
-    }
-
-    if (this.options.prettyErrors) {
-      // TODO
-    }
-
-    if (this.options.autoReload) {
-      // TODO
     }
 
     return this
@@ -106,24 +100,19 @@ class WorkerdConfig {
     return _service
   }
 
-  extendConfig(options) {
-    this.options = Object.assign({}, this.options, options)
-    this.preInitServices()
-  }
-
   Service(service: Service) {
     let _service: Service = {
       name: service.name,
       ...service,
     }
 
-    if (this.options.loopback && service.worker?.loop?.cache && service.worker?.loop?.cache?.id) {
+    if (this.options?.loopback && service.worker?.loop?.cache && service.worker?.loop?.cache?.id) {
       let cache_service = this.createLoopBackService('cache', service.worker.loop.cache.id, service)
       _service.worker.cacheApiOutbound = cache_service.name
     }
 
     if (
-      this.options.loopback &&
+      this.options?.loopback &&
       service.worker?.loop?.kv &&
       Array.isArray(service.worker?.loop?.kv)
     ) {

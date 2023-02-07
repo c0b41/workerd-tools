@@ -4,9 +4,7 @@ interface LoopBackOptions {
 }
 
 interface WorkerdConfigOptions {
-  loopback: LoopBackOptions | null
-  prettyErrors?: boolean
-  autoReload?: boolean
+  loopback?: LoopBackOptions
 }
 
 interface ServiceModules {
@@ -54,6 +52,14 @@ type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindi
 
 interface ServicedExternal {
   address: String
+  http?: SocketHttp
+  https?: SocketHttps
+}
+
+interface ServiceDisk {
+  writable?: boolean
+  allowDotfiles?: boolean
+  path: string
 }
 
 interface ServicedNetWork {
@@ -91,18 +97,33 @@ interface Service {
   worker?: ServicedWorker
   network?: ServicedNetWork
   external?: ServicedExternal
+  disk?: ServiceDisk
 }
 
 interface Socket {
   name: String
   address: String
-  https: {
-    [keypair: string]: {
-      privateKey: String
-      certificateChain: String
-    }
-  }
+  https?: SocketHttps
+  http?: SocketHttp
   service: string
+}
+
+type SocketHttps = {
+  [keypair: string]: {
+    privateKey: String
+    certificateChain: String
+  }
+}
+
+type SocketHttp = {
+  style?: 'proxy' | 'host'
+  injectRequestHeaders: HttpHeaderInjectOptions[]
+  injectResponseHeaders: HttpHeaderInjectOptions[]
+}
+
+type HttpHeaderInjectOptions = {
+  name: string
+  value: string
 }
 
 interface toJson {

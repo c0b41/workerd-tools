@@ -35,7 +35,7 @@ export default class ConfigOutput {
       let structServiceWorkerBindings = structServiceWorker.initBindings(bindingSize)
       service.worker.bindings.forEach((binding: ServiceBindings, index: number) => {
         // @ts-ignore
-        let structServiceWorkerBinding = struct.Worker_Binding()
+        let structServiceWorkerBinding = structServiceWorkerBindings.get(index)
 
         if ('type' in binding) {
           switch (binding.type) {
@@ -43,7 +43,11 @@ export default class ConfigOutput {
               structServiceWorkerBinding.setText(binding.value)
               break
             case 'data':
-              structServiceWorkerBinding.setData(binding.value)
+              let structServiceWorkerBindingData = structServiceWorkerBinding.initData(
+                binding.value.byteLength
+              )
+              structServiceWorkerBindingData.copyBuffer(binding.value)
+              structServiceWorkerBinding.setData(structServiceWorkerBindingData)
               break
             case 'json':
               structServiceWorkerBinding.setJson(binding.value)
@@ -154,11 +158,90 @@ export default class ConfigOutput {
     }
   }
 
+  private generateExternal(service: Service, struct: Struct) {
+    // @ts-ignore
+    let structServiceExternal = struct.initExternal()
+
+    if (service.external.address) {
+      structServiceExternal.setAddress(service.external.address)
+    }
+
+    if (service.external.http) {
+      let structServiceExternalHttp = structServiceExternal.initHttp()
+
+      if (service.external.http.style) {
+        structServiceExternalHttp.setStyle(service.external.http.style)
+      }
+
+      if (
+        service.external.http.injectRequestHeaders &&
+        service.external.http.injectRequestHeaders.length > 0
+      ) {
+        let size = service.external.http.injectRequestHeaders.length ?? 0
+        let structServiceExternalHttpRequestHeaders =
+          structServiceExternalHttp.initInjectRequestHeaders(size)
+
+        service.external.http.injectRequestHeaders.forEach(
+          (header: HttpHeaderInjectOptions, index: number) => {
+            let injectRequestHeader = structServiceExternalHttpRequestHeaders.get(index)
+            injectRequestHeader.setName(header.name)
+            injectRequestHeader.setValue(header.value)
+          }
+        )
+
+        structServiceExternalHttp.setInjectRequestHeaders(structServiceExternalHttpRequestHeaders)
+      }
+
+      if (
+        service.external.http.injectResponseHeaders &&
+        service.external.http.injectResponseHeaders.length > 0
+      ) {
+        let size = service.external.http.injectResponseHeaders.length ?? 0
+        let structServiceExternalHttpResponseHeaders =
+          structServiceExternalHttp.initInjectResponseHeaders(size)
+
+        service.external.http.injectResponseHeaders.forEach(
+          (header: HttpHeaderInjectOptions, index: number) => {
+            let injectResponseHeader = structServiceExternalHttpResponseHeaders.get(index)
+            injectResponseHeader.setName(header.name)
+            injectResponseHeader.setValue(header.value)
+          }
+        )
+
+        structServiceExternalHttp.setInjectResponseHeaders(structServiceExternalHttpResponseHeaders)
+      }
+
+      structServiceExternal.setHttp(structServiceExternalHttp)
+    }
+
+    if (service.external.https) {
+      let structServiceExternalHttps = structServiceExternal.initHttps()
+
+      if (service.external.https.keypair) {
+        let structSocketHttpsTls = structServiceExternalHttps.initTlsOptions()
+        let structSocketHttpsKeypair = structServiceExternalHttps.initKeypair()
+        structSocketHttpsKeypair.setPrivateKey(service.external.https.keypair.privateKey)
+        structSocketHttpsKeypair.setCertificateChain(
+          service.external.https.keypair.certificateChain
+        )
+        structSocketHttpsTls.setKeypair(structSocketHttpsKeypair)
+        structServiceExternalHttps.setTlsOptions(structSocketHttpsTls)
+      }
+
+      structServiceExternal.setHttps(structServiceExternalHttps)
+    }
+  }
+
   private generateServices(struct: Struct) {
-    let size = this.config.services.length ?? 0
+    const allServices = [
+      ...this.config.pre_services,
+      ...this.config.dev_services,
+      ...this.config.services,
+    ]
+    let size = allServices.length ?? 0
     // @ts-ignore
     let services = struct.initServices(size)
-    this.config.services.forEach((service, index) => {
+    allServices.forEach((service, index) => {
       // @ts-ignore
       let structService = services.get(index)
 
@@ -179,31 +262,22 @@ export default class ConfigOutput {
         }
       }
 
-      if (service.worker) {
-        this.generateWorker(service, structService)
-      }
-    })
-  }
-
-  private generatePreServices(struct: Struct) {
-    let size = this.config.pre_services.length ?? 0
-    // @ts-ignore
-    let services = struct.initServices(size)
-    this.config.pre_services.forEach((service, index) => {
-      // @ts-ignore
-      let structService = services.get(index)
-
-      if (service.name) {
-        structService.setName(service.name)
+      if (service.disk) {
+        let structServiceDisk = structService.initDisk()
+        if (service.disk.path) {
+          structServiceDisk.setPath(service.disk.path)
+        }
+        if (service.disk.allowDotfiles) {
+          structServiceDisk.setAllowDotfiles(service.disk.allowDotfiles)
+        }
+        if (service.disk.writable) {
+          structServiceDisk.setWritable(service.disk.writable)
+        }
+        structService.setDisk(structServiceDisk)
       }
 
       if (service.external) {
-        let structServiceExternal = structService.initExternal()
-        if (service.external.address) {
-          structServiceExternal.setAddress(service.external.address)
-        }
-
-        structService.setExternal(structServiceExternal)
+        this.generateExternal(service, structService)
       }
 
       if (service.worker) {
@@ -246,6 +320,46 @@ export default class ConfigOutput {
 
         structSocket.setHttps(structSocketHttps)
       }
+
+      if (socket.http) {
+        let structSocketHttp = structSocket.initHttp()
+        if (socket.http.style) {
+          structSocketHttp.setStyle(socket.http.style)
+        }
+
+        if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.length > 0) {
+          let size = socket.http.injectRequestHeaders.length ?? 0
+          let structSocketHttpInjectRequestHeaders = structSocketHttp.initInjectRequestHeaders(size)
+
+          socket.http.injectRequestHeaders.forEach(
+            (header: HttpHeaderInjectOptions, index: number) => {
+              let injectRequestHeader = structSocketHttpInjectRequestHeaders.get(index)
+              injectRequestHeader.setName(header.name)
+              injectRequestHeader.setValue(header.value)
+            }
+          )
+
+          structSocketHttp.setInjectRequestHeaders(structSocketHttpInjectRequestHeaders)
+        }
+
+        if (socket.http.injectResponseHeaders && socket.http.injectResponseHeaders.length > 0) {
+          let size = socket.http.injectResponseHeaders.length ?? 0
+          let structSocketHttpInjectResponseHeaders =
+            structSocketHttp.initInjectResponseHeaders(size)
+
+          socket.http.injectResponseHeaders.forEach(
+            (header: HttpHeaderInjectOptions, index: number) => {
+              let injectResponseHeader = structSocketHttpInjectResponseHeaders.get(index)
+              injectResponseHeader.setName(header.name)
+              injectResponseHeader.setValue(header.value)
+            }
+          )
+
+          structSocketHttp.setInjectResponseHeaders(structSocketHttpInjectResponseHeaders)
+        }
+
+        structSocket.setHttp(structSocketHttp)
+      }
     })
   }
 
@@ -253,7 +367,6 @@ export default class ConfigOutput {
     const message = new Message()
     const struct = message.initRoot(CapnpConfig)
 
-    this.generatePreServices(struct)
     this.generateServices(struct)
     this.generateSockets(struct)
 
