@@ -11,7 +11,17 @@ const sharedConfig = {
     minify: true,
     sourcemap: false,
     external: deps,
-};
+}
+
+const typesConfig = {
+    entry: 'src/index.ts',
+    output: 'dist/index.d.ts',
+    force: false,
+    tsc: '--extendedDiagnostics',
+    logLevel: 'debug'
+}
+
+new Generator(typesConfig).generate()
 
 if (isDev) {
     build({
@@ -25,12 +35,6 @@ if (isDev) {
         sourcemap: true
     });
 } else {
-
-    new Generator({
-        entry: 'src/index.ts',
-        output: 'dist/index.d.ts',
-    }).generate();
-
     build({
         ...sharedConfig,
         platform: 'node', // for CJS

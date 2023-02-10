@@ -1,7 +1,9 @@
 import type Protocol from 'devtools-protocol'
 import WebSocket from 'ws'
-import pino, { LoggerOptions } from 'pino'
+import pino, { BaseLogger } from 'pino'
 import got from 'got'
+import { ProcessEvents } from './event'
+import { sleep } from '../lib/utils'
 
 export const mapConsoleAPIMessageTypeToConsoleMethod: {
   [key in Protocol.Runtime.ConsoleAPICalledEvent['type']]: Exclude<keyof Console, 'Console'>
@@ -163,18 +165,24 @@ function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
 export class Inspector {
   private sockets: WebSocket[] = []
   private options: InspectorOptions = {}
-  private excludes: RegExp[] = [] // workerd-config internal services
+  private excludes: RegExp[] = []
   constructor(options: InspectorOptions) {
     this.options = options
     this.excludes = [/loop:/, /dev:/, ...this.options.excludes]
-    this.preConnect()
+    ProcessEvents.on('ready', () => {
+      this.initialize()
+    })
+
+    ProcessEvents.on('exited', () => {
+      this.closeAll()
+    })
   }
 
-  private async preConnect() {
+  private async initialize() {
+    // sleep(3000)
     let workers = await this.fetchActiveWorkers()
-    console.log(workers)
 
-    this.sockets = workers.map((worker) => {
+    this.sockets = workers.map((worker: string) => {
       return new InspectorSocket({
         name: worker,
         port: this.options.port,
@@ -208,6 +216,8 @@ export class Inspector {
     this.sockets.forEach((socket) => {
       socket.close()
     })
+
+    this.sockets = []
   }
 }
 
@@ -215,20 +225,18 @@ class InspectorSocket {
   private ws: WebSocket | null = null
   private port: number | null = null
   private name: string | null = null
-  private logger: LoggerOptions | null = null
+  private logger: BaseLogger | null = null
   constructor(options: InspectorSocketOptions) {
-    if (options.name && options.name) {
-      this.name = options.name
-      this.port = options.port
-      this.ws = new WebSocket(`ws://localhost:${options.port}/${options.name}`)
-      this.logger = pino({
-        transport: {
-          target: 'pino-pretty',
-        },
-        name: `worker:${options.name}`,
-      })
-      this.connect()
-    }
+    this.name = options.name
+    this.port = options.port
+    this.ws = new WebSocket(`ws://localhost:${options.port}/${options.name}`)
+    this.logger = pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+      name: `worker:${options.name}`,
+    })
+    this.connect()
   }
 
   private connect() {

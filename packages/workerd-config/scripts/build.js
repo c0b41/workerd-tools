@@ -10,7 +10,17 @@ const sharedConfig = {
     minify: true,
     sourcemap: false,
     external: Object.keys(dependencies),
-};
+}
+
+const typesConfig = {
+    entry: 'src/index.ts',
+    output: 'dist/index.d.ts',
+    force: false,
+    tsc: '--extendedDiagnostics',
+    logLevel: 'debug'
+}
+
+new Generator(typesConfig).generate()
 
 if (isDev) {
     build({
@@ -19,14 +29,10 @@ if (isDev) {
         outfile: "dist/index.js",
         watch: true,
         minify: false,
-        sourcemap: true
+        sourcemap: true,
+        logLevel: 'info'
     });
 } else {
-
-    new Generator({
-        entry: 'src/index.ts',
-        output: 'dist/index.d.ts',
-    }).generate();
 
     build({
         ...sharedConfig,

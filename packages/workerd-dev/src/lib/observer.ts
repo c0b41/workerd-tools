@@ -5,7 +5,7 @@ import { ProcessEvents } from './event'
 export class Observer {
   private dist: string
   private logger: BaseLogger | null = null
-  constructor(dist) {
+  constructor(dist: string) {
     this.dist = dist
 
     this.logger = pino({
@@ -15,10 +15,10 @@ export class Observer {
       name: `watch`,
     })
 
-    this.watchFile()
+    this.initialize()
   }
 
-  private watchFile() {
+  private initialize() {
     try {
       this.logger.info(`Watching for file changes on: ${this.dist}`)
 
@@ -30,7 +30,7 @@ export class Observer {
 
       watcher.on('change', async (filePath) => {
         this.logger.info(`${filePath} has been updated.`)
-        ProcessEvents.emit('restart', null)
+        ProcessEvents.emit('changes', null)
       })
 
       watcher.on('error', (error) => this.logger.error(`Watcher error: ${error}`))

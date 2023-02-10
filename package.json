@@ -1,6 +1,9 @@
 {
   "name": "@cobai/workerd-tools",
   "private": true,
+  "scripts": {
+    "patch": "patch-package"
+  },
   "devDependencies": {
     "lerna": "3.22.1"
   },

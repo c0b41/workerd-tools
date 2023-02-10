@@ -1,16 +1,17 @@
 import * as dockerNames from 'docker-names'
+import { LoopBackServiceType, Service, Socket, WorkerdConfigOptions } from '../types/main'
 import ConfigOutput from './output'
 import { generateWorkerScript } from './utils'
 
 class WorkerdConfig {
-  public services: Array<Service> = []
-  public pre_services: Array<Service> = []
-  public dev_services: Array<Service> = []
-  public sockets: Array<Socket> = []
+  public services: Service[] = []
+  public pre_services: Service[] = []
+  public dev_services: Service[] = []
+  public sockets: Socket[] = []
   private options: WorkerdConfigOptions | null = {
     loopback: null,
   }
-  constructor(options: WorkerdConfigOptions) {
+  constructor(options?: WorkerdConfigOptions) {
     this.options = options
     this.preInitServices()
   }

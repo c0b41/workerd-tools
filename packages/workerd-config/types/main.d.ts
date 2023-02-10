@@ -1,13 +1,13 @@
-interface LoopBackOptions {
+export interface LoopBackOptions {
   address: String
   path?: String
 }
 
-interface WorkerdConfigOptions {
+export interface WorkerdConfigOptions {
   loopback?: LoopBackOptions
 }
 
-interface ServiceModules {
+export interface ServiceModules {
   name: String
   esModule?: String
   commonJs?: String
@@ -15,7 +15,7 @@ interface ServiceModules {
 
 // TODO: WASM, TEXT, JSON, DATA, https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B#L526
 
-type ServiceBindingCrypto = {
+export type ServiceBindingCrypto = {
   name: String
   cryptoKey: {
     raw?: String
@@ -32,51 +32,51 @@ type ServiceBindingCrypto = {
   }
 }
 
-type ServiceBindingService = {
+export type ServiceBindingService = {
   name: String
   service?: String
   kvNamespace?: String
   r2Bucket?: String
 }
 
-type ServiceBindingBasic = {
+export type ServiceBindingBasic = {
   name: String
   type: 'text' | 'json' | 'wasm' | 'data'
   value: any
 }
 
-type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService
+export type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService
 
 // https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B
 // TODO: durable object namespace
 
-interface ServicedExternal {
+export interface ServicedExternal {
   address: String
   http?: SocketHttp
   https?: SocketHttps
 }
 
-interface ServiceDisk {
+export interface ServiceDisk {
   writable?: boolean
   allowDotfiles?: boolean
   path: string
 }
 
-interface ServicedNetWork {
+export interface ServicedNetWork {
   allow?: String[]
   deny?: String[]
 }
 
-interface ServiceCache {
+export interface ServiceCache {
   id: String
 }
 
-interface ServiceKv {
+export interface ServiceKv {
   name: String
   id: String
 }
 
-interface ServicedWorker {
+export interface ServicedWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
   modules?: ServiceModules[]
@@ -87,12 +87,12 @@ interface ServicedWorker {
   globalOutbound?: string
 }
 
-interface LoopServices {
+export interface LoopServices {
   cache?: ServiceCache
   kv?: ServiceKv[]
 }
 
-interface Service {
+export interface Service {
   name: string
   worker?: ServicedWorker
   network?: ServicedNetWork
@@ -100,7 +100,7 @@ interface Service {
   disk?: ServiceDisk
 }
 
-interface Socket {
+export interface Socket {
   name: String
   address: String
   https?: SocketHttps
@@ -108,29 +108,29 @@ interface Socket {
   service: string
 }
 
-type SocketHttps = {
+export type SocketHttps = {
   [keypair: string]: {
     privateKey: String
     certificateChain: String
   }
 }
 
-type SocketHttp = {
+export type SocketHttp = {
   style?: 'proxy' | 'host'
   injectRequestHeaders: HttpHeaderInjectOptions[]
   injectResponseHeaders: HttpHeaderInjectOptions[]
 }
 
-type HttpHeaderInjectOptions = {
+export type HttpHeaderInjectOptions = {
   name: string
   value: string
 }
 
-interface toJson {
+export interface toJson {
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]
   dev_services: Service[]
 }
 
-type LoopBackServiceType = 'kv' | 'cache'
+export type LoopBackServiceType = 'kv' | 'cache'

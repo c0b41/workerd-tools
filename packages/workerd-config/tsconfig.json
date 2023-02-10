@@ -2,8 +2,8 @@
    "compilerOptions": {
       "module": "commonjs",
       "target": "ESNext",
+      "declarationDir": "types",
       "declaration": true,
-      "declarationMap": true,
       "emitDeclarationOnly": true,
    },
    "include": [

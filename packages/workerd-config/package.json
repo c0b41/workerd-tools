@@ -4,7 +4,6 @@
   "license": "MIT",
   "scripts": {
     "capnp": "capnpc -o ts ./src/config/workerd.capnp",
-    "patch": "patch-package",
     "build": "node ./scripts/build"
   },
   "files": [

@@ -1,8 +1,15 @@
 import { WorkerdConfig } from '.'
-import { serializeConfig } from './config'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
 import { Config, kVoid } from './config/workerd'
 import { Config as CapnpConfig } from './config/workerd.capnp.js'
+import {
+  ServiceBindings,
+  ServiceModules,
+  HttpHeaderInjectOptions,
+  toJson,
+  Service,
+  Socket,
+} from '../types/main'
 
 export default class ConfigOutput {
   private config: WorkerdConfig | null
@@ -241,7 +248,7 @@ export default class ConfigOutput {
     let size = allServices.length ?? 0
     // @ts-ignore
     let services = struct.initServices(size)
-    allServices.forEach((service, index) => {
+    allServices.forEach((service: Service, index: number) => {
       // @ts-ignore
       let structService = services.get(index)
 
@@ -290,7 +297,7 @@ export default class ConfigOutput {
     let size = this.config.sockets.length ?? 0
     // @ts-ignore
     let sockets = struct.initSockets(size)
-    this.config.sockets.forEach((socket, index) => {
+    this.config.sockets.forEach((socket: Socket, index: number) => {
       // @ts-ignore
       let structSocket = sockets.get(index)
       if (socket.name) {
