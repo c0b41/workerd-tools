@@ -1,0 +1,66 @@
+const LIVE_RELOAD = `<script defer type="application/javascript">
+(function () {
+  var url = new URL("http://localhost:1336");
+  function reload() { location.reload(); }
+  function connect(reconnected) {
+    var ws = new WebSocket(url);
+    if (reconnected) ws.onopen = reload;
+    ws.onclose = function(e) {
+      e.code === 1012 ? reload() : e.code === 1000 || e.code === 1001 || setTimeout(connect, 1000, true);
+    }
+  }
+  connect();
+})();
+</script>`
+
+const errorResponse = (err) => (
+`<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Error P</title>
+	</head>
+	<body>
+		<pre>${err.stack}</pre>
+	</body>
+</html>`
+)
+
+async function handleEvent(event) {
+    const request = new Request(event.request);
+    try {
+        let response = await ${SERVICE}.fetch(request);
+
+        if (
+        SERVICE_RELOAD !== undefined &&
+        response.headers.get("Content-Type")?.toLowerCase().includes("text/html")
+        ) {
+            const headers = new Headers(response.headers);
+            const contentLength = parseInt(headers.get("content-length"));
+            if (!isNaN(contentLength)) {
+                headers.set("content-length", contentLength + LIVE_RELOAD.byteLength);
+            }
+
+            const { readable, writable } = new IdentityTransformStream();
+            event.waitUntil((async () => {
+                await response.body?.pipeTo(writable, { preventClose: true });
+                const writer = writable.getWriter();
+                await writer.write(LIVE_RELOAD);
+                await writer.close();
+            })());
+
+            return new Response(readable, {
+                status: response.status,
+                statusText: response.statusText,
+                headers,
+            });
+        }
+
+        return response;
+    } catch (e) {
+        return new Response(errorResponse(e));
+    }
+}
+addEventListener("fetch", (event) => {
+    event.respondWith(handleEvent(event));
+});

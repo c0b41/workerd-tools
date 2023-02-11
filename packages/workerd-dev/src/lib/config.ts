@@ -1,12 +1,15 @@
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { ConfigOutput, WorkerdConfig } from '@c0b41/workerd-config'
+import { generateWorkerScript } from '@c0b41/workerd-config'
 
 export class Config {
   private path: string
   private instance: WorkerdConfig
-  constructor(path: string) {
+  private workersOptions: WorkersOptions
+  constructor(path: string, workerOptions: WorkersOptions) {
     this.path = path
+    this.workersOptions = workerOptions
 
     this.initialize()
   }
@@ -20,16 +23,45 @@ export class Config {
   }
 
   private generateDevServices() {
-    // this.instance
-    // TODO: generate autoReload and prettyErrors services
+    if (this.workersOptions.prettyErrors) {
+      let dev_services = []
+      this.instance.sockets = this.instance.sockets.map((socket) => {
+        if (socket.address && socket.service) {
+          let service = {} as any // Todo type
+          service.name = `dev:${socket.service}`
+          service.worker = {
+            serviceWorkerScript: generateWorkerScript('dev'),
+            bindings: [
+              {
+                name: 'SERVICE',
+                service: socket.service,
+              },
+            ],
+          }
+
+          if (this.workersOptions.autoReload) {
+            service.worker.bindings.push({
+              name: 'SERVICE_RELOAD',
+              type: 'text',
+              value: true,
+            })
+          }
+          dev_services.push(service)
+          socket.service = `dev:${socket.service}`
+        }
+
+        return socket
+      })
+
+      this.instance.dev_services = dev_services
+    }
   }
 
   public getConfig(): Buffer {
     try {
       const configPath = join(process.cwd(), this.path)
       this.instance = require(configPath)
-      // TODO: extend dev services
-      // this.generateDevServices()
+      this.generateDevServices()
       const output = new ConfigOutput(this.instance)
       return output.toBuffer()
     } catch (error) {

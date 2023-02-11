@@ -137,4 +137,4 @@ class WorkerdConfig {
   }
 }
 
-export { WorkerdConfig, ConfigOutput }
+export { WorkerdConfig, ConfigOutput, generateWorkerScript }

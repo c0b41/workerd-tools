@@ -1,29 +1,29 @@
 export interface LoopBackOptions {
-  address: String
-  path?: String
+  address: string
+  path?: string
 }
 
 export interface WorkerdConfigOptions {
   loopback?: LoopBackOptions
 }
 
-export interface ServiceModules {
-  name: String
-  esModule?: String
-  commonJs?: String
-}
-
-// TODO: WASM, TEXT, JSON, DATA, https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B#L526
+export type ServiceModules =
+  | { name: string; esModule?: string }
+  | { name: string; commonJsModule?: string }
+  | { name: string; text?: string }
+  | { name: string; data?: Uint8Array }
+  | { name: string; wasm?: Uint8Array }
+  | { name: string; json?: string }
 
 export type ServiceBindingCrypto = {
-  name: String
+  name: string
   cryptoKey: {
-    raw?: String
+    raw?: string
     hex?: string
-    base64?: String
-    jwk?: String
-    pkcs8?: String
-    spki?: String
+    base64?: string
+    jwk?: string
+    pkcs8?: string
+    spki?: string
     algorithm?: {
       json: JSON
     }
@@ -33,14 +33,14 @@ export type ServiceBindingCrypto = {
 }
 
 export type ServiceBindingService = {
-  name: String
-  service?: String
-  kvNamespace?: String
-  r2Bucket?: String
+  name: string
+  service?: string
+  kvNamespace?: string
+  r2Bucket?: string
 }
 
 export type ServiceBindingBasic = {
-  name: String
+  name: string
   type: 'text' | 'json' | 'wasm' | 'data'
   value: any
 }
@@ -51,7 +51,7 @@ export type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | Servi
 // TODO: durable object namespace
 
 export interface ServicedExternal {
-  address: String
+  address: string
   http?: SocketHttp
   https?: SocketHttps
 }
@@ -63,27 +63,27 @@ export interface ServiceDisk {
 }
 
 export interface ServicedNetWork {
-  allow?: String[]
-  deny?: String[]
+  allow?: string[]
+  deny?: string[]
 }
 
 export interface ServiceCache {
-  id: String
+  id: string
 }
 
 export interface ServiceKv {
-  name: String
-  id: String
+  name: string
+  id: string
 }
 
 export interface ServicedWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
   modules?: ServiceModules[]
-  serviceWorkerScript?: String
+  serviceWorkerScript?: string
   loop?: LoopServices
   bindings?: ServiceBindings[]
-  cacheApiOutbound?: String
+  cacheApiOutbound?: string
   globalOutbound?: string
 }
 
@@ -101,8 +101,8 @@ export interface Service {
 }
 
 export interface Socket {
-  name: String
-  address: String
+  name: string
+  address: string
   https?: SocketHttps
   http?: SocketHttp
   service: string
@@ -110,8 +110,8 @@ export interface Socket {
 
 export type SocketHttps = {
   [keypair: string]: {
-    privateKey: String
-    certificateChain: String
+    privateKey: string
+    certificateChain: string
   }
 }
 

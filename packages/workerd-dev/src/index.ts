@@ -3,6 +3,7 @@ import { Observer } from './lib/observer'
 import { Runtime } from './lib/runtime'
 import { ProcessEvents } from './lib/event'
 import { Config } from './lib/config'
+import { WebsocketServer } from './lib/websocket'
 
 export class WorkerdDevServer {
   private options: ServerOptions = {}
@@ -21,24 +22,26 @@ export class WorkerdDevServer {
     // File changes
     this.observer = new Observer(this.options.dist)
     //  Initialize workerd process
-    await this.runtime.initialize()
+    //await this.runtime.initialize()
 
     // Initialize workers inspectors
     if (this.options.inspector?.port && this.options.worker.logs) {
-      new Inspector(this.options.inspector)
+      //new Inspector(this.options.inspector)
     }
 
-    // TODO: websocket server for autoReload
+    if (this.options.worker.autoReload) {
+      new WebsocketServer()
+    }
 
     // For Config generation
     if (this.options.config) {
-      this.config = new Config(this.options.config)
+      //this.config = new Config(this.options.config, this.options.worker)
     }
 
     // Track file changes and update workerd config binary
     ProcessEvents.on('changes', () => {
-      let buffer = this.config.getConfig()
-      this.runtime.write(buffer)
+      //let buffer = this.config.getConfig()
+      //this.runtime.write(buffer)
     })
   }
 }

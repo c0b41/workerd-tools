@@ -1,4 +1,5 @@
 import { WorkerdConfig } from '.'
+import { readFileSync } from 'fs'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
 import { Config, kVoid } from './config/workerd'
 import { Config as CapnpConfig } from './config/workerd.capnp.js'
@@ -17,7 +18,18 @@ export default class ConfigOutput {
     this.config = config
   }
 
-  private generateWorker(service: Service, struct: Struct) {
+  private readFile(path: string) {
+    let content = null
+    try {
+      content = readFileSync(path, 'utf-8')
+    } catch (error) {
+      console.log(error)
+    } finally {
+      return content
+    }
+  }
+
+  private generateWorker(service: Service, struct: Struct, internal: boolean) {
     // @ts-ignore
     let structServiceWorker = struct.initWorker()
 
@@ -140,7 +152,12 @@ export default class ConfigOutput {
     }
 
     if (service.worker.serviceWorkerScript) {
-      structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
+      if (internal) {
+        structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
+      } else {
+        let content = this.readFile(service.worker.serviceWorkerScript)
+        structServiceWorker.setServiceWorkerScript(content)
+      }
     }
 
     if (service.worker.modules) {
@@ -152,12 +169,30 @@ export default class ConfigOutput {
           moduleStruct.setName(module.name)
         }
 
-        if (module.esModule) {
-          moduleStruct.setEsModule(module.esModule)
+        if ('esModule' in module) {
+          let content = this.readFile(module.esModule)
+          moduleStruct.setEsModule(content)
         }
 
-        if (module.commonJs) {
-          moduleStruct.setCommonJsModule(module.commonJs)
+        if ('commonJsModule' in module) {
+          let content = this.readFile(module.commonJsModule)
+          moduleStruct.setCommonJsModule(content)
+        }
+
+        if ('text' in module) {
+          moduleStruct.setText(module.text)
+        }
+
+        if ('data' in module) {
+          moduleStruct.setData(module.data)
+        }
+
+        if ('json' in module) {
+          moduleStruct.setJson(module.json)
+        }
+
+        if ('wasm' in module) {
+          moduleStruct.setWasm(module.wasm)
         }
       })
 
@@ -239,16 +274,11 @@ export default class ConfigOutput {
     }
   }
 
-  private generateServices(struct: Struct) {
-    const allServices = [
-      ...this.config.pre_services,
-      ...this.config.dev_services,
-      ...this.config.services,
-    ]
-    let size = allServices.length ?? 0
+  private generateServices(servicesList: Service[], struct: Struct, internal: boolean = false) {
+    let size = servicesList.length ?? 0
     // @ts-ignore
     let services = struct.initServices(size)
-    allServices.forEach((service: Service, index: number) => {
+    servicesList.forEach((service: Service, index: number) => {
       // @ts-ignore
       let structService = services.get(index)
 
@@ -288,7 +318,7 @@ export default class ConfigOutput {
       }
 
       if (service.worker) {
-        this.generateWorker(service, structService)
+        this.generateWorker(service, structService, internal)
       }
     })
   }
@@ -374,7 +404,9 @@ export default class ConfigOutput {
     const message = new Message()
     const struct = message.initRoot(CapnpConfig)
 
-    this.generateServices(struct)
+    this.generateServices(this.config.pre_services, struct, true)
+    this.generateServices(this.config.dev_services, struct, true)
+    this.generateServices(this.config.services, struct)
     this.generateSockets(struct)
 
     if (type == 'buffer') {

@@ -10,7 +10,8 @@ new WorkerdDevServer({
         logs: true
     },
     worker: {
-        logs: true
+        logs: true,
+        autoReload: true
     },
     inspector: {
         port: 9229,

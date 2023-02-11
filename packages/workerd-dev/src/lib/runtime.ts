@@ -108,6 +108,7 @@ export class Runtime {
 
   private async dispose() {
     if (this.process) {
+      ProcessEvents.emit('exited')
       this.process.kill('SIGINT')
       this.process = null
     }
