@@ -1,0 +1,14 @@
+{
+  "name": "example",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "node ./workerd.dev.js"
+  },
+  "dependencies": {
+    "@c0b41/workerd-config": "0.0.1",
+    "@c0b41/workerd-dev": "0.0.1"
+  },
+  "devDependencies": {}
+}

@@ -1,5 +1,5 @@
 import * as dockerNames from 'docker-names'
-import { LoopBackServiceType, Service, Socket, WorkerdConfigOptions } from '../types/main'
+import { LoopBackServiceType, Service, Socket, WorkerdConfigOptions } from '../types'
 import ConfigOutput from './output'
 import { generateWorkerScript } from './utils'
 

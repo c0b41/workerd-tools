@@ -2,6 +2,7 @@ import childProcess from 'child_process'
 import pino, { BaseLogger } from 'pino'
 import rl from 'readline'
 import workerdPath from 'workerd'
+import { InspectorOptions, WorkerdOptions } from '../../types'
 import { ProcessEvents } from './event'
 
 //const errorReg = /(?<logpath>.*?)\s(?<level>.*?):(?<message>\s(.*?));\s(?<extra>.*)=\s(?<message2>.*?)\n/gm

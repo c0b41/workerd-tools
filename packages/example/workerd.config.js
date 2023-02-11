@@ -3,11 +3,6 @@ const { WorkerdConfig } = require('@c0b41/workerd-config')
 let config = new WorkerdConfig()
 
 config.Service({
-    name: 222,
-    bxx: 222
-})
-
-config.Service({
     name: 'internet',
     network: {
         allow: ['public', 'private', 'local', 'network'],
@@ -22,8 +17,7 @@ config.Service({
         modules: [
             {
                 name: 'worker.js',
-                esModule: true,
-                embed: 'sample/worker.js'
+                esModule: 'src/worker/worker.js'
             }
         ],
     }

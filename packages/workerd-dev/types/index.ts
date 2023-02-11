@@ -1,4 +1,4 @@
-interface ServerOptions {
+export interface ServerOptions {
   dist?: string
   config?: string
   inspector?: InspectorOptions
@@ -6,7 +6,7 @@ interface ServerOptions {
   worker?: WorkersOptions
 }
 
-type WorkerdOptions = {
+export type WorkerdOptions = {
   pwd?: string
   bin?: string
   verbose?: boolean
@@ -14,23 +14,23 @@ type WorkerdOptions = {
   logs?: boolean
 }
 
-type WorkersOptions = {
+export type WorkersOptions = {
   logs?: boolean
   prettyErrors?: boolean
   autoReload?: boolean
 }
 
-type ServerOptionsLoggin = {
+export type ServerOptionsLoggin = {
   workerd: boolean
   worker: boolean
 }
 
-interface InspectorOptions {
+export interface InspectorOptions {
   port?: number
-  excludes?: RegExp[]
+  excludes?: RegExp
 }
 
-interface InspectorSocketOptions {
+export interface InspectorSocketOptions {
   port: number
   name: string
 }

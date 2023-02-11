@@ -20,7 +20,7 @@ const typesConfig = {
     logLevel: 'debug'
 }
 
-new Generator(typesConfig).generate()
+new Generator(typesConfig, true, true).generate()
 
 if (isDev) {
     build({

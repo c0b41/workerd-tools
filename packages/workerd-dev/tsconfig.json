@@ -1,17 +1,15 @@
 {
    "compilerOptions": {
-      "module": "ES2020",
+      "module": "commonjs",
       "target": "ESNext",
+      "declarationDir": "types",
       "declaration": true,
-      "declarationMap": true,
       "emitDeclarationOnly": true,
-      "esModuleInterop": true,
-      "moduleResolution":"Node16",
-      "types": ["@types/node"]
+      "esModuleInterop": true
    },
    "include": [
       "src/**/*.ts",
-      "types/**/*.d.ts"
+      "types/**/*.ts"
    ],
    "exclude": ["node_modules", "dist"]
 }

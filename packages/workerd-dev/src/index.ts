@@ -4,6 +4,7 @@ import { Runtime } from './lib/runtime'
 import { ProcessEvents } from './lib/event'
 import { Config } from './lib/config'
 import { WebsocketServer } from './lib/websocket'
+import { ServerOptions } from '../types'
 
 export class WorkerdDevServer {
   private options: ServerOptions = {}

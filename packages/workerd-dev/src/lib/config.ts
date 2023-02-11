@@ -2,6 +2,8 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import { ConfigOutput, WorkerdConfig } from '@c0b41/workerd-config'
 import { generateWorkerScript } from '@c0b41/workerd-config'
+import { WorkersOptions } from '../../types'
+import { Service } from '@c0b41/workerd-config/types/index'
 
 export class Config {
   private path: string
@@ -27,8 +29,9 @@ export class Config {
       let dev_services = []
       this.instance.sockets = this.instance.sockets.map((socket) => {
         if (socket.address && socket.service) {
-          let service = {} as any // Todo type
-          service.name = `dev:${socket.service}`
+          let service: Service = {
+            name: `dev:${socket.service}`,
+          }
           service.worker = {
             serviceWorkerScript: generateWorkerScript('dev'),
             bindings: [

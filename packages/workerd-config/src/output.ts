@@ -1,7 +1,6 @@
 import { WorkerdConfig } from '.'
 import { readFileSync } from 'fs'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
-import { Config, kVoid } from './config/workerd'
 import { Config as CapnpConfig } from './config/workerd.capnp.js'
 import {
   ServiceBindings,
@@ -10,7 +9,7 @@ import {
   toJson,
   Service,
   Socket,
-} from '../types/main'
+} from '../types'
 
 export default class ConfigOutput {
   private config: WorkerdConfig | null
@@ -292,10 +291,20 @@ export default class ConfigOutput {
         if (service.network.allow) {
           let allowsize = service.network.allow.length ?? 0
           let structServiceNetworkAllow = structServiceNetwork.initAllow(allowsize)
-          service.network.allow.forEach((network, index) => {
+          service.network.allow.forEach((network: string, index: number) => {
             structServiceNetworkAllow.set(index, network)
           })
           structServiceNetwork.setAllow(structServiceNetworkAllow)
+        }
+
+        if (service.network.deny) {
+          let denysize = service.network.deny.length ?? 0
+          let structServiceNetworkDeny = structServiceNetwork.initDeny(denysize)
+          service.network.deny.forEach((network: string, index: number) => {
+            structServiceNetworkDeny.set(index, network)
+          })
+
+          structServiceNetwork.setDeny(structServiceNetworkDeny)
         }
       }
 

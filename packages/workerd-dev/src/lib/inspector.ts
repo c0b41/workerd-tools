@@ -4,6 +4,7 @@ import pino, { BaseLogger } from 'pino'
 import got from 'got'
 import { ProcessEvents } from './event'
 import { sleep } from '../lib/utils'
+import { InspectorOptions, InspectorSocketOptions } from '../../types'
 
 export const mapConsoleAPIMessageTypeToConsoleMethod: {
   [key in Protocol.Runtime.ConsoleAPICalledEvent['type']]: Exclude<keyof Console, 'Console'>
@@ -165,10 +166,8 @@ function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
 export class Inspector {
   private sockets: WebSocket[] = []
   private options: InspectorOptions = {}
-  private excludes: RegExp[] = []
   constructor(options: InspectorOptions) {
     this.options = options
-    this.excludes = [/loop:/, /dev:/, ...this.options.excludes]
     ProcessEvents.on('ready', () => {
       this.initialize()
     })
@@ -192,17 +191,20 @@ export class Inspector {
 
   private async fetchActiveWorkers() {
     let workers = new Set()
+    let defaultExclude = /(dev:|loop:)/
     try {
       let response = await got(`http://localhost:${this.options.port}/json/list`)
       if (response.body) {
         let list = JSON.parse(response.body)
 
-        this.excludes.forEach((reg) => {
-          list.forEach((worker) => {
-            if (!workers.has(worker) && !new RegExp(reg).test(worker)) {
-              workers.add(worker)
-            }
-          })
+        list.forEach((worker: string) => {
+          if (
+            !workers.has(worker) &&
+            (!new RegExp(defaultExclude).test(worker) ||
+              !new RegExp(this.options.excludes).test(worker))
+          ) {
+            workers.add(worker)
+          }
         })
       }
     } catch (error) {
