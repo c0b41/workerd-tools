@@ -1,5 +1,6 @@
 import { WorkerdConfig } from '.'
 import { readFileSync } from 'fs'
+import { parse } from 'path'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
 import { Config as CapnpConfig } from './config/workerd.capnp.js'
 import {
@@ -22,13 +23,13 @@ export default class ConfigOutput {
     try {
       content = readFileSync(path, 'utf-8')
     } catch (error) {
-      console.log(error)
+      //console.log(error)
     } finally {
       return content
     }
   }
 
-  private generateWorker(service: Service, struct: Struct, internal: boolean) {
+  private generateWorker(service: Service, struct: Struct) {
     // @ts-ignore
     let structServiceWorker = struct.initWorker()
 
@@ -151,11 +152,12 @@ export default class ConfigOutput {
     }
 
     if (service.worker.serviceWorkerScript) {
-      if (internal) {
-        structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
-      } else {
-        let content = this.readFile(service.worker.serviceWorkerScript)
+      // check for dev services
+      let content = this.readFile(service.worker.serviceWorkerScript)
+      if (content) {
         structServiceWorker.setServiceWorkerScript(content)
+      } else {
+        structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
       }
     }
 
@@ -273,7 +275,12 @@ export default class ConfigOutput {
     }
   }
 
-  private generateServices(servicesList: Service[], struct: Struct, internal: boolean = false) {
+  private generateServices(struct: Struct) {
+    let servicesList = [
+      ...this.config.pre_services,
+      ...this.config.dev_services,
+      ...this.config.services,
+    ]
     let size = servicesList.length ?? 0
     // @ts-ignore
     let services = struct.initServices(size)
@@ -327,7 +334,7 @@ export default class ConfigOutput {
       }
 
       if (service.worker) {
-        this.generateWorker(service, structService, internal)
+        this.generateWorker(service, structService)
       }
     })
   }
@@ -413,9 +420,7 @@ export default class ConfigOutput {
     const message = new Message()
     const struct = message.initRoot(CapnpConfig)
 
-    this.generateServices(this.config.pre_services, struct, true)
-    this.generateServices(this.config.dev_services, struct, true)
-    this.generateServices(this.config.services, struct)
+    this.generateServices(struct)
     this.generateSockets(struct)
 
     if (type == 'buffer') {

@@ -30,7 +30,7 @@ export class Observer {
 
       watcher.on('change', async (filePath) => {
         this.logger.info(`${filePath} has been updated.`)
-        ProcessEvents.emit('changes', null)
+        ProcessEvents.emit('reload')
       })
 
       watcher.on('error', (error) => this.logger.error(`Watcher error: ${error}`))

@@ -5,16 +5,16 @@ new WorkerdDevServer({
     config: './workerd.config.js',
     workerd: {
         //pwd: './sample',
-        //bin: './'
+        bin: 'workerd',
         verbose: true,
         logs: true
     },
     worker: {
         logs: true,
-        autoReload: true
+        autoReload: false,
+        prettyErrors: true
     },
     inspector: {
-        port: 9229,
-        excludes: ['loop']
+        port: 9229
     },
 })

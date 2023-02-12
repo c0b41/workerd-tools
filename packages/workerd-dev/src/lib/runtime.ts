@@ -14,17 +14,16 @@ export class Runtime {
   private args: string[] = [
     'serve',
     '--binary', // Required to use binary capnp config
-    '--watch', // Reload to process
     '--experimental',
+    '--watch',
   ]
   private options: WorkerdOptions
   private inspector: InspectorOptions
   private logger: BaseLogger
-  private ready: boolean = false
   constructor(options: WorkerdOptions, inspector: InspectorOptions) {
     this.options = options
     this.inspector = inspector
-    this.bin = workerdPath
+    this.bin = this.options.bin ?? workerdPath
 
     this.logger = pino({
       transport: {
@@ -33,14 +32,45 @@ export class Runtime {
       name: 'workerd',
     })
 
-    ProcessEvents.on('initialize', () => {
-      this.initialize()
+    ProcessEvents.on('config', (buffer) => {
+      this.write(buffer)
+    })
+
+    ProcessEvents.on('reload', async () => {
+      await this.initialize()
     })
   }
 
   public setArgs(args: string[]) {
     this.args = args
   }
+
+  public async initialize() {
+    await this.dispose()
+
+    const command = this.getCommand()
+    const args = this.getCommonArgs()
+    this.logger.info(`Workerd process arguments.. ${command} ${args.join(' ')}`)
+    const runtimeProcess = childProcess.spawn(command, args, {
+      cwd: this.options.pwd ?? process.cwd(),
+      stdio: 'pipe',
+    })
+    this.process = runtimeProcess
+
+    this.pipeOut()
+    this.cleanUp()
+
+    ProcessEvents.emit('started')
+  }
+
+  public write(message: Buffer) {
+    if (this.process) {
+      this.logger.info('Buffer writed to workerd process')
+      this.process.stdin.write(message)
+      this.process.stdin.end()
+    }
+  }
+
   private getCommonArgs(): string[] {
     let args = [...this.args]
     if (this.inspector?.port !== undefined) {
@@ -55,37 +85,22 @@ export class Runtime {
         args.push(arg)
       })
     }
+
+    args.push('-')
     return args
   }
+
   public setBin(bin: String) {
     this.bin = bin as string
   }
 
-  private getCommand(): string[] {
-    return [this.bin, ...this.getCommonArgs()]
-  }
-  public async initialize() {
-    await this.dispose()
-
-    const [command, ...args] = this.getCommand()
-    const runtimeProcess = childProcess.spawn(command, args, {
-      cwd: this.options.pwd ?? process.cwd(),
-      stdio: 'pipe',
-    })
-    this.process = runtimeProcess
-    await this.pipeOut()
-    await this.cleanUp()
+  private getCommand(): string {
+    return this.bin
   }
 
-  public write(message: Buffer) {
-    if (this.process) {
-      this.process.stdin.write(message)
-      this.process.stdin.end()
-    }
-  }
-
-  private async pipeOut() {
+  private pipeOut() {
     if (this.process && this.options.logs) {
+      this.logger.info('Workerd process started')
       const stdout = rl.createInterface(this.process.stdout)
       const stderr = rl.createInterface(this.process.stderr)
       stdout.on('line', (data) => {
@@ -102,8 +117,8 @@ export class Runtime {
   }
 
   private async cleanUp() {
-    return new Promise((resolve) => {
-      this.process.once('exit', () => resolve(null))
+    this.process.once('exit', () => {
+      ProcessEvents.emit('exited')
     })
   }
 

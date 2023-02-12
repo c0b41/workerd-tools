@@ -10,15 +10,16 @@ export class WebsocketServer {
       transport: {
         target: 'pino-pretty',
       },
-      name: `ws`,
+      name: `websocket`,
     })
-    ProcessEvents.on('reload', () => {
-      this.reload()
-    }).on('exited', () => {
+
+    ProcessEvents.on('exited', () => {
       this.close()
     })
 
-    this.initialize()
+    ProcessEvents.on('started', () => {
+      this.initialize()
+    })
   }
 
   private initialize() {

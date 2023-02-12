@@ -1,4 +1,4 @@
-const { WorkerdDevServer } = require('./dist')
+const { WorkerdDevServer } = require('@c0b41/workerd-dev')
 
 new WorkerdDevServer({
     dist: './src/worker/**.*',

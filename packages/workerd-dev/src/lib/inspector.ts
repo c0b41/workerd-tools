@@ -29,7 +29,7 @@ export const mapConsoleAPIMessageTypeToConsoleMethod: {
   endGroup: 'groupEnd',
 }
 
-function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
+function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent) {
   const args: string[] = []
   for (const ro of evt.args) {
     switch (ro.type) {
@@ -144,41 +144,55 @@ function logConsoleMessage(evt: Protocol.Runtime.ConsoleAPICalledEvent): void {
 
   const method = mapConsoleAPIMessageTypeToConsoleMethod[evt.type]
 
-  if (method in console) {
-    switch (method) {
-      case 'dir':
-        console.dir(args)
-        break
-      case 'table':
-        console.table(args)
-        break
-      default:
-        // eslint-disable-next-line prefer-spread
-        console[method].apply(console, args)
-        break
-    }
-  } else {
-    console.warn(`Unsupported console method: ${method}`)
-    console.log('console event:', evt)
-  }
+  //if (method in console) {
+  //  switch (method) {
+  //    case 'dir':
+  //      console.dir(args)
+  //      break
+  //    case 'table':
+  //      console.table(args)
+  //      break
+  //    default:
+  //      // eslint-disable-next-line prefer-spread
+  //      console[method].apply(console, args)
+  //      break
+  //  }
+  //} else {
+  //  console.warn(`Unsupported console method: ${method}`)
+  //  console.log('console event:', evt)
+  //}
+
+  return args
 }
 
 export class Inspector {
   private sockets: WebSocket[] = []
   private options: InspectorOptions = {}
+  private logger: BaseLogger | null = null
   constructor(options: InspectorOptions) {
     this.options = options
-    ProcessEvents.on('ready', () => {
-      this.initialize()
+
+    this.logger = pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+      name: `inspector`,
     })
 
     ProcessEvents.on('exited', () => {
       this.closeAll()
     })
+
+    ProcessEvents.on('started', () => {
+      this.initialize().then(() => {
+        this.logger.info('Inspector connection started')
+      })
+    })
   }
 
   private async initialize() {
-    // sleep(3000)
+    this.closeAll()
+    await sleep(3000)
     let workers = await this.fetchActiveWorkers()
 
     this.sockets = workers.map((worker: string) => {
@@ -197,18 +211,18 @@ export class Inspector {
       if (response.body) {
         let list = JSON.parse(response.body)
 
-        list.forEach((worker: string) => {
+        list.forEach((worker: { id: string }) => {
           if (
-            !workers.has(worker) &&
-            (!new RegExp(defaultExclude).test(worker) ||
-              !new RegExp(this.options.excludes).test(worker))
+            !workers.has(worker.id) &&
+            (!new RegExp(defaultExclude).test(worker.id) ||
+              !new RegExp(this.options.excludes).test(worker.id))
           ) {
-            workers.add(worker)
+            workers.add(worker.id)
           }
         })
       }
     } catch (error) {
-      console.log(error)
+      console.log(`Activer Worker list failed`)
     } finally {
       return Array.from(workers)
     }
@@ -243,17 +257,19 @@ class InspectorSocket {
 
   private connect() {
     let id = 0
+    let keepAliveInterval: NodeJS.Timer = null
     this.ws.addEventListener('open', () => {
-      this.send({ method: 'Runtime.enable', id: this.name })
-      this.send({ method: 'Network.enable', id: this.name })
+      this.send({ method: 'Runtime.enable', id: id++ })
+      this.send({ method: 'Network.enable', id: id++ })
 
-      let keepAliveInterval: NodeJS.Timer = setInterval(() => {
+      keepAliveInterval = setInterval(() => {
         this.send({
           method: 'Runtime.getIsolateId',
-          id: this.name,
+          id: id++,
         })
       }, 10_000)
-      this.logger.info(`Inspector connected.`)
+      this.logger.info(`${this.name} Inspector connected.`)
+      this.events()
     })
 
     this.ws.on('unexpected-response', () => {
@@ -263,6 +279,10 @@ class InspectorSocket {
        * so we'll just retry the connection process
        */
       //retryRemoteWebSocketConnection()
+    })
+
+    this.ws.addEventListener('close', () => {
+      clearInterval(keepAliveInterval)
     })
   }
 
@@ -275,7 +295,7 @@ class InspectorSocket {
           break
 
         case 'Runtime.consoleAPICalled':
-          logConsoleMessage(evt.params)
+          this.logger.info(logConsoleMessage(evt.params))
           break
         default:
           // others errors

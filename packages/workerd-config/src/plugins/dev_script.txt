@@ -13,27 +13,15 @@ const LIVE_RELOAD = `<script defer type="application/javascript">
 })();
 </script>`
 
-const errorResponse = (err) => (
-`<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<title>Error P</title>
-	</head>
-	<body>
-		<pre>${err.stack}</pre>
-	</body>
-</html>`
-)
 
 async function handleEvent(event) {
     const request = new Request(event.request);
     try {
-        let response = await ${SERVICE}.fetch(request);
+        let response = await SERVICE.fetch(request);
 
         if (
-        SERVICE_RELOAD !== undefined &&
-        response.headers.get("Content-Type")?.toLowerCase().includes("text/html")
+            SERVICE_RELOAD &&
+            response.headers.get("Content-Type")?.toLowerCase().includes("text/html")
         ) {
             const headers = new Headers(response.headers);
             const contentLength = parseInt(headers.get("content-length"));
@@ -58,7 +46,22 @@ async function handleEvent(event) {
 
         return response;
     } catch (e) {
-        return new Response(errorResponse(e));
+        let template = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Error P</title>
+</head>
+<body>
+    <pre>${e.stack}</pre>
+</body>
+</html>`
+        return new Response(template, {
+            status: 500,
+            headers: {
+                "content-type": "text/html; charset=utf-8",
+            }
+        })
     }
 }
 addEventListener("fetch", (event) => {

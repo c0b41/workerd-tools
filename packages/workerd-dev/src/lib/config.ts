@@ -1,9 +1,11 @@
 import { join } from 'path'
-import { existsSync } from 'fs'
+import { existsSync, writeFileSync } from 'fs'
 import { ConfigOutput, WorkerdConfig } from '@c0b41/workerd-config'
 import { generateWorkerScript } from '@c0b41/workerd-config'
 import { WorkersOptions } from '../../types'
 import { Service } from '@c0b41/workerd-config/types/index'
+import { ProcessEvents } from './event'
+import { requireUncached } from './utils'
 
 export class Config {
   private path: string
@@ -14,6 +16,11 @@ export class Config {
     this.workersOptions = workerOptions
 
     this.initialize()
+
+    ProcessEvents.on('started', () => {
+      let buffer = this.getConfig()
+      ProcessEvents.emit('config', buffer)
+    })
   }
 
   private initialize() {
@@ -34,6 +41,7 @@ export class Config {
           }
           service.worker = {
             serviceWorkerScript: generateWorkerScript('dev'),
+            compatibilityDate: '2022-09-16',
             bindings: [
               {
                 name: 'SERVICE',
@@ -42,13 +50,11 @@ export class Config {
             ],
           }
 
-          if (this.workersOptions.autoReload) {
-            service.worker.bindings.push({
-              name: 'SERVICE_RELOAD',
-              type: 'text',
-              value: true,
-            })
-          }
+          service.worker.bindings.push({
+            name: 'SERVICE_RELOAD',
+            type: 'text',
+            value: this.workersOptions.autoReload ? true : false,
+          })
           dev_services.push(service)
           socket.service = `dev:${socket.service}`
         }
@@ -60,12 +66,21 @@ export class Config {
     }
   }
 
+  private generateConfig() {
+    const configPath = join(process.cwd(), this.path)
+    try {
+      this.instance = requireUncached(configPath)
+      this.generateDevServices()
+    } catch (error) {
+      throw new Error(`${configPath} does not exist`)
+    }
+  }
+
   public getConfig(): Buffer {
     try {
-      const configPath = join(process.cwd(), this.path)
-      this.instance = require(configPath)
-      this.generateDevServices()
+      this.generateConfig()
       const output = new ConfigOutput(this.instance)
+      this.instance = null
       return output.toBuffer()
     } catch (error) {
       console.log(error)

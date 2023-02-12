@@ -18,31 +18,30 @@ export class WorkerdDevServer {
   }
 
   private async initialize() {
-    // Workerd process
-    this.runtime = new Runtime(this.options.workerd, this.options.inspector)
-    // File changes
-    this.observer = new Observer(this.options.dist)
-    //  Initialize workerd process
-    //await this.runtime.initialize()
+    try {
+      // Workerd process
+      this.runtime = new Runtime(this.options.workerd, this.options.inspector)
+      // File changes
+      this.observer = new Observer(this.options.dist)
 
-    // Initialize workers inspectors
-    if (this.options.inspector?.port && this.options.worker.logs) {
-      //new Inspector(this.options.inspector)
+      // For Config generation
+      if (this.options.config) {
+        this.config = new Config(this.options.config, this.options.worker)
+      }
+
+      // Initialize workers inspectors
+      if (this.options.inspector?.port && this.options?.worker?.logs) {
+        new Inspector(this.options.inspector)
+      }
+      //if (this.options.worker.autoReload) {
+      //  new WebsocketServer()
+      //}
+
+      //  Initialize workerd process
+      await this.runtime.initialize()
+    } catch (error) {
+      console.log(error)
+      process.exit()
     }
-
-    if (this.options.worker.autoReload) {
-      new WebsocketServer()
-    }
-
-    // For Config generation
-    if (this.options.config) {
-      //this.config = new Config(this.options.config, this.options.worker)
-    }
-
-    // Track file changes and update workerd config binary
-    ProcessEvents.on('changes', () => {
-      //let buffer = this.config.getConfig()
-      //this.runtime.write(buffer)
-    })
   }
 }

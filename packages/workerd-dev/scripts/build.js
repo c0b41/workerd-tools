@@ -32,7 +32,8 @@ if (isDev) {
         outfile: "dist/index.js",
         watch: true,
         minify: false,
-        sourcemap: true
+        sourcemap: true,
+        logLevel: 'info'
     });
 } else {
     build({
