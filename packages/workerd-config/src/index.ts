@@ -77,7 +77,7 @@ class WorkerdConfig {
           value: 'cache',
         },
         {
-          name: 'LOOP_NAMESPACE',
+          name: 'LOOP_CACHE_ID',
           type: 'text',
           value: id,
         },

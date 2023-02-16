@@ -3,7 +3,7 @@ addEventListener("fetch", (event) => {
     const url = new URL(request.url);
     const LoopBackPath = LOOP_PLUGIN_PATH ? LOOP_PLUGIN_PATH : '';
     url.pathname = `${LoopBackPath}/${LOOP_PLUGIN}/${encodeURIComponent(request.url)}`;
-    if (globalThis.LOOP_NAMESPACE !== undefined) request.headers.set("LOOP-NS", LOOP_NAMESPACE);
+    if (globalThis.LOOP_CACHE_ID !== undefined) request.headers.set("loop-cache-id", LOOP_CACHE_ID);
 
     event.respondWith(LOOP_SERVICE.fetch(url, request));
 });

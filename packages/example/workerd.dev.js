@@ -1,5 +1,6 @@
 const { WorkerdDevServer } = require('@c0b41/workerd-dev')
 
+/** @type { import("@c0b41/workerd-dev").WorkerdDevServer } */
 new WorkerdDevServer({
     dist: './src/worker/**.*',
     config: './workerd.config.js',
@@ -9,9 +10,9 @@ new WorkerdDevServer({
     },
     worker: {
         logs: true,
-        autoReload: true
+        autoReload: true,
     },
     inspector: {
-        port: 9229
-    },
+        port: 9229,
+    }
 })

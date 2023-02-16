@@ -1,5 +1,6 @@
 const { WorkerdConfig } = require('@c0b41/workerd-config')
 
+/** @type { import("@c0b41/workerd-config").WorkerdConfig } */
 let config = new WorkerdConfig()
 
 config.Service({
