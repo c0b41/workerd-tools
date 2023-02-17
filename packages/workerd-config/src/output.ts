@@ -10,6 +10,7 @@ import {
   toJson,
   Service,
   Socket,
+  DurableObjectNamespace,
 } from '../types'
 
 export default class ConfigOutput {
@@ -198,6 +199,40 @@ export default class ConfigOutput {
       })
 
       structServiceWorker.setModules(structServiceWorkerModules)
+    }
+
+    if (service.worker.durableObjectStorage) {
+      let structServiceWorkerDurableObjectStorage = structServiceWorker.initDurableObjectStorage()
+      if (service.worker.durableObjectStorage.inMemory) {
+        structServiceWorkerDurableObjectStorage.setInMemory()
+      }
+
+      if (service.worker.durableObjectStorage.localDisk) {
+        // TODO: update workerd.capnp for localdisk
+        // structServiceWorkerDurableObjectStorage.setLocalDisk(service.worker.durableObjectStorage.localDisk)
+      }
+    }
+
+    if (service.worker.durableObjectNamespaces) {
+      let nameSpacesSize = service.worker.durableObjectNamespaces.length ?? 0
+      let structServiceWorkerDurableObjectNamespaces =
+        structServiceWorker.initDurableObjectNamespaces(nameSpacesSize)
+
+      service.worker.durableObjectNamespaces.forEach(
+        (namespace: DurableObjectNamespace, index: number) => {
+          let namespaceStruct = structServiceWorkerDurableObjectNamespaces.get(index)
+
+          if (namespace.className) {
+            namespaceStruct.setClassName(namespace.className)
+          }
+
+          if (namespace.uniqueKey) {
+            namespaceStruct.setUniqueKey(namespace.uniqueKey)
+          }
+        }
+      )
+
+      structServiceWorker.setDurableObjectNamespaces(structServiceWorkerDurableObjectNamespaces)
     }
   }
 

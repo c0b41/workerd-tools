@@ -76,6 +76,16 @@ export interface ServiceKv {
   id: string
 }
 
+export interface DurableObjectNamespace {
+  className: string
+  uniqueKey: string
+}
+
+export interface DurableObjectStorage {
+  inMemory?: boolean
+  localDisk?: string
+}
+
 export interface ServicedWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
@@ -83,6 +93,8 @@ export interface ServicedWorker {
   serviceWorkerScript?: string
   loop?: LoopServices
   bindings?: ServiceBindings[]
+  durableObjectNamespaces?: DurableObjectNamespace[]
+  durableObjectStorage?: DurableObjectStorage
   cacheApiOutbound?: string
   globalOutbound?: string
 }
