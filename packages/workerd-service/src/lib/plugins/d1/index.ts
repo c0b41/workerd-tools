@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
-import { d1PluginOptions } from '../../../../types/main'
+import { d1PluginOptions } from '../../../../types/index'
 import d1Service from './service'
 
 let defaults = {

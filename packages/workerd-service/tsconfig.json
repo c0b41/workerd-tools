@@ -6,11 +6,12 @@
       "declarationMap": true,
       "emitDeclarationOnly": true,
       "esModuleInterop": true,
-      "moduleResolution":"Node16"
+      "moduleResolution":"Node16",
+      "checkJs": true,
    },
    "include": [
       "src/**/*.ts",
-      "types/**/*.d.ts"
+      "types/**/*.ts"
    ],
    "exclude": ["node_modules", "dist"]
 }

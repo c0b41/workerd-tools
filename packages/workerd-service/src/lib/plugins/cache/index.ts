@@ -1,21 +1,17 @@
 import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
-import { cachePluginOptions } from '../../../../types/main'
 import cacheService from './service'
+import CacheGateway from './gateway'
+import { cachePluginOptions } from '../../../../types/index'
 
 let defaults = {
   path: undefined,
-  gateway: null,
 }
 
 export default fp(async (app: FastifyInstance, opts: cachePluginOptions = defaults) => {
-  const {
-    path,
-    gateway = () => {
-      console.log('CACHE gateway')
-    },
-  } = opts
+  const { path } = opts
 
+  let gateway = new CacheGateway(app)
   const routes = cacheService(gateway)
 
   app.register(

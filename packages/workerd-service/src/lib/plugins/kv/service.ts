@@ -1,7 +1,7 @@
 //import { decodeKey } from './utils'
 import { PARAM_CACHE_TTL } from './constants'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { KvServiceRoutes, requestKvParams } from '../../../../types/main'
+import { KvServiceRoutes, requestKvParams } from '../../../../types/index'
 
 export default (gateway): KvServiceRoutes => ({
   listKv: async (request: FastifyRequest<{ Params: requestKvParams }>, reply: FastifyReply) => {

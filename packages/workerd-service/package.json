@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
+    "dev": "node ./dist/index.js",
     "build": "node ./scripts/build"
   },
   "files": [
@@ -14,7 +15,8 @@
     "chokidar": "^3.5.3",
     "docker-names": "^1.2.1",
     "fastify": "^4.10.2",
-    "fastify-plugin": "^4.4.0"
+    "fastify-plugin": "^4.4.0",
+    "fastify-sqlite": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.17",

@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
-import { kvPluginOptions } from '../../../../types/main'
+import { kvPluginOptions } from '../../../../types/index'
 import kvService from './service'
 
 let defaults = {
