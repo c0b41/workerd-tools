@@ -95,6 +95,7 @@ export interface ServicedWorker {
   bindings?: ServiceBindings[]
   durableObjectNamespaces?: DurableObjectNamespace[]
   durableObjectStorage?: DurableObjectStorage
+  durableObjectUniqueKeyModifier?: string
   cacheApiOutbound?: string
   globalOutbound?: string
 }

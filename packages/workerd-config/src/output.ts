@@ -38,6 +38,15 @@ export default class ConfigOutput {
       structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
     }
 
+    if (service.worker.compatibilityFlags) {
+      let flagsSize = service.worker.compatibilityFlags.length ?? 0
+      let structServiceWorkerCompatibilityFlags =
+        structServiceWorker.initCompatibilityFlags(flagsSize)
+      service.worker.compatibilityFlags.forEach((flag: string, index: number) => {
+        structServiceWorkerCompatibilityFlags.set(index, flag)
+      })
+    }
+
     if (service.worker.cacheApiOutbound) {
       let structServiceWorkerCacheApiOut = structServiceWorker.initCacheApiOutbound()
       structServiceWorkerCacheApiOut.setName(service.worker.cacheApiOutbound)
@@ -199,6 +208,12 @@ export default class ConfigOutput {
       })
 
       structServiceWorker.setModules(structServiceWorkerModules)
+    }
+
+    if (service.worker.durableObjectUniqueKeyModifier) {
+      structServiceWorker.setDurableObjectUniqueKeyModifier(
+        service.worker.durableObjectUniqueKeyModifier
+      )
     }
 
     if (service.worker.durableObjectStorage) {
