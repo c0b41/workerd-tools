@@ -208,8 +208,9 @@ export default class ConfigOutput {
       }
 
       if (service.worker.durableObjectStorage.localDisk) {
-        // TODO: update workerd.capnp for localdisk
-        // structServiceWorkerDurableObjectStorage.setLocalDisk(service.worker.durableObjectStorage.localDisk)
+        structServiceWorkerDurableObjectStorage.setLocalDisk(
+          service.worker.durableObjectStorage.localDisk
+        )
       }
     }
 

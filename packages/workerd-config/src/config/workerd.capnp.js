@@ -7,7 +7,7 @@ exports.TlsOptions = exports.TlsOptions_Version = exports.TlsOptions_Keypair = e
  */
 const capnp = require("capnp-ts");
 const capnp_ts_1 = require("capnp-ts");
-exports._capnpFileId = "e6afd26682091c01";
+exports._capnpFileId = BigInt("0xe6afd26682091c01");
 class Config extends capnp_ts_1.Struct {
     adoptServices(value) { capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(0, this)); }
     disownServices() { return capnp_ts_1.Struct.disown(this.getServices()); }
@@ -503,7 +503,7 @@ class Worker_Binding_CryptoKey extends capnp_ts_1.Struct {
     getAlgorithm() { return capnp_ts_1.Struct.getAs(Worker_Binding_CryptoKey_Algorithm, this); }
     initAlgorithm() { return capnp_ts_1.Struct.getAs(Worker_Binding_CryptoKey_Algorithm, this); }
     getExtractable() { return capnp_ts_1.Struct.getBit(32, this, Worker_Binding_CryptoKey._capnp.defaultExtractable); }
-    setExtractable(value) { capnp_ts_1.Struct.setBit(32, value, this); }
+    setExtractable(value) { capnp_ts_1.Struct.setBit(32, value, this, Worker_Binding_CryptoKey._capnp.defaultExtractable); }
     adoptUsages(value) { capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(2, this)); }
     disownUsages() { return capnp_ts_1.Struct.disown(this.getUsages()); }
     getUsages() { return capnp_ts_1.Struct.getList(2, capnp.Uint16List, this); }
@@ -785,19 +785,30 @@ var Worker_DurableObjectStorage_Which;
 (function (Worker_DurableObjectStorage_Which) {
     Worker_DurableObjectStorage_Which[Worker_DurableObjectStorage_Which["NONE"] = 0] = "NONE";
     Worker_DurableObjectStorage_Which[Worker_DurableObjectStorage_Which["IN_MEMORY"] = 1] = "IN_MEMORY";
+    Worker_DurableObjectStorage_Which[Worker_DurableObjectStorage_Which["LOCAL_DISK"] = 2] = "LOCAL_DISK";
 })(Worker_DurableObjectStorage_Which = exports.Worker_DurableObjectStorage_Which || (exports.Worker_DurableObjectStorage_Which = {}));
 class Worker_DurableObjectStorage extends capnp_ts_1.Struct {
     isNone() { return capnp_ts_1.Struct.getUint16(2, this) === 0; }
     setNone() { capnp_ts_1.Struct.setUint16(2, 0, this); }
     isInMemory() { return capnp_ts_1.Struct.getUint16(2, this) === 1; }
     setInMemory() { capnp_ts_1.Struct.setUint16(2, 1, this); }
+    getLocalDisk() {
+        capnp_ts_1.Struct.testWhich("localDisk", capnp_ts_1.Struct.getUint16(2, this), 2, this);
+        return capnp_ts_1.Struct.getText(8, this);
+    }
+    isLocalDisk() { return capnp_ts_1.Struct.getUint16(2, this) === 2; }
+    setLocalDisk(value) {
+        capnp_ts_1.Struct.setUint16(2, 2, this);
+        capnp_ts_1.Struct.setText(8, value, this);
+    }
     toString() { return "Worker_DurableObjectStorage_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(2, this); }
 }
 exports.Worker_DurableObjectStorage = Worker_DurableObjectStorage;
 Worker_DurableObjectStorage.NONE = Worker_DurableObjectStorage_Which.NONE;
 Worker_DurableObjectStorage.IN_MEMORY = Worker_DurableObjectStorage_Which.IN_MEMORY;
-Worker_DurableObjectStorage._capnp = { displayName: "durableObjectStorage", id: "cc72b3faa57827d4", size: new capnp_ts_1.ObjectSize(8, 8) };
+Worker_DurableObjectStorage.LOCAL_DISK = Worker_DurableObjectStorage_Which.LOCAL_DISK;
+Worker_DurableObjectStorage._capnp = { displayName: "durableObjectStorage", id: "cc72b3faa57827d4", size: new capnp_ts_1.ObjectSize(8, 9) };
 var Worker_Which;
 (function (Worker_Which) {
     Worker_Which[Worker_Which["MODULES"] = 0] = "MODULES";
@@ -888,7 +899,7 @@ Worker.INHERIT = Worker_Which.INHERIT;
 Worker.Module = Worker_Module;
 Worker.Binding = Worker_Binding;
 Worker.DurableObjectNamespace = Worker_DurableObjectNamespace;
-Worker._capnp = { displayName: "Worker", id: "acfa77e88fd97d1c", size: new capnp_ts_1.ObjectSize(8, 8), defaultGlobalOutbound: capnp.readRawPointer(new Uint8Array([0x10, 0x05, 0x40, 0x02, 0x11, 0x05, 0x4a, 0x00, 0x00, 0xff, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x65, 0x74, 0x00, 0x00, 0x00]).buffer) };
+Worker._capnp = { displayName: "Worker", id: "acfa77e88fd97d1c", size: new capnp_ts_1.ObjectSize(8, 9), defaultGlobalOutbound: capnp.readRawPointer(new Uint8Array([0x10, 0x05, 0x40, 0x02, 0x11, 0x05, 0x4a, 0x00, 0x00, 0xff, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x65, 0x74, 0x00, 0x00, 0x00]).buffer) };
 class ExternalServer_Https extends capnp_ts_1.Struct {
     adoptOptions(value) { capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(1, this)); }
     disownOptions() { return capnp_ts_1.Struct.disown(this.getOptions()); }
@@ -979,9 +990,9 @@ class DiskDirectory extends capnp_ts_1.Struct {
     getPath() { return capnp_ts_1.Struct.getText(0, this); }
     setPath(value) { capnp_ts_1.Struct.setText(0, value, this); }
     getWritable() { return capnp_ts_1.Struct.getBit(0, this, DiskDirectory._capnp.defaultWritable); }
-    setWritable(value) { capnp_ts_1.Struct.setBit(0, value, this); }
+    setWritable(value) { capnp_ts_1.Struct.setBit(0, value, this, DiskDirectory._capnp.defaultWritable); }
     getAllowDotfiles() { return capnp_ts_1.Struct.getBit(1, this, DiskDirectory._capnp.defaultAllowDotfiles); }
-    setAllowDotfiles(value) { capnp_ts_1.Struct.setBit(1, value, this); }
+    setAllowDotfiles(value) { capnp_ts_1.Struct.setBit(1, value, this, DiskDirectory._capnp.defaultAllowDotfiles); }
     toString() { return "DiskDirectory_" + super.toString(); }
 }
 exports.DiskDirectory = DiskDirectory;
@@ -1002,7 +1013,7 @@ exports.HttpOptions_Header = HttpOptions_Header;
 HttpOptions_Header._capnp = { displayName: "Header", id: "dc0394b5a6f3417e", size: new capnp_ts_1.ObjectSize(0, 2) };
 class HttpOptions extends capnp_ts_1.Struct {
     getStyle() { return capnp_ts_1.Struct.getUint16(0, this, HttpOptions._capnp.defaultStyle); }
-    setStyle(value) { capnp_ts_1.Struct.setUint16(0, value, this); }
+    setStyle(value) { capnp_ts_1.Struct.setUint16(0, value, this, HttpOptions._capnp.defaultStyle); }
     getForwardedProtoHeader() { return capnp_ts_1.Struct.getText(0, this); }
     setForwardedProtoHeader(value) { capnp_ts_1.Struct.setText(0, value, this); }
     getCfBlobHeader() { return capnp_ts_1.Struct.getText(1, this); }
@@ -1051,9 +1062,9 @@ class TlsOptions extends capnp_ts_1.Struct {
     initKeypair() { return capnp_ts_1.Struct.initStructAt(0, TlsOptions_Keypair, this); }
     setKeypair(value) { capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(0, this)); }
     getRequireClientCerts() { return capnp_ts_1.Struct.getBit(0, this, TlsOptions._capnp.defaultRequireClientCerts); }
-    setRequireClientCerts(value) { capnp_ts_1.Struct.setBit(0, value, this); }
+    setRequireClientCerts(value) { capnp_ts_1.Struct.setBit(0, value, this, TlsOptions._capnp.defaultRequireClientCerts); }
     getTrustBrowserCas() { return capnp_ts_1.Struct.getBit(1, this, TlsOptions._capnp.defaultTrustBrowserCas); }
-    setTrustBrowserCas(value) { capnp_ts_1.Struct.setBit(1, value, this); }
+    setTrustBrowserCas(value) { capnp_ts_1.Struct.setBit(1, value, this, TlsOptions._capnp.defaultTrustBrowserCas); }
     adoptTrustedCertificates(value) { capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(1, this)); }
     disownTrustedCertificates() { return capnp_ts_1.Struct.disown(this.getTrustedCertificates()); }
     getTrustedCertificates() { return capnp_ts_1.Struct.getList(1, capnp.TextList, this); }
@@ -1061,7 +1072,7 @@ class TlsOptions extends capnp_ts_1.Struct {
     initTrustedCertificates(length) { return capnp_ts_1.Struct.initList(1, capnp.TextList, length, this); }
     setTrustedCertificates(value) { capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(1, this)); }
     getMinVersion() { return capnp_ts_1.Struct.getUint16(2, this, TlsOptions._capnp.defaultMinVersion); }
-    setMinVersion(value) { capnp_ts_1.Struct.setUint16(2, value, this); }
+    setMinVersion(value) { capnp_ts_1.Struct.setUint16(2, value, this, TlsOptions._capnp.defaultMinVersion); }
     getCipherList() { return capnp_ts_1.Struct.getText(2, this); }
     setCipherList(value) { capnp_ts_1.Struct.setText(2, value, this); }
     toString() { return "TlsOptions_" + super.toString(); }
