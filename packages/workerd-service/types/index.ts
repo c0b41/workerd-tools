@@ -1,8 +1,11 @@
 import { RequestGenericInterface, RouteHandler } from 'fastify'
+import { Response } from '@whatwg-node/fetch'
 
 export interface sqliteFunc {
   all: Function
   get: Function
+  exec: Function
+  run: Function
 }
 
 declare module 'fastify' {
@@ -58,11 +61,12 @@ export interface StoredMeta<Meta = unknown> {
 }
 
 export interface IEBaseGateway {
-  onStart(): void
+  onReady?(): Promise<void>
+  onClose?(): Promise<void>
 }
 
 export interface IECacheGateway extends IEBaseGateway {
-  getCache(): void
+  getCache(cacheID: string, namespace: string, key: string): Promise<Response>
   putCache(): void
   deleteCache(): void
 }

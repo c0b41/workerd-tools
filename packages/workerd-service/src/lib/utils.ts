@@ -1,19 +1,28 @@
 // https://www.npmjs.com/package/sqlite
 
-import { FastifyInstance } from 'fastify'
-import { IEKvGateway, sqliteFunc, StoredMeta } from '../../types/index'
+import { sqliteFunc } from '../../types/index'
 
-class KvGateway implements IEKvGateway {
-  private readonly instance: FastifyInstance
-  constructor(instance: FastifyInstance) {
-    this.instance = instance
+export class DBHelper {
+  private readonly db: sqliteFunc
+  constructor(sql) {
+    this.db = sql
   }
 
-  onStart(): void {}
-  listKv(): void {}
-  getKv(): void {}
-  putKv(): void {}
-  deleteKv(): void {}
-}
+  public async find(query: string, params: Object): Promise<Object | null> {
+    let result = await this.db.get(query, params)
+    return result ? result : null
+  }
 
-export { KvGateway }
+  public async findAll(query: string, params: Object): Promise<[Object] | null> {
+    let result = await this.db.all(query, params)
+    return result ? result : null
+  }
+
+  public async run(query: string) {
+    return await this.db.run(query)
+  }
+
+  public async exec(query: string) {
+    return await this.db.exec(query)
+  }
+}

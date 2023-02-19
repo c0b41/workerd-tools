@@ -24,8 +24,8 @@ export default (gateway: IECacheGateway): CacheServiceRoutes => ({
     // set response header "CF-Cache-Status", "HIT"
 
     // check request headers if everthing is ok return cached response
-    let result = await gateway.match()
-    console.log(result)
+    //let result = await gateway.match()
+    //console.log(result)
 
     return reply.send('')
   },

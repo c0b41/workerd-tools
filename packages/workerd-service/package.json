@@ -12,6 +12,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
+    "@whatwg-node/fetch": "^0.8.1",
     "chokidar": "^3.5.3",
     "docker-names": "^1.2.1",
     "fastify": "^4.10.2",
