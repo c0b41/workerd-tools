@@ -5,7 +5,8 @@
     "patch": "patch-package"
   },
   "devDependencies": {
-    "lerna": "3.22.1"
+    "lerna": "3.22.1",
+    "patch-package": "^6.5.0"
   },
   "workspaces": [
     "packages/*"
