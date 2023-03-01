@@ -1,0 +1,19 @@
+version: "3.6"
+services:
+  worker:
+    container_name: myapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+      - NODE_ENV=production
+      - WORKERD_ENV=production
+    #environment:
+    ports:
+      - 8080:8080
+      - 443:443
+    restart: always
+    networks:
+      - web
+networks:
+  web:

@@ -1,1 +1,15 @@
-### workerd-tools
+## workerd-tools
+
+Some workerd tools for self hosted.
+
+[workerd-config](https://github.com/c0b41/workerd-tools/tree/master/packages/workerd-config)
+
+workerd config generator, javascript to capnp binary format
+
+[workerd-dev](https://github.com/c0b41/workerd-tools/tree/master/packages/workerd-dev)
+
+simple workerd dev server. file changes, auto restart etc.
+
+[workerd-service](https://github.com/c0b41/workerd-tools/tree/master/packages/workerd-service)
+
+self hosted version of cloudflare products. cache,kv etc.
