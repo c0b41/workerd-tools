@@ -18,9 +18,22 @@ config.Service({
         modules: [
             {
                 name: 'worker.js',
-                esModule: 'src/worker/worker.js'
+                type: 'esModule',
+                path: 'src/worker/worker.js'
             }
         ],
+        bindings: [
+            {
+                name: 'test',
+                type: 'text',
+                content: 'hi'
+            },
+            {
+                name: 'test2',
+                type: 'json',
+                content: JSON.stringify({ foo: 'bar' })
+            }
+        ]
     }
 })
 

@@ -20,13 +20,10 @@ export default class ConfigOutput {
   }
 
   private readFile(path: string) {
-    let content = null
     try {
-      content = readFileSync(path, 'utf-8')
+      return readFileSync(path, 'utf-8')
     } catch (error) {
-      //console.log(error)
-    } finally {
-      return content
+      throw new Error(`${path} doesn't exist or failed read`)
     }
   }
 
@@ -60,115 +57,17 @@ export default class ConfigOutput {
     }
 
     if (service.worker.bindings) {
-      let bindingSize = service.worker.bindings.length ?? 0
-      let structServiceWorkerBindings = structServiceWorker.initBindings(bindingSize)
-      service.worker.bindings.forEach((binding: ServiceBindings, index: number) => {
-        // @ts-ignore
-        let structServiceWorkerBinding = structServiceWorkerBindings.get(index)
-
-        if ('type' in binding) {
-          switch (binding.type) {
-            case 'text':
-              structServiceWorkerBinding.setText(binding.value)
-              break
-            case 'data':
-              let structServiceWorkerBindingData = structServiceWorkerBinding.initData(
-                binding.value.byteLength
-              )
-              structServiceWorkerBindingData.copyBuffer(binding.value)
-              structServiceWorkerBinding.setData(structServiceWorkerBindingData)
-              break
-            case 'json':
-              structServiceWorkerBinding.setJson(binding.value)
-              break
-            case 'wasm':
-              structServiceWorkerBinding.setWasm(binding.value)
-            default:
-              break
-          }
-        }
-
-        if ('service' in binding) {
-          let structServiceWorkerBindingService = structServiceWorkerBinding.initService()
-          structServiceWorkerBindingService.setName(binding.service)
-          structServiceWorkerBinding.setService(structServiceWorkerBindingService)
-        }
-
-        if ('kvNamespace' in binding) {
-          let structServiceWorkerBindingKV = structServiceWorkerBinding.initKvNamespace()
-          structServiceWorkerBindingKV.setName(binding.kvNamespace)
-          structServiceWorkerBinding.setKvNamespace(structServiceWorkerBindingKV)
-        }
-
-        if ('r2Bucket' in binding) {
-          let structServiceWorkerBindingR2 = structServiceWorkerBinding.initR2Bucket()
-          structServiceWorkerBindingR2.setName(binding.r2Bucket)
-          structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
-        }
-
-        if ('cryptoKey' in binding) {
-          let structServiceWorkerBindingCrypto = structServiceWorkerBinding.initCryptoKey()
-
-          if (binding.cryptoKey.raw) {
-            structServiceWorkerBindingCrypto.setRaw(binding.cryptoKey.raw)
-          }
-
-          if (binding.cryptoKey.base64) {
-            structServiceWorkerBindingCrypto.setBase64(binding.cryptoKey.base64)
-          }
-
-          if (binding.cryptoKey.hex) {
-            structServiceWorkerBindingCrypto.setHex(binding.cryptoKey.hex)
-          }
-
-          if (binding.cryptoKey.jwk) {
-            structServiceWorkerBindingCrypto.setJwk(binding.cryptoKey.jwk)
-          }
-
-          if (binding.cryptoKey.pkcs8) {
-            structServiceWorkerBindingCrypto.setPkcs8(binding.cryptoKey.pkcs8)
-          }
-
-          if (binding.cryptoKey.spki) {
-            structServiceWorkerBindingCrypto.setSpki(binding.cryptoKey.spki)
-          }
-
-          if (binding.cryptoKey.algorithm && binding.cryptoKey.algorithm.json) {
-            let structServiceWorkerBindingCryptoAlgo =
-              structServiceWorkerBindingCrypto.initAlgorithm()
-            structServiceWorkerBindingCryptoAlgo.setJson(binding.cryptoKey.algorithm.json)
-          }
-
-          if (binding.cryptoKey.usages && binding.cryptoKey.usages.length > 0) {
-            let usagesSize = binding.cryptoKey.usages.length ?? 0
-            let structServiceWorkerBindingCryptoUsages =
-              structServiceWorkerBindingCrypto.initUsages(usagesSize)
-
-            binding.cryptoKey.usages.forEach((usage: string, index: number) => {
-              structServiceWorkerBindingCryptoUsages.set(index, usage)
-            })
-          }
-
-          if (binding.cryptoKey.extractable) {
-            structServiceWorkerBindingCrypto.setExtractable(binding.cryptoKey.extractable)
-          }
-
-          structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
-        }
-
-        structServiceWorkerBinding.setName(binding.name)
-        structServiceWorkerBindings.set(index, structServiceWorkerBinding)
-      })
+      this.generateBinding(service.worker.bindings, structServiceWorker)
     }
 
     if (service.worker.serviceWorkerScript) {
-      // check for dev services
-      let content = this.readFile(service.worker.serviceWorkerScript)
-      if (content) {
-        structServiceWorker.setServiceWorkerScript(content)
-      } else {
-        structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript)
+      let content = service.worker.serviceWorkerScript.content ?? null
+
+      if (service.worker.serviceWorkerScript.path) {
+        content = this.readFile(service.worker.serviceWorkerScript.path)
       }
+
+      structServiceWorker.setServiceWorkerScript(content)
     }
 
     if (service.worker.modules) {
@@ -180,30 +79,31 @@ export default class ConfigOutput {
           moduleStruct.setName(module.name)
         }
 
-        if ('esModule' in module) {
-          let content = this.readFile(module.esModule)
-          moduleStruct.setEsModule(content)
+        let content = module.content ?? null
+        if (module.path) {
+          content = this.readFile(module.path)
         }
-
-        if ('commonJsModule' in module) {
-          let content = this.readFile(module.commonJsModule)
-          moduleStruct.setCommonJsModule(content)
-        }
-
-        if ('text' in module) {
-          moduleStruct.setText(module.text)
-        }
-
-        if ('data' in module) {
-          moduleStruct.setData(module.data)
-        }
-
-        if ('json' in module) {
-          moduleStruct.setJson(module.json)
-        }
-
-        if ('wasm' in module) {
-          moduleStruct.setWasm(module.wasm)
+        switch (module.type) {
+          case 'esModule':
+            moduleStruct.setEsModule(content)
+            break
+          case 'commonJsModule':
+            moduleStruct.setCommonJsModule(content)
+            break
+          case 'text':
+            moduleStruct.setText(content)
+            break
+          case 'data':
+            moduleStruct.setData(content)
+            break
+          case 'json':
+            moduleStruct.setJson(content)
+            break
+          case 'wasm':
+            moduleStruct.setWasm(content)
+            break
+          default:
+            throw new Error('Unknow module type')
         }
       })
 
@@ -314,16 +214,145 @@ export default class ConfigOutput {
       if (service.external.https.keypair) {
         let structSocketHttpsTls = structServiceExternalHttps.initTlsOptions()
         let structSocketHttpsKeypair = structServiceExternalHttps.initKeypair()
-        structSocketHttpsKeypair.setPrivateKey(service.external.https.keypair.privateKey)
-        structSocketHttpsKeypair.setCertificateChain(
-          service.external.https.keypair.certificateChain
-        )
+
+        let privateKeyContent = service.external.https.keypair.privateKey.content ?? null
+
+        if (service.external.https.keypair.privateKey.path) {
+          privateKeyContent = this.readFile(service.external.https.keypair.privateKey.path)
+        }
+
+        structSocketHttpsKeypair.setPrivateKey(privateKeyContent)
+
+        let certificateChainContent =
+          service.external.https.keypair.certificateChain.content ?? null
+
+        if (service.external.https.keypair.certificateChain.path) {
+          certificateChainContent = this.readFile(
+            service.external.https.keypair.certificateChain.path
+          )
+        }
+
+        structSocketHttpsKeypair.setCertificateChain(certificateChainContent)
         structSocketHttpsTls.setKeypair(structSocketHttpsKeypair)
         structServiceExternalHttps.setTlsOptions(structSocketHttpsTls)
       }
 
       structServiceExternal.setHttps(structServiceExternalHttps)
     }
+  }
+
+  private generateBinding(bindings: ServiceBindings[], struct: Struct) {
+    let bindingSize = bindings.length ?? 0
+    // @ts-ignore
+    let structServiceWorkerBindings = struct.initBindings(bindingSize)
+    bindings.forEach((binding: ServiceBindings, index: number) => {
+      // @ts-ignore
+      let structServiceWorkerBinding = structServiceWorkerBindings.get(index)
+
+      if ('type' in binding) {
+        let bindingContent = binding.content ?? ''
+        if (binding.path) {
+          bindingContent = this.readFile(binding.path)
+        }
+        switch (binding.type) {
+          case 'text':
+            structServiceWorkerBinding.setText(bindingContent)
+            break
+          case 'data':
+            let structServiceWorkerBindingData = structServiceWorkerBinding.initData(bindingContent)
+            structServiceWorkerBindingData.copyBuffer(bindingContent)
+            structServiceWorkerBinding.setData(structServiceWorkerBindingData)
+            break
+          case 'json':
+            structServiceWorkerBinding.setJson(bindingContent)
+            break
+          case 'wasm':
+            structServiceWorkerBinding.setWasm(bindingContent)
+          default:
+            throw new Error(`Unknow binding Type ${binding.type}`)
+        }
+      }
+
+      if ('service' in binding) {
+        let structServiceWorkerBindingService = structServiceWorkerBinding.initService()
+        structServiceWorkerBindingService.setName(binding.service)
+        structServiceWorkerBinding.setService(structServiceWorkerBindingService)
+      }
+
+      if ('kvNamespace' in binding) {
+        let structServiceWorkerBindingKV = structServiceWorkerBinding.initKvNamespace()
+        structServiceWorkerBindingKV.setName(binding.kvNamespace)
+        structServiceWorkerBinding.setKvNamespace(structServiceWorkerBindingKV)
+      }
+
+      if ('r2Bucket' in binding) {
+        let structServiceWorkerBindingR2 = structServiceWorkerBinding.initR2Bucket()
+        structServiceWorkerBindingR2.setName(binding.r2Bucket)
+        structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
+      }
+
+      if ('cryptoKey' in binding) {
+        let structServiceWorkerBindingCrypto = structServiceWorkerBinding.initCryptoKey()
+
+        if (binding.cryptoKey.raw) {
+          structServiceWorkerBindingCrypto.setRaw(binding.cryptoKey.raw)
+        }
+
+        if (binding.cryptoKey.base64) {
+          structServiceWorkerBindingCrypto.setBase64(binding.cryptoKey.base64)
+        }
+
+        if (binding.cryptoKey.hex) {
+          structServiceWorkerBindingCrypto.setHex(binding.cryptoKey.hex)
+        }
+
+        if (binding.cryptoKey.jwk) {
+          structServiceWorkerBindingCrypto.setJwk(binding.cryptoKey.jwk)
+        }
+
+        if (binding.cryptoKey.pkcs8) {
+          structServiceWorkerBindingCrypto.setPkcs8(binding.cryptoKey.pkcs8)
+        }
+
+        if (binding.cryptoKey.spki) {
+          structServiceWorkerBindingCrypto.setSpki(binding.cryptoKey.spki)
+        }
+
+        if (binding.cryptoKey.algorithm && binding.cryptoKey.algorithm.json) {
+          let structServiceWorkerBindingCryptoAlgo =
+            structServiceWorkerBindingCrypto.initAlgorithm()
+          structServiceWorkerBindingCryptoAlgo.setJson(binding.cryptoKey.algorithm.json)
+        }
+
+        if (binding.cryptoKey.usages && binding.cryptoKey.usages.length > 0) {
+          let usagesSize = binding.cryptoKey.usages.length ?? 0
+          let structServiceWorkerBindingCryptoUsages =
+            structServiceWorkerBindingCrypto.initUsages(usagesSize)
+
+          binding.cryptoKey.usages.forEach((usage: string, index: number) => {
+            structServiceWorkerBindingCryptoUsages.set(index, usage)
+          })
+        }
+
+        if (binding.cryptoKey.extractable) {
+          structServiceWorkerBindingCrypto.setExtractable(binding.cryptoKey.extractable)
+        }
+
+        structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
+      }
+
+      if ('wrapped' in binding) {
+        // https://github.com/cloudflare/workerd/pull/413
+        // TODO: wait for relase
+        // structServiceWorkerBinding.setWrapWith(binding.wrapWith)
+        //if (binding.wrapped.innerBindings) {
+        //  this.generateBinding(binding.wrapped.innerBindings, null)
+        //}
+      }
+
+      structServiceWorkerBinding.setName(binding.name)
+      structServiceWorkerBindings.set(index, structServiceWorkerBinding)
+    })
   }
 
   private generateServices(struct: Struct) {
@@ -416,8 +445,22 @@ export default class ConfigOutput {
         if (socket.https.keypair) {
           let structSocketHttpsTls = structSocketHttps.initTlsOptions()
           let structSocketHttpsKeypair = structSocketHttpsTls.initKeypair()
-          structSocketHttpsKeypair.setPrivateKey(socket.https.keypair.privateKey)
-          structSocketHttpsKeypair.setCertificateChain(socket.https.keypair.certificateChain)
+
+          let privateKeyContent = socket.https.keypair.privateKey.content ?? null
+
+          if (socket.https.keypair.privateKey.path) {
+            privateKeyContent = this.readFile(socket.https.keypair.privateKey.path)
+          }
+
+          structSocketHttpsKeypair.setPrivateKey(privateKeyContent)
+
+          let certificateChainContent = socket.https.keypair.certificateChain.content ?? null
+
+          if (socket.https.keypair.certificateChain.path) {
+            certificateChainContent = this.readFile(socket.https.keypair.certificateChain.path)
+          }
+
+          structSocketHttpsKeypair.setCertificateChain(certificateChainContent)
           structSocketHttpsTls.setKeypair(structSocketHttpsKeypair)
           structSocketHttps.setTlsOptions(structSocketHttpsTls)
         }
@@ -467,26 +510,18 @@ export default class ConfigOutput {
     })
   }
 
-  private generate(type: 'buffer' | 'str'): Buffer {
+  private generate(): Buffer {
     const message = new Message()
     const struct = message.initRoot(CapnpConfig)
 
     this.generateServices(struct)
     this.generateSockets(struct)
 
-    if (type == 'buffer') {
-      return Buffer.from(message.toArrayBuffer())
-    } else {
-      return Buffer.from(message.toString())
-    }
+    return Buffer.from(message.toArrayBuffer())
   }
 
   toBuffer(): Buffer {
-    return this.generate('buffer')
-  }
-
-  toString(): Buffer {
-    return this.generate('str')
+    return this.generate()
   }
 
   toJson(): toJson {

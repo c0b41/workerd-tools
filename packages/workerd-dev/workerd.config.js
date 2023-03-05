@@ -17,7 +17,8 @@ config.Service({
         modules: [
             {
                 name: 'worker.js',
-                esModule: 'sample/worker.js'
+                type: 'esModule',
+                path: 'sample/worker.js'
             }
         ],
     }

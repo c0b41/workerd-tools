@@ -40,7 +40,9 @@ export class Config {
             name: `dev:${socket.service}`,
           }
           service.worker = {
-            serviceWorkerScript: generateWorkerScript('dev'),
+            serviceWorkerScript: {
+              content: generateWorkerScript('dev'),
+            },
             compatibilityDate: '2022-09-16',
             bindings: [
               {

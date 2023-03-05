@@ -7,13 +7,20 @@ export interface WorkerdConfigOptions {
   loopback?: LoopBackOptions
 }
 
-export type ServiceModules =
-  | { name: string; esModule?: string }
-  | { name: string; commonJsModule?: string }
-  | { name: string; text?: string }
-  | { name: string; data?: Uint8Array }
-  | { name: string; wasm?: Uint8Array }
-  | { name: string; json?: string }
+export type ModuleType = 'esModule' | 'commonJsModule' | 'text' | 'data' | 'wasm' | 'json'
+
+export type ServiceModules = {
+  name: string
+  type: ModuleType
+  path?: string
+  content?: Uint8Array | string
+}
+// | { name: string; esModule?: string }
+// | { name: string; commonJsModule?: string }
+// | { name: string; text?: string }
+// | { name: string; data?: Uint8Array }
+// | { name: string; wasm?: Uint8Array }
+// | { name: string; json?: string }
 
 export type ServiceBindingCrypto = {
   name: string
@@ -42,10 +49,25 @@ export type ServiceBindingService = {
 export type ServiceBindingBasic = {
   name: string
   type: 'text' | 'json' | 'wasm' | 'data'
-  value: any
+  content?: Uint8Array | string
+  path?: string
 }
 
-export type ServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService
+// https://github.com/cloudflare/workerd/pull/413
+// TODO: wait for relase
+export type ServiceBindingWrapped = {
+  name: string
+  wrapped: {
+    wrapWith: string
+    innerBindings: ServiceBindings[]
+  }
+}
+
+export type ServiceBindings =
+  | ServiceBindingBasic
+  | ServiceBindingCrypto
+  | ServiceBindingService
+  | ServiceBindingWrapped
 
 // https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B
 // TODO: durable object namespace
@@ -76,6 +98,16 @@ export interface ServiceKv {
   id: string
 }
 
+export interface ServiceDatabase {
+  name: string
+  id: string
+}
+
+export interface ServiceAnalytics {
+  name: string
+  id: string
+}
+
 export interface DurableObjectNamespace {
   className: string
   uniqueKey: string
@@ -90,7 +122,10 @@ export interface ServicedWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
   modules?: ServiceModules[]
-  serviceWorkerScript?: string
+  serviceWorkerScript?: {
+    path?: string
+    content?: Uint8Array | string
+  }
   loop?: LoopServices
   bindings?: ServiceBindings[]
   durableObjectNamespaces?: DurableObjectNamespace[]
@@ -103,6 +138,8 @@ export interface ServicedWorker {
 export interface LoopServices {
   cache?: ServiceCache
   kv?: ServiceKv[]
+  database: ServiceDatabase[]
+  analytics: ServiceAnalytics[]
 }
 
 export interface Service {
@@ -123,8 +160,14 @@ export interface Socket {
 
 export type SocketHttps = {
   [keypair: string]: {
-    privateKey: string
-    certificateChain: string
+    privateKey: {
+      path?: string
+      content?: Uint8Array | string
+    }
+    certificateChain: {
+      path?: string
+      content?: Uint8Array | string
+    }
   }
 }
 
@@ -146,4 +189,4 @@ export interface toJson {
   dev_services: Service[]
 }
 
-export type LoopBackServiceType = 'kv' | 'cache'
+export type LoopBackServiceType = 'kv' | 'cache' | 'd1' | 'analytics' | 'dev'

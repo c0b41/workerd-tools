@@ -34,16 +34,19 @@ class WorkerdConfig {
 
     let script = generateWorkerScript(type)
 
-    let _service: Service = {
+    // TODO: change to new esm module type
+    let intService: Service = {
       name: `loop:${type}:${service.name}:${dockerNames.getRandomName()}`,
       worker: {
         compatibilityDate: compatibilityDate,
-        serviceWorkerScript: script,
+        serviceWorkerScript: {
+          content: script,
+        },
       },
     }
 
     if (type == 'kv') {
-      _service.worker.bindings = [
+      intService.worker.bindings = [
         {
           name: 'LOOP_PLUGIN',
           type: 'text',
@@ -61,7 +64,7 @@ class WorkerdConfig {
       ]
 
       if (this.options.loopback.path) {
-        _service.worker.bindings.push({
+        intService.worker.bindings.push({
           name: 'LOOP_PLUGIN_PATH',
           type: 'text',
           value: this.options.loopback.path,
@@ -70,7 +73,7 @@ class WorkerdConfig {
     }
 
     if (type == 'cache') {
-      _service.worker.bindings = [
+      intService.worker.bindings = [
         {
           name: 'LOOP_PLUGIN',
           type: 'text',
@@ -88,7 +91,7 @@ class WorkerdConfig {
       ]
 
       if (this.options.loopback.path) {
-        _service.worker.bindings.push({
+        intService.worker.bindings.push({
           name: 'LOOP_PLUGIN_PATH',
           type: 'text',
           value: this.options.loopback.path,
@@ -96,43 +99,53 @@ class WorkerdConfig {
       }
     }
 
-    this.pre_services.push(_service)
+    // https://github.com/cloudflare/workerd/pull/413
+    // TODO: wait for relase
+    // TODO: require new esm module
+    if (type == 'd1') {
+    }
 
-    return _service
+    if (type == 'analytics') {
+    }
+
+    this.pre_services.push(intService)
+
+    return intService
   }
 
-  Service(service: Service) {
-    let _service: Service = {
-      name: service.name,
-      ...service,
+  Service(input: Service) {
+    let service: Service = {
+      name: input.name,
+      ...input,
     }
 
-    if (this.options?.loopback && service.worker?.loop?.cache && service.worker?.loop?.cache?.id) {
-      let cache_service = this.createLoopBackService('cache', service.worker.loop.cache.id, service)
-      _service.worker.cacheApiOutbound = cache_service.name
-    }
+    if (this.options?.loopback) {
+      if (input.worker?.loop?.cache && input.worker?.loop?.cache?.id) {
+        let cache_service = this.createLoopBackService('cache', input.worker.loop.cache.id, input)
+        service.worker.cacheApiOutbound = cache_service.name
+      }
 
-    if (
-      this.options?.loopback &&
-      service.worker?.loop?.kv &&
-      Array.isArray(service.worker?.loop?.kv)
-    ) {
-      service.worker.loop.kv.forEach((bind) => {
-        let kv_service = this.createLoopBackService('kv', bind.id, service)
-        _service.worker.bindings.push({
-          name: bind.name,
-          kvNamespace: kv_service.name,
+      if (input.worker?.loop?.kv && Array.isArray(input.worker?.loop?.kv)) {
+        input.worker.loop.kv.forEach((bind) => {
+          let kv_service = this.createLoopBackService('kv', bind.id, input)
+          service.worker.bindings.push({
+            name: bind.name,
+            kvNamespace: kv_service.name,
+          })
         })
-      })
+      }
+
+      //if (input.worker?.loop?.database) {
+      //}
     }
 
-    this.services.push(_service)
+    this.services.push(service)
 
     return this
   }
 
-  Socket(socket: Socket) {
-    this.sockets.push(socket)
+  Socket(input: Socket) {
+    this.sockets.push(input)
     return this
   }
 }
