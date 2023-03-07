@@ -3,13 +3,16 @@ const { dependencies } = require('../package.json')
 const { Generator } = require('npm-dts');
 
 const isDev = process.env.NODE_ENV !== 'production'
+const external = Object.keys(dependencies).filter((dep) => dep !== 'capnp-ts')
 
 const sharedConfig = {
     entryPoints: ["src/index.ts"],
     bundle: true,
     minify: true,
-    sourcemap: false,
-    external: Object.keys(dependencies),
+    sourcemap: true,
+    external: external,
+    platform: 'node',
+    target: ['node16'],
 }
 
 const typesConfig = {
@@ -25,25 +28,22 @@ new Generator(typesConfig, true, true).generate()
 if (isDev) {
     build({
         ...sharedConfig,
-        platform: 'node', // for CJS
-        outfile: "dist/index.js",
+        outfile: 'dist/index.js',
         watch: true,
         minify: false,
-        sourcemap: true,
+        sourcemap: false,
         logLevel: 'info'
     });
 } else {
 
     build({
         ...sharedConfig,
-        platform: 'node', // for CJS
-        outfile: "dist/index.js",
+        outfile: 'dist/index.js',
     });
 
     build({
         ...sharedConfig,
-        outfile: "dist/index.esm.js",
-        platform: 'neutral', // for ESM
-        format: "esm"
+        outfile: 'dist/index.esm.js',
+        format: 'esm'
     });
 }

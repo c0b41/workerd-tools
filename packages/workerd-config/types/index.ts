@@ -23,7 +23,7 @@ export type ServiceModules = {
 // | { name: string; json?: string }
 
 export type ServiceBindingCrypto = {
-  name: string
+  name?: string
   cryptoKey: {
     raw?: string
     hex?: string
@@ -40,24 +40,29 @@ export type ServiceBindingCrypto = {
 }
 
 export type ServiceBindingService = {
-  name: string
+  name?: string
   service?: string
   kvNamespace?: string
   r2Bucket?: string
 }
 
 export type ServiceBindingBasic = {
-  name: string
-  type: 'text' | 'json' | 'wasm' | 'data'
-  content?: Uint8Array | string
+  name?: string
+  type?: 'text' | 'json' | 'wasm' | 'data'
+  content?: string | Uint8Array
   path?: string
+}
+
+export type ServiceBindingDurableObjectNamespace = {
+  name?: string
+  durableObjectNamespace?: string
 }
 
 // https://github.com/cloudflare/workerd/pull/413
 // TODO: wait for relase
 export type ServiceBindingWrapped = {
-  name: string
-  wrapped: {
+  name?: string
+  wrapped?: {
     wrapWith: string
     innerBindings: ServiceBindings[]
   }
@@ -67,10 +72,8 @@ export type ServiceBindings =
   | ServiceBindingBasic
   | ServiceBindingCrypto
   | ServiceBindingService
+  | ServiceBindingDurableObjectNamespace
   | ServiceBindingWrapped
-
-// https://github.com/cloudflare/workerd/blob/main/src/workerd/server/server-test.c%2B%2B
-// TODO: durable object namespace
 
 export interface ServicedExternal {
   address: string

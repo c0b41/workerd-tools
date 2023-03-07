@@ -55,7 +55,7 @@ export class Config {
           service.worker.bindings.push({
             name: 'SERVICE_RELOAD',
             type: 'text',
-            value: this.workersOptions.autoReload ? true : false,
+            content: this.workersOptions.autoReload ? 'true' : 'false',
           })
           dev_services.push(service)
           socket.service = `dev:${socket.service}`

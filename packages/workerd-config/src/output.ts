@@ -341,6 +341,19 @@ export default class ConfigOutput {
         structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
       }
 
+      if ('durableObjectNamespace' in binding) {
+        let structServiceWorkerBindingDurableObjectNamespace =
+          structServiceWorkerBinding.initDurableObjectNamespace()
+
+        structServiceWorkerBindingDurableObjectNamespace.setClassName(
+          binding.durableObjectNamespace
+        )
+        structServiceWorkerBinding.setName(binding.name)
+        structServiceWorkerBinding.setDurableObjectNamespace(
+          structServiceWorkerBindingDurableObjectNamespace
+        )
+      }
+
       if ('wrapped' in binding) {
         // https://github.com/cloudflare/workerd/pull/413
         // TODO: wait for relase

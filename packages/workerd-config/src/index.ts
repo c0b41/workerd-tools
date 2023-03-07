@@ -29,7 +29,7 @@ class WorkerdConfig {
     return this
   }
 
-  private createLoopBackService(type: LoopBackServiceType, id: String, service: Service) {
+  private createLoopBackService(type: LoopBackServiceType, id: string, service: Service) {
     let compatibilityDate = service.worker?.compatibilityDate ?? '2022-09-16'
 
     let script = generateWorkerScript(type)
@@ -50,12 +50,12 @@ class WorkerdConfig {
         {
           name: 'LOOP_PLUGIN',
           type: 'text',
-          value: 'kv',
+          content: 'kv',
         },
         {
           name: 'LOOP_NAMESPACE',
           type: 'text',
-          value: id,
+          content: id,
         },
         {
           name: 'LOOP_SERVICE',
@@ -67,7 +67,7 @@ class WorkerdConfig {
         intService.worker.bindings.push({
           name: 'LOOP_PLUGIN_PATH',
           type: 'text',
-          value: this.options.loopback.path,
+          content: this.options.loopback.path,
         })
       }
     }
@@ -77,12 +77,12 @@ class WorkerdConfig {
         {
           name: 'LOOP_PLUGIN',
           type: 'text',
-          value: 'cache',
+          content: 'cache',
         },
         {
           name: 'LOOP_CACHE_ID',
           type: 'text',
-          value: id,
+          content: id,
         },
         {
           name: 'LOOP_SERVICE',
@@ -94,7 +94,7 @@ class WorkerdConfig {
         intService.worker.bindings.push({
           name: 'LOOP_PLUGIN_PATH',
           type: 'text',
-          value: this.options.loopback.path,
+          content: this.options.loopback.path,
         })
       }
     }
