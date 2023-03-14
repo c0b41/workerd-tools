@@ -1,0 +1,16 @@
+{
+  "name": "@c0b41/trafik",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "node ./workerd.dev.js",
+    "build:config": "workerd-config -d dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@c0b41/workerd-config": "0.0.1",
+    "@c0b41/workerd-dev": "0.0.1"
+  }
+}
