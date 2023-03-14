@@ -158,7 +158,10 @@ export interface Socket {
   address: string
   https?: SocketHttps
   http?: SocketHttp
-  service: string
+  service?: {
+    name?: string
+    entrypoint?: string
+  }
 }
 
 export type SocketHttps = {
