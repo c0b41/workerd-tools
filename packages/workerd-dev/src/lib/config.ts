@@ -47,7 +47,7 @@ export class Config {
             bindings: [
               {
                 name: 'SERVICE',
-                service: socket.service,
+                service: socket.service.name,
               },
             ],
           }
@@ -58,7 +58,9 @@ export class Config {
             content: this.workersOptions.autoReload ? 'true' : 'false',
           })
           dev_services.push(service)
-          socket.service = `dev:${socket.service}`
+          socket.service = {
+            name: `dev:${socket.service}`,
+          }
         }
 
         return socket
