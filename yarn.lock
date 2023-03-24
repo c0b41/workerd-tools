@@ -23,25 +23,25 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@cloudflare/workerd-darwin-64@1.20230228.0":
-  version "1.20230228.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-64/-/workerd-darwin-64-1.20230228.0.tgz#ca8548c2d3df33b4c60b2d74554fe333b29e874b"
-  integrity sha512-cJvO6gWzAlJXjmSfQ6ybjp3QR/yd3fIVaLwKjB8bXjsNygl6s1OththRmRZdo2QgI1p2UqUwK0OWcBOpnxoiAg==
+"@cloudflare/workerd-darwin-64@1.20230321.0":
+  version "1.20230321.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-64/-/workerd-darwin-64-1.20230321.0.tgz#a929f7b086b43f48593380afbf07ac9ce0429fb8"
+  integrity sha512-XnO6FxMDuXl+hjl+RY90TOPlcS+sGLjep+pTzDFXb2PQmAxU14tLDIzOStsY2tlGFwl3sNmyWrsr0T/dYWyzNg==
 
-"@cloudflare/workerd-darwin-arm64@1.20230228.0":
-  version "1.20230228.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-arm64/-/workerd-darwin-arm64-1.20230228.0.tgz#52a1c9fe274e9056f846530fa14f69ed14c66a71"
-  integrity sha512-kioFkGytIeYCBgXIQU7fxiVE81a82hseavu9zuI0cBD5TclTdHCnR1o9EgNGF0N+uT1DSNV2tC0mlTH9CxU7vg==
+"@cloudflare/workerd-darwin-arm64@1.20230321.0":
+  version "1.20230321.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-arm64/-/workerd-darwin-arm64-1.20230321.0.tgz#7cd833991753a573aea04fa6c08a4a0820918298"
+  integrity sha512-vghS/BMZFO521+Z0bBahjCJfzQRJezaAqm+aYJzVdkk6IKCN5aZvTygjmfZq+K4ioUj4kx/6IdwUY08RaCMXvQ==
 
-"@cloudflare/workerd-linux-64@1.20230228.0":
-  version "1.20230228.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-64/-/workerd-linux-64-1.20230228.0.tgz#e36809b83c02b4e21d62320497cec996d077ee0d"
-  integrity sha512-IBhwFa3Tq8IwwWn+2mOJb6BABg+1E+rfqFuTROcPG/LwM5BctjnIHpfQlUvOIMZDAIuy/7o1TAiX16eEfh7xfA==
+"@cloudflare/workerd-linux-64@1.20230321.0":
+  version "1.20230321.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-64/-/workerd-linux-64-1.20230321.0.tgz#1508968e74c114e31998e5fed2d36ac88c19433d"
+  integrity sha512-DC55gRpc0UXsjKgMcCUDUqpOhZxOhyiKbRfDX5h+4dNocD1Z1u88WDyuzg4Ph6lZrXjCjqkF0yJ+ZEMfpUF4iA==
 
-"@cloudflare/workerd-linux-arm64@1.20230228.0":
-  version "1.20230228.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-arm64/-/workerd-linux-arm64-1.20230228.0.tgz#b086ad98f6d8763ecff1f504adbfd198d17e8f45"
-  integrity sha512-3Nx7AYctEtWYVlQo2AhMpmRCg+Ak31pwdRgILQAX61lZrsNBP+BVgfXpADomRJxqLrMGOLQ1riH6HODdDm9o5g==
+"@cloudflare/workerd-linux-arm64@1.20230321.0":
+  version "1.20230321.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-arm64/-/workerd-linux-arm64-1.20230321.0.tgz#241298915ec6d29c963cc83ee8ab622858408c15"
+  integrity sha512-BT8ehqUvWq09Od7kcPB3F0Zjqs781nCJ0IRF1aRI97U3xTqooU8It58TeNmIXHY+INvWrmZGaqIP2ixCELXHag==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -5251,15 +5251,15 @@ wordwrap@^1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
 
-workerd@^1.20230228.0:
-  version "1.20230228.0"
-  resolved "https://registry.yarnpkg.com/workerd/-/workerd-1.20230228.0.tgz#ab5d6abd50c08d8f50d2e9eff0058ab4f361eff5"
-  integrity sha512-n6QCfg9G/P2lOhvt96olYCUldJDGMPQvdJn1OHGPnr4C+BKeudKhPoHfpOd7WjN4YzMQaChr3mnptASBscSBNw==
+workerd@^1.20230321.0:
+  version "1.20230321.0"
+  resolved "https://registry.yarnpkg.com/workerd/-/workerd-1.20230321.0.tgz#05be2f0855d8a51d706809754efbad3a90397a20"
+  integrity sha512-5J9zYnxEK86JEEhRq2ohgj6fTpGOhQ6LEPynJzUVCNFwm94VrMjnc/MWSFBZcue5pH2k4O8K3rshjHLo7AhZNg==
   optionalDependencies:
-    "@cloudflare/workerd-darwin-64" "1.20230228.0"
-    "@cloudflare/workerd-darwin-arm64" "1.20230228.0"
-    "@cloudflare/workerd-linux-64" "1.20230228.0"
-    "@cloudflare/workerd-linux-arm64" "1.20230228.0"
+    "@cloudflare/workerd-darwin-64" "1.20230321.0"
+    "@cloudflare/workerd-darwin-arm64" "1.20230321.0"
+    "@cloudflare/workerd-linux-64" "1.20230321.0"
+    "@cloudflare/workerd-linux-arm64" "1.20230321.0"
 
 wrap-ansi@^7.0.0:
   version "7.0.0"

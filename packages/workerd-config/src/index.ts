@@ -30,7 +30,7 @@ class WorkerdConfig {
   }
 
   private createLoopBackService(type: LoopBackServiceType, id: string, service: Service) {
-    let compatibilityDate = service.worker?.compatibilityDate ?? '2022-09-16'
+    let compatibilityDate = service.worker?.compatibilityDate ?? '2023-03-21'
 
     let script = generateWorkerScript(type)
 
