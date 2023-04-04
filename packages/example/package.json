@@ -4,8 +4,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "node ./workerd.dev.js",
-    "build:config": "workerd-config -d dist"
+    "dev": "node ./workerd.dev.js",
+    "build:config": "workerd-config --dest dist"
   },
   "dependencies": {},
   "devDependencies": {

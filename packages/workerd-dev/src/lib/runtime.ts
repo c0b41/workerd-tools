@@ -15,7 +15,6 @@ export class Runtime {
     'serve',
     '--binary', // Required to use binary capnp config
     '--experimental',
-    '--watch',
   ]
   private options: WorkerdOptions
   private inspector: InspectorOptions

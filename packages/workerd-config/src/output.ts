@@ -451,7 +451,7 @@ export default class ConfigOutput {
       if (socket.service) {
         let structSocketService = structSocket.initService()
         if (socket.service.name) {
-          structSocketService.setName(socket.service)
+          structSocketService.setName(socket.service.name)
         }
 
         if (socket.service.entrypoint) {

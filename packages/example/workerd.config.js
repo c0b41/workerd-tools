@@ -40,7 +40,9 @@ config.Service({
 config.Socket({
     name: 'https',
     address: '*:8080',
-    service: 'main'
+    service: {
+        name: 'main'
+    }
 })
 
 module.exports = config

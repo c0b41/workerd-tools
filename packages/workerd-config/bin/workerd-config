@@ -3,7 +3,7 @@ const { ConfigOutput } = require('../dist');
 const fs = require('fs');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
-let format = 'bin'
+let format = 'binary'
 let config = './workerd.config.js'
 let dest = './'
 
@@ -37,12 +37,13 @@ if (argv.dest) {
 try {
     const configPath = path.join(process.cwd(), config)
     const instance = require(configPath)
-    const output = ConfigOutput(instance)
+    const output = new ConfigOutput(instance)
 
     const ext = format === 'binary' ? 'bin' : 'json'
     const destPath = path.join(process.cwd(), dest, `config.${ext}`)
-    const outputBuffer = format === 'binary' ? output.toBuffer() : output.toJson()
-    fs.writeFileSync(destPath, outputBuffer)
+    const outputBuffer = format === 'binary' ? output.toBuffer() : JSON.stringify(output.toJson(), null, 2)
+    fs.writeFileSync(destPath, outputBuffer, 'utf-8')
+    console.log(`${destPath} Generated.`)
     process.exit(0)
 } catch (error) {
     console.log('Config generation failed')

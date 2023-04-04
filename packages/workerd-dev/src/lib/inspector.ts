@@ -222,7 +222,7 @@ export class Inspector {
         })
       }
     } catch (error) {
-      console.log(`Activer Worker list failed`)
+      this.logger.info(`Activer Worker list failed`)
     } finally {
       return Array.from(workers)
     }

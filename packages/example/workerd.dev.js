@@ -5,6 +5,7 @@ new WorkerdDevServer({
     dist: './src/worker/**.*',
     config: './workerd.config.js',
     workerd: {
+        bin: 'workerd',
         verbose: true,
         logs: true
     },
