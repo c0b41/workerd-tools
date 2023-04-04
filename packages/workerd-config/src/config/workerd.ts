@@ -17,6 +17,15 @@ export type Void = typeof kVoid
 export interface Config {
   services?: Service[]
   sockets?: Socket[]
+  extensions?: Extension[]
+}
+
+export type Extension_Module = {
+  name?: string
+} & ({ esModule?: string } | { internal?: boolean })
+
+export type Extension = {
+  modules?: Extension_Module[]
 }
 
 export type Socket = {

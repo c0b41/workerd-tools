@@ -2,6 +2,6 @@ import { Data, List, Message, Struct } from 'capnp-ts'
 import { Config, kVoid } from './workerd'
 import { Config as CapnpConfig } from './workerd.capnp.js'
 
-// workerd.capnp => 1.20230221.0
+// workerd.capnp => main-2023-04-04
 
 export * from './workerd'

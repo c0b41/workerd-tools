@@ -12,6 +12,7 @@ export declare class Config extends __S {
     };
     static _Services: capnp.ListCtor<Service>;
     static _Sockets: capnp.ListCtor<Socket>;
+    static _Extensions: capnp.ListCtor<Extension>;
     adoptServices(value: capnp.Orphan<capnp.List<Service>>): void;
     disownServices(): capnp.Orphan<capnp.List<Service>>;
     getServices(): capnp.List<Service>;
@@ -30,6 +31,12 @@ export declare class Config extends __S {
     hasV8Flags(): boolean;
     initV8Flags(length: number): capnp.List<string>;
     setV8Flags(value: capnp.List<string>): void;
+    adoptExtensions(value: capnp.Orphan<capnp.List<Extension>>): void;
+    disownExtensions(): capnp.Orphan<capnp.List<Extension>>;
+    getExtensions(): capnp.List<Extension>;
+    hasExtensions(): boolean;
+    initExtensions(length: number): capnp.List<Extension>;
+    setExtensions(value: capnp.List<Extension>): void;
     toString(): string;
 }
 export declare class Socket_Https extends __S {
@@ -798,5 +805,36 @@ export declare class TlsOptions extends __S {
     setMinVersion(value: TlsOptions_Version): void;
     getCipherList(): string;
     setCipherList(value: string): void;
+    toString(): string;
+}
+export declare class Extension_Module extends __S {
+    static readonly _capnp: {
+        displayName: string;
+        id: string;
+        size: capnp.ObjectSize;
+        defaultInternal: DataView;
+    };
+    getName(): string;
+    setName(value: string): void;
+    getInternal(): boolean;
+    setInternal(value: boolean): void;
+    getEsModule(): string;
+    setEsModule(value: string): void;
+    toString(): string;
+}
+export declare class Extension extends __S {
+    static readonly Module: typeof Extension_Module;
+    static readonly _capnp: {
+        displayName: string;
+        id: string;
+        size: capnp.ObjectSize;
+    };
+    static _Modules: capnp.ListCtor<Extension_Module>;
+    adoptModules(value: capnp.Orphan<capnp.List<Extension_Module>>): void;
+    disownModules(): capnp.Orphan<capnp.List<Extension_Module>>;
+    getModules(): capnp.List<Extension_Module>;
+    hasModules(): boolean;
+    initModules(length: number): capnp.List<Extension_Module>;
+    setModules(value: capnp.List<Extension_Module>): void;
     toString(): string;
 }

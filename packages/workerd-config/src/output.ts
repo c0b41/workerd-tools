@@ -1,6 +1,5 @@
 import { WorkerdConfig } from '.'
 import { readFileSync } from 'fs'
-import { parse } from 'path'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
 import { Config as CapnpConfig } from './config/workerd.capnp.js'
 import {
@@ -11,6 +10,8 @@ import {
   Service,
   Socket,
   DurableObjectNamespace,
+  Extension,
+  ExtensionModule,
 } from '../types'
 
 export default class ConfigOutput {
@@ -530,10 +531,44 @@ export default class ConfigOutput {
     })
   }
 
+  private generateExtension(struct: Struct) {
+    let size = this.config.extensions.length ?? 0
+    // @ts-ignore
+    let extensions = struct.initExtensions(size)
+    this.config.extensions.forEach((extension: Extension, extIndex: number) => {
+      // @ts-ignore
+      let structExtension = extensions.get(extIndex)
+
+      let moduleSize = extension.modules.length ?? 0
+      let modules = structExtension.initModules(moduleSize)
+
+      extension.modules.forEach((module: ExtensionModule, modIndex: number) => {
+        let structModule = modules.get(modIndex)
+        if (module.name) {
+          structModule.setName(module.name)
+        }
+
+        let content = module.content ?? null
+        if (module.path) {
+          content = this.readFile(module.path)
+        }
+
+        if (content) {
+          structModule.setEsModule(content)
+        }
+
+        if (module.internal) {
+          structModule.setInternal(module.internal)
+        }
+      })
+    })
+  }
+
   private generate(): Buffer {
     const message = new Message()
     const struct = message.initRoot(CapnpConfig)
 
+    this.generateExtension(struct)
     this.generateServices(struct)
     this.generateSockets(struct)
 
@@ -546,6 +581,7 @@ export default class ConfigOutput {
 
   toJson(): toJson {
     return {
+      extensions: [...this.config.extensions],
       services: [...this.config.services],
       pre_services: [...this.config.pre_services],
       sockets: [...this.config.sockets],

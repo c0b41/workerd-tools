@@ -189,6 +189,7 @@ export type HttpHeaderInjectOptions = {
 }
 
 export interface toJson {
+  extensions: Extension[]
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]
@@ -196,3 +197,14 @@ export interface toJson {
 }
 
 export type LoopBackServiceType = 'kv' | 'cache' | 'd1' | 'analytics' | 'dev'
+
+export type ExtensionModule = {
+  name: string
+  internal?: boolean
+  path?: string
+  content?: Uint8Array | string
+}
+
+export interface Extension {
+  modules?: ExtensionModule[]
+}

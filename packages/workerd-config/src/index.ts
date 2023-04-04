@@ -1,9 +1,10 @@
 import * as dockerNames from 'docker-names'
-import { LoopBackServiceType, Service, Socket, WorkerdConfigOptions } from '../types'
+import { Extension, LoopBackServiceType, Service, Socket, WorkerdConfigOptions } from '../types'
 import ConfigOutput from './output'
 import { generateWorkerScript } from './utils'
 
 class WorkerdConfig {
+  public extensions: Extension[] = []
   public services: Service[] = []
   public pre_services: Service[] = []
   public dev_services: Service[] = []
@@ -141,6 +142,11 @@ class WorkerdConfig {
 
     this.services.push(service)
 
+    return this
+  }
+
+  Extension(input: Extension) {
+    this.extensions.push(input)
     return this
   }
 
