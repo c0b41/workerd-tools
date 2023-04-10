@@ -100,12 +100,10 @@ class WorkerdConfig {
       }
     }
 
-    // https://github.com/cloudflare/workerd/pull/413
-    // TODO: wait for relase
-    // TODO: require new esm module
+    // TODO: soon?
     if (type == 'd1') {
     }
-
+    // TODO: soon?
     if (type == 'analytics') {
     }
 
@@ -137,6 +135,9 @@ class WorkerdConfig {
       }
 
       //if (input.worker?.loop?.database) {
+      //}
+
+      //if (input.worker?.loop?.analytics) {
       //}
     }
 

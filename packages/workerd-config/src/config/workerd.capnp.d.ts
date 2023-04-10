@@ -371,6 +371,26 @@ export declare class Worker_Binding_CryptoKey extends __S {
     toString(): string;
     which(): Worker_Binding_CryptoKey_Which;
 }
+export declare class Worker_Binding_WrappedBinding extends __S {
+    static readonly _capnp: {
+        displayName: string;
+        id: string;
+        size: capnp.ObjectSize;
+        defaultEntrypoint: string;
+    };
+    static _InnerBindings: capnp.ListCtor<Worker_Binding>;
+    getModuleName(): string;
+    setModuleName(value: string): void;
+    getEntrypoint(): string;
+    setEntrypoint(value: string): void;
+    adoptInnerBindings(value: capnp.Orphan<capnp.List<Worker_Binding>>): void;
+    disownInnerBindings(): capnp.Orphan<capnp.List<Worker_Binding>>;
+    getInnerBindings(): capnp.List<Worker_Binding>;
+    hasInnerBindings(): boolean;
+    initInnerBindings(length: number): capnp.List<Worker_Binding>;
+    setInnerBindings(value: capnp.List<Worker_Binding>): void;
+    toString(): string;
+}
 export declare class Worker_Binding_Parameter extends __S {
     static readonly _capnp: {
         displayName: string;
@@ -399,7 +419,8 @@ export declare enum Worker_Binding_Which {
     DURABLE_OBJECT_NAMESPACE = 8,
     KV_NAMESPACE = 9,
     R2BUCKET = 10,
-    R2ADMIN = 11
+    R2ADMIN = 11,
+    WRAPPED = 12
 }
 export declare class Worker_Binding extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Which.UNSPECIFIED;
@@ -414,9 +435,11 @@ export declare class Worker_Binding extends __S {
     static readonly KV_NAMESPACE = Worker_Binding_Which.KV_NAMESPACE;
     static readonly R2BUCKET = Worker_Binding_Which.R2BUCKET;
     static readonly R2ADMIN = Worker_Binding_Which.R2ADMIN;
+    static readonly WRAPPED = Worker_Binding_Which.WRAPPED;
     static readonly Type: typeof Worker_Binding_Type;
     static readonly DurableObjectNamespaceDesignator: typeof Worker_Binding_DurableObjectNamespaceDesignator;
     static readonly CryptoKey: typeof Worker_Binding_CryptoKey;
+    static readonly WrappedBinding: typeof Worker_Binding_WrappedBinding;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -492,6 +515,13 @@ export declare class Worker_Binding extends __S {
     initR2Admin(): ServiceDesignator;
     isR2Admin(): boolean;
     setR2Admin(value: ServiceDesignator): void;
+    adoptWrapped(value: capnp.Orphan<Worker_Binding_WrappedBinding>): void;
+    disownWrapped(): capnp.Orphan<Worker_Binding_WrappedBinding>;
+    getWrapped(): Worker_Binding_WrappedBinding;
+    hasWrapped(): boolean;
+    initWrapped(): Worker_Binding_WrappedBinding;
+    isWrapped(): boolean;
+    setWrapped(value: Worker_Binding_WrappedBinding): void;
     toString(): string;
     which(): Worker_Binding_Which;
 }

@@ -14,6 +14,8 @@ import {
   ExtensionModule,
 } from '../types'
 
+// TODO: write proper typing with workerd.capnp.d.ts
+
 export default class ConfigOutput {
   private config: WorkerdConfig | null
   constructor(config: WorkerdConfig) {
@@ -58,7 +60,9 @@ export default class ConfigOutput {
     }
 
     if (service.worker.bindings) {
-      this.generateBinding(service.worker.bindings, structServiceWorker)
+      let workerBindingSize = service.worker.bindings.length ?? 0
+      let structServiceWorkerBindings = structServiceWorker.initBindings(workerBindingSize)
+      this.generateBinding(service.worker.bindings, structServiceWorkerBindings)
     }
 
     if (service.worker.serviceWorkerScript) {
@@ -242,10 +246,8 @@ export default class ConfigOutput {
     }
   }
 
-  private generateBinding(bindings: ServiceBindings[], struct: Struct) {
-    let bindingSize = bindings.length ?? 0
+  private generateBinding(bindings: ServiceBindings[], structServiceWorkerBindings: Struct) {
     // @ts-ignore
-    let structServiceWorkerBindings = struct.initBindings(bindingSize)
     bindings.forEach((binding: ServiceBindings, index: number) => {
       // @ts-ignore
       let structServiceWorkerBinding = structServiceWorkerBindings.get(index)
@@ -356,15 +358,27 @@ export default class ConfigOutput {
       }
 
       if ('wrapped' in binding) {
-        // https://github.com/cloudflare/workerd/pull/413
-        // TODO: wait for relase
-        // structServiceWorkerBinding.setWrapWith(binding.wrapWith)
-        //if (binding.wrapped.innerBindings) {
-        //  this.generateBinding(binding.wrapped.innerBindings, null)
-        //}
+        let structServiceWorkerBindingWrapped = structServiceWorkerBinding.initWrapped()
+
+        if (binding.wrapped.moduleName) {
+          structServiceWorkerBindingWrapped.setModuleName(binding.wrapped.moduleName)
+        }
+
+        if (binding.wrapped.entrypoint) {
+          structServiceWorkerBindingWrapped.setEntrypoint(binding.wrapped.entrypoint)
+        }
+        if (binding.wrapped.innerBindings) {
+          let wrappedBindingSize = binding.wrapped.innerBindings.length ?? 0
+          let structServiceWorkerWrappedBindings =
+            structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
+          this.generateBinding(binding.wrapped.innerBindings, structServiceWorkerWrappedBindings)
+        }
+
+        structServiceWorkerBinding.setWrapped(structServiceWorkerBindingWrapped)
       }
 
       structServiceWorkerBinding.setName(binding.name)
+      // @ts-ignore
       structServiceWorkerBindings.set(index, structServiceWorkerBinding)
     })
   }

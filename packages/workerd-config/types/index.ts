@@ -58,12 +58,11 @@ export type ServiceBindingDurableObjectNamespace = {
   durableObjectNamespace?: string
 }
 
-// https://github.com/cloudflare/workerd/pull/413
-// TODO: wait for relase
 export type ServiceBindingWrapped = {
   name?: string
   wrapped?: {
-    wrapWith: string
+    moduleName: string
+    entrypoint?: string
     innerBindings: ServiceBindings[]
   }
 }

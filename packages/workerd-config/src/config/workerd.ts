@@ -98,7 +98,14 @@ export type Worker_Binding = {
   | { kvNamespace?: ServiceDesignator }
   | { r2Bucket?: ServiceDesignator }
   | { r2Admin?: ServiceDesignator }
+  | { wrapped?: Worker_Binding_Wrapped }
 )
+
+export interface Worker_Binding_Wrapped {
+  moduleName: string
+  entrypoint?: string
+  innerBindings?: Worker_Binding
+}
 
 export interface Worker_Binding_Parameter {
   type?: Worker_Binding_Type
