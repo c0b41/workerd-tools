@@ -104,7 +104,7 @@ export type Worker_Binding = {
 export interface Worker_Binding_Wrapped {
   moduleName: string
   entrypoint?: string
-  innerBindings?: Worker_Binding
+  innerBindings?: Worker_Binding[]
 }
 
 export interface Worker_Binding_Parameter {

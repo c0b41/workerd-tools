@@ -1,0 +1,1 @@
+export const secret = '[top secret message 1337]'

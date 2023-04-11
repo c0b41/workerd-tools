@@ -1,6 +1,6 @@
 {
   "name": "@c0b41/workerd-config",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "scripts": {
     "capnp": "capnpc -o ts ./src/config/workerd.capnp",

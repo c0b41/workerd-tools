@@ -3,6 +3,7 @@
 # Refer to the comments in /src/workerd/server/workerd.capnp for more details.
 
 using Workerd = import "/workerd/workerd.capnp";
+using Foo = import "ext.capnp";
 
 # A constant of type Workerd.Config defines the top-level configuration for an
 # instance of the workerd runtime. A single config file can contain multiple
@@ -14,17 +15,19 @@ const helloWorldExample :Workerd.Config = (
   # ability to talk to a network, or accessing a disk directory. Here we create a single
   # worker service. The configuration details for the worker are defined below.
   services = [ 
-    (name = "main", worker = .helloWorld),
-    (name = "foo", worker = .helloWorld2) 
+    (name = "main", worker = .helloWorld)
+    #(name = "foo", worker = .helloWorld2) 
     ],
 
   # Every configuration defines the one or more sockets on which the server will listene.
   # Here, we create a single socket that will listen on localhost port 8080, and will
   # dispatch to the "main" service that we defined above.
   sockets = [ 
-    ( name = "http", address = "*:8080", http = (), service = "main" ),
-    ( name = "http", address = "*:8081", http = (), service = "foo" ) 
-  ]
+    ( name = "http", address = "*:8080", http = (), service = "main" )
+    #( name = "http", address = "*:8081", http = (), service = "foo" ) 
+  ],
+
+  extensions = [ Foo.fooExtension ],
 );
 
 # The definition of the actual helloWorld worker exposed using the "main" service.
@@ -37,6 +40,24 @@ const helloWorld :Workerd.Worker = (
     (name = "worker", esModule = embed "worker.js")
   ],
   compatibilityDate = "2022-09-16",
+   bindings = [
+    ( 
+      name = "message",
+      text = "worker hi"
+    ),
+    (
+      name = "xdd",
+      wrapped = (
+        moduleName = "foo:bind",
+        innerBindings = [
+          (
+            name = "yolo",
+            text = "inner binding yoloxdd"
+          )
+        ]
+      )
+    )
+  ],
 );
 
 const helloWorld2 :Workerd.Worker = (

@@ -5278,7 +5278,7 @@ wordwrap@^1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
 
-workerd@1.20230404.0, workerd@^1.20230228.0:
+workerd@^1.20230228.0, workerd@^1.20230404.0:
   version "1.20230404.0"
   resolved "https://registry.yarnpkg.com/workerd/-/workerd-1.20230404.0.tgz#8762f66b3fe513981dd1a84b04b82a4a509259cc"
   integrity sha512-tTiWZkJXetNmahmVZL1AcFH/U1cp9MMYRcQNBD1RjTSGh/v8VlKlEKTp4Ss6EdItvPNKQqsE7s/6y/TrblTI7g==
