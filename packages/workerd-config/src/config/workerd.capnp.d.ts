@@ -222,7 +222,8 @@ export declare enum Worker_Binding_Type_Which {
     DURABLE_OBJECT_NAMESPACE = 7,
     KV_NAMESPACE = 8,
     R2BUCKET = 9,
-    R2ADMIN = 10
+    R2ADMIN = 10,
+    QUEUE = 11
 }
 export declare class Worker_Binding_Type extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Type_Which.UNSPECIFIED;
@@ -236,6 +237,7 @@ export declare class Worker_Binding_Type extends __S {
     static readonly KV_NAMESPACE = Worker_Binding_Type_Which.KV_NAMESPACE;
     static readonly R2BUCKET = Worker_Binding_Type_Which.R2BUCKET;
     static readonly R2ADMIN = Worker_Binding_Type_Which.R2ADMIN;
+    static readonly QUEUE = Worker_Binding_Type_Which.QUEUE;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -268,6 +270,8 @@ export declare class Worker_Binding_Type extends __S {
     setR2Bucket(): void;
     isR2Admin(): boolean;
     setR2Admin(): void;
+    isQueue(): boolean;
+    setQueue(): void;
     toString(): string;
     which(): Worker_Binding_Type_Which;
 }
@@ -420,7 +424,8 @@ export declare enum Worker_Binding_Which {
     KV_NAMESPACE = 9,
     R2BUCKET = 10,
     R2ADMIN = 11,
-    WRAPPED = 12
+    WRAPPED = 12,
+    QUEUE = 13
 }
 export declare class Worker_Binding extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Which.UNSPECIFIED;
@@ -436,6 +441,7 @@ export declare class Worker_Binding extends __S {
     static readonly R2BUCKET = Worker_Binding_Which.R2BUCKET;
     static readonly R2ADMIN = Worker_Binding_Which.R2ADMIN;
     static readonly WRAPPED = Worker_Binding_Which.WRAPPED;
+    static readonly QUEUE = Worker_Binding_Which.QUEUE;
     static readonly Type: typeof Worker_Binding_Type;
     static readonly DurableObjectNamespaceDesignator: typeof Worker_Binding_DurableObjectNamespaceDesignator;
     static readonly CryptoKey: typeof Worker_Binding_CryptoKey;
@@ -522,6 +528,13 @@ export declare class Worker_Binding extends __S {
     initWrapped(): Worker_Binding_WrappedBinding;
     isWrapped(): boolean;
     setWrapped(value: Worker_Binding_WrappedBinding): void;
+    adoptQueue(value: capnp.Orphan<ServiceDesignator>): void;
+    disownQueue(): capnp.Orphan<ServiceDesignator>;
+    getQueue(): ServiceDesignator;
+    hasQueue(): boolean;
+    initQueue(): ServiceDesignator;
+    isQueue(): boolean;
+    setQueue(value: ServiceDesignator): void;
     toString(): string;
     which(): Worker_Binding_Which;
 }

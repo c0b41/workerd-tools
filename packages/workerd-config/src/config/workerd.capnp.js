@@ -324,6 +324,7 @@ var Worker_Binding_Type_Which;
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["KV_NAMESPACE"] = 8] = "KV_NAMESPACE";
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["R2BUCKET"] = 9] = "R2BUCKET";
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["R2ADMIN"] = 10] = "R2ADMIN";
+    Worker_Binding_Type_Which[Worker_Binding_Type_Which["QUEUE"] = 11] = "QUEUE";
 })(Worker_Binding_Type_Which = exports.Worker_Binding_Type_Which || (exports.Worker_Binding_Type_Which = {}));
 class Worker_Binding_Type extends capnp_ts_1.Struct {
     isUnspecified() { return capnp_ts_1.Struct.getUint16(0, this) === 0; }
@@ -365,6 +366,8 @@ class Worker_Binding_Type extends capnp_ts_1.Struct {
     setR2Bucket() { capnp_ts_1.Struct.setUint16(0, 9, this); }
     isR2Admin() { return capnp_ts_1.Struct.getUint16(0, this) === 10; }
     setR2Admin() { capnp_ts_1.Struct.setUint16(0, 10, this); }
+    isQueue() { return capnp_ts_1.Struct.getUint16(0, this) === 11; }
+    setQueue() { capnp_ts_1.Struct.setUint16(0, 11, this); }
     toString() { return "Worker_Binding_Type_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -380,6 +383,7 @@ Worker_Binding_Type.DURABLE_OBJECT_NAMESPACE = Worker_Binding_Type_Which.DURABLE
 Worker_Binding_Type.KV_NAMESPACE = Worker_Binding_Type_Which.KV_NAMESPACE;
 Worker_Binding_Type.R2BUCKET = Worker_Binding_Type_Which.R2BUCKET;
 Worker_Binding_Type.R2ADMIN = Worker_Binding_Type_Which.R2ADMIN;
+Worker_Binding_Type.QUEUE = Worker_Binding_Type_Which.QUEUE;
 Worker_Binding_Type._capnp = { displayName: "Type", id: "8906a1296519bf8a", size: new capnp_ts_1.ObjectSize(8, 1) };
 class Worker_Binding_DurableObjectNamespaceDesignator extends capnp_ts_1.Struct {
     getClassName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -571,6 +575,7 @@ var Worker_Binding_Which;
     Worker_Binding_Which[Worker_Binding_Which["R2BUCKET"] = 10] = "R2BUCKET";
     Worker_Binding_Which[Worker_Binding_Which["R2ADMIN"] = 11] = "R2ADMIN";
     Worker_Binding_Which[Worker_Binding_Which["WRAPPED"] = 12] = "WRAPPED";
+    Worker_Binding_Which[Worker_Binding_Which["QUEUE"] = 13] = "QUEUE";
 })(Worker_Binding_Which = exports.Worker_Binding_Which || (exports.Worker_Binding_Which = {}));
 class Worker_Binding extends capnp_ts_1.Struct {
     getName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -776,6 +781,25 @@ class Worker_Binding extends capnp_ts_1.Struct {
         capnp_ts_1.Struct.setUint16(0, 12, this);
         capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(1, this));
     }
+    adoptQueue(value) {
+        capnp_ts_1.Struct.setUint16(0, 13, this);
+        capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(1, this));
+    }
+    disownQueue() { return capnp_ts_1.Struct.disown(this.getQueue()); }
+    getQueue() {
+        capnp_ts_1.Struct.testWhich("queue", capnp_ts_1.Struct.getUint16(0, this), 13, this);
+        return capnp_ts_1.Struct.getStruct(1, ServiceDesignator, this);
+    }
+    hasQueue() { return !capnp_ts_1.Struct.isNull(capnp_ts_1.Struct.getPointer(1, this)); }
+    initQueue() {
+        capnp_ts_1.Struct.setUint16(0, 13, this);
+        return capnp_ts_1.Struct.initStructAt(1, ServiceDesignator, this);
+    }
+    isQueue() { return capnp_ts_1.Struct.getUint16(0, this) === 13; }
+    setQueue(value) {
+        capnp_ts_1.Struct.setUint16(0, 13, this);
+        capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(1, this));
+    }
     toString() { return "Worker_Binding_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -793,6 +817,7 @@ Worker_Binding.KV_NAMESPACE = Worker_Binding_Which.KV_NAMESPACE;
 Worker_Binding.R2BUCKET = Worker_Binding_Which.R2BUCKET;
 Worker_Binding.R2ADMIN = Worker_Binding_Which.R2ADMIN;
 Worker_Binding.WRAPPED = Worker_Binding_Which.WRAPPED;
+Worker_Binding.QUEUE = Worker_Binding_Which.QUEUE;
 Worker_Binding.Type = Worker_Binding_Type;
 Worker_Binding.DurableObjectNamespaceDesignator = Worker_Binding_DurableObjectNamespaceDesignator;
 Worker_Binding.CryptoKey = Worker_Binding_CryptoKey;

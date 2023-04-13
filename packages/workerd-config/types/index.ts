@@ -31,6 +31,7 @@ export type ServiceBindingService = {
   service?: string
   kvNamespace?: string
   r2Bucket?: string
+  queue?: string
 }
 
 export type ServiceBindingBasic = {

@@ -99,6 +99,7 @@ export type Worker_Binding = {
   | { r2Bucket?: ServiceDesignator }
   | { r2Admin?: ServiceDesignator }
   | { wrapped?: Worker_Binding_Wrapped }
+  | { queue?: ServiceDesignator }
 )
 
 export interface Worker_Binding_Wrapped {

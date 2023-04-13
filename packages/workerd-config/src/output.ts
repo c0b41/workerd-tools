@@ -294,6 +294,12 @@ export default class ConfigOutput {
         structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
       }
 
+      if ('queue' in binding) {
+        let structServiceWorkerBindingQueue = structServiceWorkerBinding.initQueue()
+        structServiceWorkerBindingQueue.setName(binding.queue)
+        structServiceWorkerBinding.setQueue(structServiceWorkerBindingQueue)
+      }
+
       if ('cryptoKey' in binding) {
         let structServiceWorkerBindingCrypto = structServiceWorkerBinding.initCryptoKey()
 
