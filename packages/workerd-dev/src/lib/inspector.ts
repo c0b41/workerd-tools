@@ -205,7 +205,7 @@ export class Inspector {
 
   private async fetchActiveWorkers() {
     let workers = new Set()
-    let defaultExclude = /(dev:|loop:)/
+    let defaultExclude = /(dev:|int:)/
     try {
       let response = await got(`http://localhost:${this.options.port}/json/list`)
       if (response.body) {

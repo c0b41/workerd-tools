@@ -1,11 +1,4 @@
-export interface LoopBackOptions {
-  address: string
-  path?: string
-}
-
-export interface WorkerdConfigOptions {
-  loopback?: LoopBackOptions
-}
+export interface WorkerdConfigOptions {}
 
 export type ModuleType = 'esModule' | 'commonJsModule' | 'text' | 'data' | 'wasm' | 'json'
 
@@ -15,12 +8,6 @@ export type ServiceModules = {
   path?: string
   content?: Uint8Array | string
 }
-// | { name: string; esModule?: string }
-// | { name: string; commonJsModule?: string }
-// | { name: string; text?: string }
-// | { name: string; data?: Uint8Array }
-// | { name: string; wasm?: Uint8Array }
-// | { name: string; json?: string }
 
 export type ServiceBindingCrypto = {
   name?: string
@@ -91,25 +78,6 @@ export interface ServicedNetWork {
   deny?: string[]
 }
 
-export interface ServiceCache {
-  id: string
-}
-
-export interface ServiceKv {
-  name: string
-  id: string
-}
-
-export interface ServiceDatabase {
-  name: string
-  id: string
-}
-
-export interface ServiceAnalytics {
-  name: string
-  id: string
-}
-
 export interface DurableObjectNamespace {
   className: string
   uniqueKey: string
@@ -128,20 +96,22 @@ export interface ServicedWorker {
     path?: string
     content?: Uint8Array | string
   }
-  loop?: LoopServices
   bindings?: ServiceBindings[]
   durableObjectNamespaces?: DurableObjectNamespace[]
   durableObjectStorage?: DurableObjectStorage
   durableObjectUniqueKeyModifier?: string
   cacheApiOutbound?: string
   globalOutbound?: string
+  plugins?: WorkerPlugin[]
 }
 
-export interface LoopServices {
-  cache?: ServiceCache
-  kv?: ServiceKv[]
-  database: ServiceDatabase[]
-  analytics: ServiceAnalytics[]
+export interface WorkerPlugin {
+  (options: any): {
+    compatibilityDate?: string
+    compatibilityFlags?: string[]
+    cacheApiOutbound?: string
+    globalOutbound?: string
+  }
 }
 
 export interface Service {
@@ -194,8 +164,6 @@ export interface toJson {
   pre_services: Service[]
   dev_services: Service[]
 }
-
-export type LoopBackServiceType = 'kv' | 'cache' | 'd1' | 'analytics' | 'dev'
 
 export type ExtensionModule = {
   name: string

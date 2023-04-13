@@ -1,0 +1,23 @@
+{
+  "name": "@c0b41/workerd-plugins",
+  "version": "0.0.3",
+  "license": "MIT",
+  "scripts": {
+    "build": "node ./scripts/build",
+    "build:cache": "node ./scripts/plugins/cache",
+    "build:kv": "node ./scripts/plugins/kv",
+    "build:dev": "node ./scripts/plugins/dev"
+  },
+  "files": [],
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "dependencies": {
+    "docker-names": "^1.2.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230404.0",
+    "esbuild": "^0.16.10",
+    "npm-dts": "^1.3.12"
+  }
+}

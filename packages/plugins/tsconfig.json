@@ -5,11 +5,12 @@
       "declarationDir": "types",
       "declaration": true,
       "emitDeclarationOnly": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "types": ["@cloudflare/workers-types"]
    },
    "include": [
       "src/**/*.ts",
-      "types/**/*.d.ts"
-, "../plugins/src/utils.ts"   ],
+      "types/**/*.d.ts"  
+   ],
    "exclude": ["node_modules", "dist", "src/config/*.ts"]
 }
