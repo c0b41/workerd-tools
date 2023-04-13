@@ -112,6 +112,7 @@ export interface WorkerPlugin {
     compatibilityFlags?: string[]
     cacheApiOutbound?: string
     globalOutbound?: string
+    bindings?: ServiceBindings[]
   }
 }
 

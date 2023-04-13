@@ -13,6 +13,7 @@ const sharedConfig = {
     format: 'esm',
     platform: 'browser',
     outfile: 'dist/plugins/cache/index.esm.js',
+    tsconfig: './module.tsconfig.json',
 }
 
 

@@ -1,10 +1,25 @@
-export interface ServiceCache {
-  id: string
+export interface CacheOptions {
+  name: string
+  cache_id: string
+  API: {
+    base: string
+    path?: string
+    token?: string
+  }
 }
 
-export interface ServiceKv {
+export interface KvOptions {
   name: string
-  id: string
+  kv_id: string
+  API: {
+    base: string
+    path?: string
+    token?: string
+  }
+}
+
+export interface DevOptions {
+  autoReload: boolean
 }
 
 export interface ServiceDatabase {
@@ -16,12 +31,3 @@ export interface ServiceAnalytics {
   name: string
   id: string
 }
-
-export interface LoopServices {
-  cache?: ServiceCache
-  kv?: ServiceKv[]
-  database: ServiceDatabase[]
-  analytics: ServiceAnalytics[]
-}
-
-export type LoopBackServiceType = 'kv' | 'cache' | 'd1' | 'analytics' | 'dev'

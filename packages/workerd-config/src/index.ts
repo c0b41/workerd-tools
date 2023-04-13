@@ -29,6 +29,8 @@ class WorkerdConfig {
         }
       }
 
+      // TODO: extract bindings, globalOutbound, cacheApiOutbound
+
       service = {
         ...service,
         ...rest,
