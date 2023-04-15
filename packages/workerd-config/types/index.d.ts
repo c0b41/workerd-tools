@@ -162,12 +162,12 @@ export type IExtensionModule = {
   content?: Uint8Array | string
 }
 
-export interface Extension {
+export interface IExtension {
   modules?: IExtensionModule[]
 }
 
 export interface toJson {
-  extensions: Extension
+  extensions: IExtension
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]

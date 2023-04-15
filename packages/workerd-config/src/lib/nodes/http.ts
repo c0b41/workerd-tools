@@ -10,6 +10,20 @@ export default class Http {
     return this._style
   }
 
+  get styleIndex(): number {
+    switch (this._style) {
+      case 'host':
+        return 0
+        break
+      case 'proxy':
+        return 1
+        break
+      default:
+        return 0
+        break
+    }
+  }
+
   setStyle(value: 'proxy' | 'host') {
     this._style = value
   }

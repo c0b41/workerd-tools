@@ -7,6 +7,16 @@ export type IBinding =
   | ServiceBindingDurableObjectNamespace
   | ServiceBindingWrapped
 
+export type IServiceBindingTypes =
+  | 'crypto'
+  | 'service'
+  | 'wrapped'
+  | 'durableobjectnamespace'
+  | 'text'
+  | 'json'
+  | 'wasm'
+  | 'data'
+
 export class ServiceBindingBasic extends ServiceModule {
   private _name: string
   private _type: 'text' | 'json' | 'wasm' | 'data'
@@ -20,11 +30,11 @@ export class ServiceBindingBasic extends ServiceModule {
   }
 
   get type(): string {
-    return this._name
+    return this._type
   }
 
-  seType(value: string) {
-    this._name = value
+  setType(value: 'text' | 'json' | 'wasm' | 'data') {
+    this._type = value
   }
 }
 
@@ -114,6 +124,11 @@ export class CryptoKey {
 
 export class ServiceBindingCrypto extends CryptoKey {
   private _name: string
+  private _type: 'crypto'
+
+  get type(): string {
+    return this._type
+  }
 
   get name(): string {
     return this._name
@@ -130,6 +145,11 @@ export class ServiceBindingService {
   private _kvNamespace?: string
   private _r2Bucket?: string
   private _queue?: string
+  private _type: 'service'
+
+  get type(): string {
+    return this._type
+  }
 
   get name(): string {
     return this._name
@@ -175,6 +195,11 @@ export class ServiceBindingService {
 export class ServiceBindingDurableObjectNamespace {
   private _name: string
   private _durableObjectNamespace?: string
+  private _type: 'durableobjectnamespace'
+
+  get type(): string {
+    return this._type
+  }
 
   get name(): string {
     return this._name
@@ -226,6 +251,11 @@ export class Wrapped {
 export class ServiceBindingWrapped {
   private _name: string
   private _wrapped?: Wrapped
+  private _type: 'wrapped'
+
+  get type(): string {
+    return this._type
+  }
 
   get name(): string {
     return this._name

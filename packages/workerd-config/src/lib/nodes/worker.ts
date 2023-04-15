@@ -72,11 +72,11 @@ export default class Worker {
     this._globalOutbound = value
   }
 
-  get durableObjectNamespace(): Set<DurableObjectNamespace> {
+  get durableObjectNamespaces(): Set<DurableObjectNamespace> {
     return this._durableObjectNamespaces
   }
 
-  setDurableObjectNamespace(value: DurableObjectNamespace) {
+  setDurableObjectNamespaces(value: DurableObjectNamespace) {
     this._durableObjectNamespaces.add(value)
   }
 

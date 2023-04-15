@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 
 export default class ServiceModule {
   private _path: string
-  private _content: Uint8Array | string
+  private _content: string
 
   get path(): string {
     return this._path
@@ -12,7 +12,7 @@ export default class ServiceModule {
     this._path = value
   }
 
-  get content(): Uint8Array | string {
+  get content(): string {
     if (this._content) {
       return this._content
     }
@@ -23,11 +23,11 @@ export default class ServiceModule {
     }
   }
 
-  setContent(value: Uint8Array | string) {
+  setContent(value: string) {
     this._content = value
   }
 
-  private readFile(path: string) {
+  private readFile(path: string): string {
     try {
       return readFileSync(path, 'utf-8')
     } catch (error) {
