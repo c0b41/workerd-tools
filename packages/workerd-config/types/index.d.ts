@@ -1,8 +1,10 @@
+import { Service, Socket } from '../src/nodes'
+
 export interface WorkerdConfigOptions {}
 
 export type ModuleType = 'esModule' | 'commonJsModule' | 'text' | 'data' | 'wasm' | 'json'
 
-export type ServiceModules = {
+export type IServiceModules = {
   name: string
   type: ModuleType
   path?: string
@@ -51,35 +53,35 @@ export type ServiceBindingWrapped = {
   wrapped?: {
     moduleName: string
     entrypoint?: string
-    innerBindings: ServiceBindings[]
+    innerBindings: IServiceBindings[]
   }
 }
 
-export type ServiceBindings =
+export type IServiceBindings =
   | ServiceBindingBasic
   | ServiceBindingCrypto
   | ServiceBindingService
   | ServiceBindingDurableObjectNamespace
   | ServiceBindingWrapped
 
-export interface ServicedExternal {
+export interface IServiceExternal {
   address: string
-  http?: SocketHttp
-  https?: SocketHttps
+  http?: ISocketHttp
+  https?: ISocketHttps
 }
 
-export interface ServiceDisk {
+export interface IServiceDisk {
   writable?: boolean
   allowDotfiles?: boolean
   path: string
 }
 
-export interface ServicedNetWork {
+export interface IServiceNetWork {
   allow?: string[]
   deny?: string[]
 }
 
-export interface DurableObjectNamespace {
+export interface IDurableObjectNamespace {
   className: string
   uniqueKey: string
 }
@@ -89,16 +91,16 @@ export interface DurableObjectStorage {
   localDisk?: string
 }
 
-export interface ServicedWorker {
+export interface IServiceWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
-  modules?: ServiceModules[]
+  modules?: IServiceModules[]
   serviceWorkerScript?: {
     path?: string
     content?: Uint8Array | string
   }
-  bindings?: ServiceBindings[]
-  durableObjectNamespaces?: DurableObjectNamespace[]
+  bindings?: IServiceBindings[]
+  durableObjectNamespaces?: IDurableObjectNamespace[]
   durableObjectStorage?: DurableObjectStorage
   durableObjectUniqueKeyModifier?: string
   cacheApiOutbound?: string
@@ -107,35 +109,29 @@ export interface ServicedWorker {
 }
 
 export interface WorkerPlugin {
-  (options: any): {
-    compatibilityDate?: string
-    compatibilityFlags?: string[]
-    cacheApiOutbound?: string
-    globalOutbound?: string
-    bindings?: ServiceBindings[]
-  }
+  (options: any, service: Service): Service
 }
 
-export interface Service {
+export interface IService {
   name: string
-  worker?: ServicedWorker
-  network?: ServicedNetWork
-  external?: ServicedExternal
-  disk?: ServiceDisk
+  worker?: IServiceWorker
+  network?: IServiceNetWork
+  external?: IServiceExternal
+  disk?: IServiceDisk
 }
 
-export interface Socket {
+export interface ISocket {
   name: string
   address: string
-  https?: SocketHttps
-  http?: SocketHttp
+  https?: ISocketHttps
+  http?: ISocketHttp
   service?: {
     name?: string
     entrypoint?: string
   }
 }
 
-export type SocketHttps = {
+export type ISocketHttps = {
   [keypair: string]: {
     privateKey: {
       path?: string
@@ -148,26 +144,26 @@ export type SocketHttps = {
   }
 }
 
-export type SocketHttp = {
+export type ISocketHttp = {
   style?: 'proxy' | 'host'
-  injectRequestHeaders: HttpHeaderInjectOptions[]
-  injectResponseHeaders: HttpHeaderInjectOptions[]
+  injectRequestHeaders: IHttpHeaderInjectOptions[]
+  injectResponseHeaders: IHttpHeaderInjectOptions[]
 }
 
-export type HttpHeaderInjectOptions = {
+export type IHttpHeaderInjectOptions = {
   name: string
   value: string
 }
 
 export interface toJson {
-  extensions: Extension[]
-  services: Service[]
-  sockets: Socket[]
-  pre_services: Service[]
-  dev_services: Service[]
+  extensions: Extension
+  services: Set<Service>
+  sockets: Set<Socket>
+  pre_services: Set<Service>
+  dev_services: Set<Service>
 }
 
-export type ExtensionModule = {
+export type IExtensionModule = {
   name: string
   internal?: boolean
   path?: string
@@ -175,5 +171,5 @@ export type ExtensionModule = {
 }
 
 export interface Extension {
-  modules?: ExtensionModule[]
+  modules?: IExtensionModule[]
 }

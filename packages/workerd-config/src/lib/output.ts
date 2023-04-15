@@ -1,18 +1,18 @@
 import { WorkerdConfig } from '.'
 import { readFileSync } from 'fs'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
-import { Config as CapnpConfig } from './config/workerd.capnp.js'
+import { Config as CapnpConfig } from '../config/workerd.capnp.js'
 import {
   ServiceBindings,
-  ServiceModules,
+  IServiceModules,
   HttpHeaderInjectOptions,
   toJson,
-  Service,
+  IService,
   Socket,
-  DurableObjectNamespace,
+  IDurableObjectNamespace,
   Extension,
-  ExtensionModule,
-} from '../types'
+  IExtensionModule,
+} from '../../types'
 
 // TODO: write proper typing with workerd.capnp.d.ts
 
