@@ -1,4 +1,4 @@
-import { Service, Socket } from '../src/nodes'
+import { Service, Socket } from '../src/lib/nodes'
 
 export interface WorkerdConfigOptions {}
 
@@ -155,14 +155,6 @@ export type IHttpHeaderInjectOptions = {
   value: string
 }
 
-export interface toJson {
-  extensions: Extension
-  services: Set<Service>
-  sockets: Set<Socket>
-  pre_services: Set<Service>
-  dev_services: Set<Service>
-}
-
 export type IExtensionModule = {
   name: string
   internal?: boolean
@@ -172,4 +164,12 @@ export type IExtensionModule = {
 
 export interface Extension {
   modules?: IExtensionModule[]
+}
+
+export interface toJson {
+  extensions: Extension
+  services: Service[]
+  sockets: Socket[]
+  pre_services: Service[]
+  dev_services: Service[]
 }

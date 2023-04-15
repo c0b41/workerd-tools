@@ -18,4 +18,6 @@ export {
   ServiceBindingDurableObjectNamespace,
   ServiceBindingService,
   ServiceBindingWrapped,
+  Wrapped,
+  IBinding,
 } from './binding'

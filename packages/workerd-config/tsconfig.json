@@ -11,5 +11,5 @@
       "src/**/*.ts",
       "types/**/*.d.ts"
 , "../plugins/src/utils.ts"   ],
-   "exclude": ["node_modules", "dist", "src/config/*.ts"]
+   "exclude": ["node_modules", "dist", "src/lib/config/*.ts"]
 }

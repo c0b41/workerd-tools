@@ -1,18 +1,18 @@
-import { WorkerdConfig } from '.'
+import { default as WorkerdConfig } from '.'
 import { readFileSync } from 'fs'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
-import { Config as CapnpConfig } from '../config/workerd.capnp.js'
+import { Config as CapnpConfig } from './config/workerd.capnp.js'
 import {
-  ServiceBindings,
+  IServiceBindings,
   IServiceModules,
-  HttpHeaderInjectOptions,
+  IHttpHeaderInjectOptions,
   toJson,
   IService,
-  Socket,
   IDurableObjectNamespace,
   Extension,
   IExtensionModule,
 } from '../../types'
+import { IBinding, Service, Socket } from './nodes'
 
 // TODO: write proper typing with workerd.capnp.d.ts
 
@@ -246,7 +246,7 @@ export default class ConfigOutput {
     }
   }
 
-  private generateBinding(bindings: ServiceBindings[], structServiceWorkerBindings: Struct) {
+  private generateBinding(bindings: IBinding[], structServiceWorkerBindings: Struct) {
     // @ts-ignore
     bindings.forEach((binding: ServiceBindings, index: number) => {
       // @ts-ignore
@@ -454,10 +454,10 @@ export default class ConfigOutput {
   }
 
   private generateSockets(struct: Struct) {
-    let size = this.config.sockets.length ?? 0
+    let size = this.config.sockets.size ?? 0
     // @ts-ignore
     let sockets = struct.initSockets(size)
-    this.config.sockets.forEach((socket: Socket, index: number) => {
+    this.config.sockets.forEach((socket: Socket) => {
       // @ts-ignore
       let structSocket = sockets.get(index)
       if (socket.name) {
@@ -515,33 +515,29 @@ export default class ConfigOutput {
           structSocketHttp.setStyle(socket.http.style)
         }
 
-        if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.length > 0) {
-          let size = socket.http.injectRequestHeaders.length ?? 0
+        if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.size > 0) {
+          let size = socket.http.injectRequestHeaders.size ?? 0
           let structSocketHttpInjectRequestHeaders = structSocketHttp.initInjectRequestHeaders(size)
 
-          socket.http.injectRequestHeaders.forEach(
-            (header: HttpHeaderInjectOptions, index: number) => {
-              let injectRequestHeader = structSocketHttpInjectRequestHeaders.get(index)
-              injectRequestHeader.setName(header.name)
-              injectRequestHeader.setValue(header.value)
-            }
-          )
+          socket.http.injectRequestHeaders.forEach((header: IHttpHeaderInjectOptions) => {
+            let injectRequestHeader = structSocketHttpInjectRequestHeaders.get(index)
+            injectRequestHeader.setName(header.name)
+            injectRequestHeader.setValue(header.value)
+          })
 
           structSocketHttp.setInjectRequestHeaders(structSocketHttpInjectRequestHeaders)
         }
 
-        if (socket.http.injectResponseHeaders && socket.http.injectResponseHeaders.length > 0) {
-          let size = socket.http.injectResponseHeaders.length ?? 0
+        if (socket.http.injectResponseHeaders && socket.http.injectResponseHeaders.size > 0) {
+          let size = socket.http.injectResponseHeaders.size ?? 0
           let structSocketHttpInjectResponseHeaders =
             structSocketHttp.initInjectResponseHeaders(size)
 
-          socket.http.injectResponseHeaders.forEach(
-            (header: HttpHeaderInjectOptions, index: number) => {
-              let injectResponseHeader = structSocketHttpInjectResponseHeaders.get(index)
-              injectResponseHeader.setName(header.name)
-              injectResponseHeader.setValue(header.value)
-            }
-          )
+          socket.http.injectResponseHeaders.forEach((header: IHttpHeaderInjectOptions) => {
+            let injectResponseHeader = structSocketHttpInjectResponseHeaders.get(index)
+            injectResponseHeader.setName(header.name)
+            injectResponseHeader.setValue(header.value)
+          })
 
           structSocketHttp.setInjectResponseHeaders(structSocketHttpInjectResponseHeaders)
         }
@@ -552,7 +548,7 @@ export default class ConfigOutput {
   }
 
   private generateExtension(struct: Struct) {
-    let size = this.config.extensions.length ?? 0
+    let size = this.config.extensions.modules.size ?? 0
     // @ts-ignore
     let extensions = struct.initExtensions(size)
     this.config.extensions.forEach((extension: Extension, extIndex: number) => {
@@ -601,11 +597,11 @@ export default class ConfigOutput {
 
   toJson(): toJson {
     return {
-      extensions: [...this.config.extensions],
-      services: [...this.config.services],
-      pre_services: [...this.config.pre_services],
-      sockets: [...this.config.sockets],
-      dev_services: [...this.config.dev_services],
+      extensions: this.config.extensions,
+      services: Array.from(this.config.services),
+      pre_services: Array.from(this.config.preServices),
+      sockets: Array.from(this.config.sockets),
+      dev_services: Array.from(this.config.devServices),
     }
   }
 }

@@ -1,4 +1,3 @@
-// TODO: auto-generate this file
 import type {
   HttpOptions_Style,
   TlsOptions_Version,

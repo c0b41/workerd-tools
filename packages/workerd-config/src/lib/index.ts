@@ -7,6 +7,7 @@ import {
   WorkerdConfigOptions,
   IServiceBindings,
 } from '../../types'
+import { createBinding } from './helper'
 import {
   WorkerConfigModule,
   ExtensionModule,
@@ -23,9 +24,7 @@ import {
   WorkerModule,
   DurableObjectNamespace,
   DurableObjectStorage,
-  ServiceBindingBasic,
-  ServiceBindingService,
-} from '../nodes'
+} from './nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
   private options: WorkerdConfigOptions | null = {}
@@ -237,60 +236,16 @@ class WorkerdConfig extends WorkerConfigModule {
 
       if (input.worker.bindings) {
         input.worker.bindings.forEach((binding: IServiceBindings) => {
-          if ('type' in binding) {
-            let worker_binding = new ServiceBindingBasic()
-
-            if (binding.name) {
-              worker_binding.setName(binding.name)
-            }
-
-            if (binding.content) {
-              worker_binding.setContent(binding.content)
-            }
-
-            if (binding.path) {
-              worker_binding.setPath(binding.path)
-            }
-
-            if (binding.type) {
-              worker_binding.seType(binding.type)
-            }
-
-            worker.setBindings(worker_binding)
-          }
-
-          if ('service' in binding) {
-            let worker_binding = new ServiceBindingService()
-            worker_binding.setService(binding.service)
-            worker.setBindings(worker_binding)
-          }
-
-          if ('kvNamespace' in binding) {
-            let worker_binding = new ServiceBindingService()
-            worker_binding.setKvNamespace(binding.kvNamespace)
-            worker.setBindings(worker_binding)
-          }
-
-          if ('r2Bucket' in binding) {
-            let worker_binding = new ServiceBindingService()
-            worker_binding.setR2Bucket(binding.r2Bucket)
-            worker.setBindings(worker_binding)
-          }
-
-          if ('queue' in binding) {
-            let worker_binding = new ServiceBindingService()
-            worker_binding.setQueue(binding.queue)
-            worker.setBindings(worker_binding)
-          }
+          let worker_binding = createBinding(binding)
+          worker.setBindings(worker_binding)
         })
       }
-      // todo: bindings
 
       service.setWorker(worker)
     }
 
     // Todo: write better.
-    if (input.worker) {
+    if (input.worker?.plugins) {
       let plugins = input.worker.plugins
       if (plugins && plugins.length > 0) {
         for (const plugin of plugins) {

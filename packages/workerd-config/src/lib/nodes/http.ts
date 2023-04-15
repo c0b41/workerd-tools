@@ -1,4 +1,4 @@
-import { IHttpHeaderInjectOptions } from '../../types'
+import { IHttpHeaderInjectOptions } from '../../../types'
 
 export default class Http {
   private _style: 'proxy' | 'host'
