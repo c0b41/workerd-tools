@@ -1,4 +1,4 @@
-import { Service, Socket } from '../src/lib/nodes'
+import { Extension, Service, Socket } from '../src/lib/nodes'
 
 export interface WorkerdConfigOptions {}
 
@@ -167,7 +167,7 @@ export interface IExtension {
 }
 
 export interface toJson {
-  extensions: IExtension
+  extensions: Extension
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]

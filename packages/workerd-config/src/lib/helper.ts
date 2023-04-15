@@ -7,6 +7,7 @@ import {
   ServiceBindingWrapped,
   Wrapped,
   IBinding,
+  Service,
 } from './nodes'
 
 function createBinding(binding: IServiceBindings): IBinding {
@@ -138,4 +139,10 @@ function createBinding(binding: IServiceBindings): IBinding {
   return worker_binding
 }
 
-export { createBinding }
+function unionServices(sets): Set<Service> {
+  return sets.reduce((combined, list) => {
+    return new Set([...combined, ...list])
+  }, new Set())
+}
+
+export { createBinding, unionServices }

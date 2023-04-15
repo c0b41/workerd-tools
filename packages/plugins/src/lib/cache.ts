@@ -7,7 +7,7 @@ import { Service, ServiceBindings } from '@c0b41/workerd-config/types/index'
 // todo: update with new api
 
 export default (options: CacheOptions) => {
-  return (instance: WorkerdConfig) => {
+  return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
     let cacheExternalService: Service = {
