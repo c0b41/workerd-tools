@@ -27,6 +27,10 @@ export default class ServiceModule {
     this._content = value
   }
 
+  get toUint8Array(): Uint8Array {
+    return new TextEncoder().encode(this._content)
+  }
+
   private readFile(path: string): string {
     try {
       return readFileSync(path, 'utf-8')

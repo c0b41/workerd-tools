@@ -12,12 +12,4 @@ export { default as WorkerModule } from './worker_module'
 export { default as Worker } from './worker'
 export { Socket, SocketService } from './socket'
 export { Extension, ExtensionModule } from './extension'
-export {
-  ServiceBindingBasic,
-  ServiceBindingCrypto,
-  ServiceBindingDurableObjectNamespace,
-  ServiceBindingService,
-  ServiceBindingWrapped,
-  Wrapped,
-  IBinding,
-} from './binding'
+export { Binding, Wrapped, IBindingType, CryptoKey, Data, Wasm } from './binding'

@@ -1,30 +1,16 @@
-import { IHttpHeaderInjectOptions } from '../../../types'
+import { IHttpHeaderInjectOptions, IHttpStyles } from '../../../types'
 
 export default class Http {
-  private _style: 'proxy' | 'host'
+  private _style: IHttpStyles
   private _injectRequestHeaders: Set<IHttpHeaderInjectOptions> = new Set()
   private _injectResponseHeaders: Set<IHttpHeaderInjectOptions> = new Set()
   constructor() {}
 
-  get style() {
+  get style(): number {
     return this._style
   }
 
-  get styleIndex(): number {
-    switch (this._style) {
-      case 'host':
-        return 0
-        break
-      case 'proxy':
-        return 1
-        break
-      default:
-        return 0
-        break
-    }
-  }
-
-  setStyle(value: 'proxy' | 'host') {
+  setStyle(value: IHttpStyles) {
     this._style = value
   }
 

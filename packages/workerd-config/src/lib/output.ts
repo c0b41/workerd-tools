@@ -17,358 +17,23 @@ import {
   Worker_DurableObjectNamespace,
   Worker_Binding,
   DiskDirectory,
+  HttpOptions_Header,
+  ServiceDesignator,
+  Worker_Module,
+  Worker_DurableObjectStorage,
 } from './config/workerd.capnp.js'
 import { IHttpHeaderInjectOptions, toJson } from '../../types'
-import { DurableObjectNamespace, ExtensionModule, IBinding, Service, Socket } from './nodes'
-import { unionServices } from './helper'
+import { DurableObjectNamespace, ExtensionModule, Service, Socket, WorkerModule } from './nodes'
+import { unionServices, createBinaryBinding } from './helper'
 
 export default class WorkerdOutput {
   private config: WorkerdConfig | null
   private struct: CapnpConfig
+  private out: Message
   constructor(config: WorkerdConfig) {
     this.config = config
-  }
-
-  private generateWorker(service: Service, struct: CapService) {
-    let structServiceWorker: CapWorker = struct.initWorker()
-
-    if (service.worker.compatibilityDate) {
-      structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
-    }
-
-    if (service.worker.compatibilityFlags) {
-      let flagsSize = service.worker.compatibilityFlags.length ?? 0
-      let structServiceWorkerCompatibilityFlags =
-        structServiceWorker.initCompatibilityFlags(flagsSize)
-      service.worker.compatibilityFlags.forEach((flag: string, index: number) => {
-        structServiceWorkerCompatibilityFlags.set(index, flag)
-      })
-    }
-
-    if (service.worker.cacheApiOutbound) {
-      let structServiceWorkerCacheApiOut = structServiceWorker.initCacheApiOutbound()
-      structServiceWorkerCacheApiOut.setName(service.worker.cacheApiOutbound)
-      structServiceWorker.setCacheApiOutbound(structServiceWorkerCacheApiOut)
-    }
-
-    if (service.worker.globalOutbound) {
-      let structServiceWorkerGlobalOut = structServiceWorker.initGlobalOutbound()
-      structServiceWorkerGlobalOut.setName(service.worker.globalOutbound)
-      structServiceWorker.setGlobalOutbound(structServiceWorkerGlobalOut)
-    }
-
-    if (service.worker.bindings) {
-      let workerBindingSize = service.worker.bindings.size ?? 0
-      let structServiceWorkerBindings: List<Worker_Binding> =
-        structServiceWorker.initBindings(workerBindingSize)
-      this.generateBinding(service.worker.bindings, structServiceWorkerBindings)
-    }
-
-    if (service.worker.serviceWorkerScript) {
-      if (service.worker.serviceWorkerScript.content) {
-        structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript.content)
-      }
-    }
-
-    if (service.worker.modules) {
-      let modulesSize = service.worker.modules.length ?? 0
-      let structServiceWorkerModules = structServiceWorker.initModules(modulesSize)
-      service.worker.modules.forEach((module: ServiceModules, index: number) => {
-        let moduleStruct = structServiceWorkerModules.get(index)
-        if (module.name) {
-          moduleStruct.setName(module.name)
-        }
-
-        let content = module.content ?? null
-        if (module.path) {
-          content = this.readFile(module.path)
-        }
-        switch (module.type) {
-          case 'esModule':
-            moduleStruct.setEsModule(content)
-            break
-          case 'commonJsModule':
-            moduleStruct.setCommonJsModule(content)
-            break
-          case 'text':
-            moduleStruct.setText(content)
-            break
-          case 'data':
-            moduleStruct.setData(content)
-            break
-          case 'json':
-            moduleStruct.setJson(content)
-            break
-          case 'wasm':
-            moduleStruct.setWasm(content)
-            break
-          default:
-            throw new Error('Unknow module type')
-        }
-      })
-
-      structServiceWorker.setModules(structServiceWorkerModules)
-    }
-
-    if (service.worker.durableObjectUniqueKeyModifier) {
-      structServiceWorker.setDurableObjectUniqueKeyModifier(
-        service.worker.durableObjectUniqueKeyModifier
-      )
-    }
-
-    if (service.worker.durableObjectStorage) {
-      let structServiceWorkerDurableObjectStorage = structServiceWorker.initDurableObjectStorage()
-      if (service.worker.durableObjectStorage.inMemory) {
-        structServiceWorkerDurableObjectStorage.setInMemory()
-      }
-
-      if (service.worker.durableObjectStorage.localDisk) {
-        structServiceWorkerDurableObjectStorage.setLocalDisk(
-          service.worker.durableObjectStorage.localDisk
-        )
-      }
-    }
-
-    if (service.worker.durableObjectNamespaces) {
-      let nameSpacesSize = service.worker.durableObjectNamespaces.size ?? 0
-      let structServiceWorkerDurableObjectNamespaces: List<Worker_DurableObjectNamespace> =
-        structServiceWorker.initDurableObjectNamespaces(nameSpacesSize)
-
-      structServiceWorkerDurableObjectNamespaces.forEach(
-        (namespaceStruct: Worker_DurableObjectNamespace, index: number) => {
-          service.worker.durableObjectNamespaces.forEach((namespace: DurableObjectNamespace) => {
-            if (namespace.className) {
-              namespaceStruct.setClassName(namespace.className)
-            }
-
-            if (namespace.uniqueKey) {
-              namespaceStruct.setUniqueKey(namespace.uniqueKey)
-            }
-          })
-        }
-      )
-
-      structServiceWorker.setDurableObjectNamespaces(structServiceWorkerDurableObjectNamespaces)
-    }
-  }
-
-  private generateExternal(service: Service, struct: CapService) {
-    let structServiceExternal: ExternalServer = struct.initExternal()
-
-    if (service.external.address) {
-      structServiceExternal.setAddress(service.external.address)
-    }
-
-    if (service.external.http) {
-      let structServiceExternalHttp: HttpOptions = structServiceExternal.initHttp()
-
-      if (service.external.http.style) {
-        structServiceExternalHttp.setStyle(service.external.http.styleIndex)
-      }
-
-      if (
-        service.external.http.injectRequestHeaders &&
-        service.external.http.injectRequestHeaders.size > 0
-      ) {
-        let size = service.external.http.injectRequestHeaders.size ?? 0
-        let structServiceExternalHttpRequestHeaders =
-          structServiceExternalHttp.initInjectRequestHeaders(size)
-
-        service.external.http.injectRequestHeaders.forEach((header: IHttpHeaderInjectOptions) => {
-          let injectRequestHeader = structServiceExternalHttpRequestHeaders.get(index)
-          injectRequestHeader.setName(header.name)
-          injectRequestHeader.setValue(header.value)
-        })
-
-        structServiceExternalHttp.setInjectRequestHeaders(structServiceExternalHttpRequestHeaders)
-      }
-
-      if (
-        service.external.http.injectResponseHeaders &&
-        service.external.http.injectResponseHeaders.size > 0
-      ) {
-        let size = service.external.http.injectResponseHeaders.size ?? 0
-        let structServiceExternalHttpResponseHeaders =
-          structServiceExternalHttp.initInjectResponseHeaders(size)
-
-        service.external.http.injectResponseHeaders.forEach((header: IHttpHeaderInjectOptions) => {
-          let injectResponseHeader = structServiceExternalHttpResponseHeaders.get(index)
-          injectResponseHeader.setName(header.name)
-          injectResponseHeader.setValue(header.value)
-        })
-
-        structServiceExternalHttp.setInjectResponseHeaders(structServiceExternalHttpResponseHeaders)
-      }
-
-      structServiceExternal.setHttp(structServiceExternalHttp)
-    }
-
-    if (service.external.https) {
-      let structServiceExternalHttps: ExternalServer_Https = structServiceExternal.initHttps()
-
-      if (service.external.https.keypair) {
-        let structSocketHttpsTls: TlsOptions = structServiceExternalHttps.initTlsOptions()
-        let structSocketHttpsKeypair: TlsOptions_Keypair = structSocketHttpsTls.initKeypair()
-
-        if (service.external.https.keypair.privateKey.content) {
-          structSocketHttpsKeypair.setPrivateKey(service.external.https.keypair.privateKey.content)
-        }
-
-        if (service.external.https.keypair.certificateChain.content) {
-          structSocketHttpsKeypair.setCertificateChain(
-            service.external.https.keypair.certificateChain.content
-          )
-        }
-
-        structSocketHttpsTls.setKeypair(structSocketHttpsKeypair)
-        structServiceExternalHttps.setTlsOptions(structSocketHttpsTls)
-      }
-    }
-  }
-
-  private generateBinding(
-    bindings: Set<IBinding>,
-    structServiceWorkerBindings: List<Worker_Binding>
-  ) {
-    structServiceWorkerBindings.forEach(
-      (structServiceWorkerBinding: Worker_Binding, index: number) => {
-        bindings.forEach((binding: IBinding) => {
-          switch (binding.type) {
-            case 'text':
-              structServiceWorkerBinding.setText(binding.content)
-              break
-            case 'data':
-              let structServiceWorkerBindingData = structServiceWorkerBinding.initData(
-                binding.content
-              )
-              structServiceWorkerBindingData.copyBuffer(bindingContent)
-              structServiceWorkerBinding.setData(structServiceWorkerBindingData)
-              break
-            case 'json':
-              structServiceWorkerBinding.setJson(bindingContent)
-              break
-            case 'wasm':
-              structServiceWorkerBinding.setWasm(bindingContent)
-            default:
-              throw new Error(`Unknow binding Type ${binding.type}`)
-          }
-
-          if ('service' in binding) {
-            let structServiceWorkerBindingService = structServiceWorkerBinding.initService()
-            structServiceWorkerBindingService.setName(binding.service)
-            structServiceWorkerBinding.setService(structServiceWorkerBindingService)
-          }
-
-          if ('kvNamespace' in binding) {
-            let structServiceWorkerBindingKV = structServiceWorkerBinding.initKvNamespace()
-            structServiceWorkerBindingKV.setName(binding.kvNamespace)
-            structServiceWorkerBinding.setKvNamespace(structServiceWorkerBindingKV)
-          }
-
-          if ('r2Bucket' in binding) {
-            let structServiceWorkerBindingR2 = structServiceWorkerBinding.initR2Bucket()
-            structServiceWorkerBindingR2.setName(binding.r2Bucket)
-            structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
-          }
-
-          if ('queue' in binding) {
-            let structServiceWorkerBindingQueue = structServiceWorkerBinding.initQueue()
-            structServiceWorkerBindingQueue.setName(binding.queue)
-            structServiceWorkerBinding.setQueue(structServiceWorkerBindingQueue)
-          }
-
-          if ('cryptoKey' in binding) {
-            let structServiceWorkerBindingCrypto = structServiceWorkerBinding.initCryptoKey()
-
-            if (binding.cryptoKey.raw) {
-              structServiceWorkerBindingCrypto.setRaw(binding.cryptoKey.raw)
-            }
-
-            if (binding.cryptoKey.base64) {
-              structServiceWorkerBindingCrypto.setBase64(binding.cryptoKey.base64)
-            }
-
-            if (binding.cryptoKey.hex) {
-              structServiceWorkerBindingCrypto.setHex(binding.cryptoKey.hex)
-            }
-
-            if (binding.cryptoKey.jwk) {
-              structServiceWorkerBindingCrypto.setJwk(binding.cryptoKey.jwk)
-            }
-
-            if (binding.cryptoKey.pkcs8) {
-              structServiceWorkerBindingCrypto.setPkcs8(binding.cryptoKey.pkcs8)
-            }
-
-            if (binding.cryptoKey.spki) {
-              structServiceWorkerBindingCrypto.setSpki(binding.cryptoKey.spki)
-            }
-
-            if (binding.cryptoKey.algorithm && binding.cryptoKey.algorithm.json) {
-              let structServiceWorkerBindingCryptoAlgo =
-                structServiceWorkerBindingCrypto.initAlgorithm()
-              structServiceWorkerBindingCryptoAlgo.setJson(binding.cryptoKey.algorithm.json)
-            }
-
-            if (binding.cryptoKey.usages && binding.cryptoKey.usages.length > 0) {
-              let usagesSize = binding.cryptoKey.usages.length ?? 0
-              let structServiceWorkerBindingCryptoUsages =
-                structServiceWorkerBindingCrypto.initUsages(usagesSize)
-
-              binding.cryptoKey.usages.forEach((usage: string, index: number) => {
-                structServiceWorkerBindingCryptoUsages.set(index, usage)
-              })
-            }
-
-            if (binding.cryptoKey.extractable) {
-              structServiceWorkerBindingCrypto.setExtractable(binding.cryptoKey.extractable)
-            }
-
-            structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
-          }
-
-          if ('durableObjectNamespace' in binding) {
-            let structServiceWorkerBindingDurableObjectNamespace =
-              structServiceWorkerBinding.initDurableObjectNamespace()
-
-            structServiceWorkerBindingDurableObjectNamespace.setClassName(
-              binding.durableObjectNamespace
-            )
-            structServiceWorkerBinding.setName(binding.name)
-            structServiceWorkerBinding.setDurableObjectNamespace(
-              structServiceWorkerBindingDurableObjectNamespace
-            )
-          }
-
-          if ('wrapped' in binding) {
-            let structServiceWorkerBindingWrapped = structServiceWorkerBinding.initWrapped()
-
-            if (binding.wrapped.moduleName) {
-              structServiceWorkerBindingWrapped.setModuleName(binding.wrapped.moduleName)
-            }
-
-            if (binding.wrapped.entrypoint) {
-              structServiceWorkerBindingWrapped.setEntrypoint(binding.wrapped.entrypoint)
-            }
-            if (binding.wrapped.innerBindings) {
-              let wrappedBindingSize = binding.wrapped.innerBindings.size ?? 0
-              let structServiceWorkerWrappedBindings =
-                structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
-              //this.generateBinding(
-              //  binding.wrapped.innerBindings,
-              //  structServiceWorkerWrappedBindings
-              //)
-            }
-
-            structServiceWorkerBinding.setWrapped(structServiceWorkerBindingWrapped)
-          }
-
-          structServiceWorkerBinding.setName(binding.name)
-          // @ts-ignore
-          structServiceWorkerBindings.set(index, structServiceWorkerBinding)
-        })
-      }
-    )
+    this.out = new Message()
+    this.struct = this.out.initRoot(CapnpConfig)
   }
 
   private generateServices() {
@@ -430,11 +95,222 @@ export default class WorkerdOutput {
         }
 
         if (service.external) {
-          this.generateExternal(service, structService)
+          let structServiceExternal: ExternalServer = structService.initExternal()
+
+          if (service.external.address) {
+            structServiceExternal.setAddress(service.external.address)
+          }
+
+          if (service.external.http) {
+            let structServiceExternalHttp: HttpOptions = structServiceExternal.initHttp()
+
+            if (service.external.http.style) {
+              structServiceExternalHttp.setStyle(service.external.http.style)
+            }
+
+            if (
+              service.external.http.injectRequestHeaders &&
+              service.external.http.injectRequestHeaders.size > 0
+            ) {
+              let size = service.external.http.injectRequestHeaders.size ?? 0
+              let structServiceExternalHttpRequestHeaders: List<HttpOptions_Header> =
+                structServiceExternalHttp.initInjectRequestHeaders(size)
+
+              service.external.http.injectRequestHeaders.forEach(
+                (header: IHttpHeaderInjectOptions) => {
+                  let injectRequestHeader = structServiceExternalHttpRequestHeaders.get(index)
+                  injectRequestHeader.setName(header.name)
+                  injectRequestHeader.setValue(header.value)
+                }
+              )
+
+              structServiceExternalHttp.setInjectRequestHeaders(
+                structServiceExternalHttpRequestHeaders
+              )
+            }
+
+            if (
+              service.external.http.injectResponseHeaders &&
+              service.external.http.injectResponseHeaders.size > 0
+            ) {
+              let size = service.external.http.injectResponseHeaders.size ?? 0
+              let structServiceExternalHttpResponseHeaders: List<HttpOptions_Header> =
+                structServiceExternalHttp.initInjectResponseHeaders(size)
+
+              service.external.http.injectResponseHeaders.forEach(
+                (header: IHttpHeaderInjectOptions) => {
+                  let injectResponseHeader = structServiceExternalHttpResponseHeaders.get(index)
+                  injectResponseHeader.setName(header.name)
+                  injectResponseHeader.setValue(header.value)
+                }
+              )
+
+              structServiceExternalHttp.setInjectResponseHeaders(
+                structServiceExternalHttpResponseHeaders
+              )
+            }
+
+            structServiceExternal.setHttp(structServiceExternalHttp)
+          }
+
+          if (service.external.https) {
+            let structServiceExternalHttps: ExternalServer_Https = structServiceExternal.initHttps()
+
+            if (service.external.https.keypair) {
+              let structSocketHttpsTls: TlsOptions = structServiceExternalHttps.initTlsOptions()
+              let structSocketHttpsKeypair: TlsOptions_Keypair = structSocketHttpsTls.initKeypair()
+
+              if (service.external.https.keypair.privateKey.content) {
+                structSocketHttpsKeypair.setPrivateKey(
+                  service.external.https.keypair.privateKey.content
+                )
+              }
+
+              if (service.external.https.keypair.certificateChain.content) {
+                structSocketHttpsKeypair.setCertificateChain(
+                  service.external.https.keypair.certificateChain.content
+                )
+              }
+
+              structSocketHttpsTls.setKeypair(structSocketHttpsKeypair)
+              structServiceExternalHttps.setTlsOptions(structSocketHttpsTls)
+            }
+          }
         }
 
         if (service.worker) {
-          this.generateWorker(service, structService)
+          let structServiceWorker: CapWorker = structService.initWorker()
+
+          if (service.worker.compatibilityDate) {
+            structServiceWorker.setCompatibilityDate(service.worker.compatibilityDate)
+          }
+
+          if (service.worker.compatibilityFlags) {
+            let flagsSize = service.worker.compatibilityFlags.size ?? 0
+            let structServiceWorkerCompatibilityFlags: List<string> =
+              structServiceWorker.initCompatibilityFlags(flagsSize)
+
+            structServiceWorkerCompatibilityFlags.forEach((structFlag: string, index: number) => {
+              service.worker.compatibilityFlags.forEach((flag: string) => {
+                structServiceWorkerCompatibilityFlags.set(index, flag)
+              })
+            })
+          }
+
+          if (service.worker.cacheApiOutbound) {
+            let structServiceWorkerCacheApiOut: ServiceDesignator =
+              structServiceWorker.initCacheApiOutbound()
+            structServiceWorkerCacheApiOut.setName(service.worker.cacheApiOutbound)
+            structServiceWorker.setCacheApiOutbound(structServiceWorkerCacheApiOut)
+          }
+
+          if (service.worker.globalOutbound) {
+            let structServiceWorkerGlobalOut: ServiceDesignator =
+              structServiceWorker.initGlobalOutbound()
+            structServiceWorkerGlobalOut.setName(service.worker.globalOutbound)
+            structServiceWorker.setGlobalOutbound(structServiceWorkerGlobalOut)
+          }
+
+          if (service.worker.bindings) {
+            let workerBindingSize = service.worker.bindings.size ?? 0
+            let structServiceWorkerBindings: List<Worker_Binding> =
+              structServiceWorker.initBindings(workerBindingSize)
+            createBinaryBinding(service.worker.bindings, structServiceWorkerBindings)
+
+            structServiceWorker.setBindings(structServiceWorkerBindings)
+          }
+
+          if (service.worker?.serviceWorkerScript?.content) {
+            structServiceWorker.setServiceWorkerScript(service.worker.serviceWorkerScript.content)
+          }
+
+          if (service.worker.modules) {
+            let modulesSize = service.worker.modules.size ?? 0
+            let structServiceWorkerModules: List<Worker_Module> =
+              structServiceWorker.initModules(modulesSize)
+
+            structServiceWorkerModules.forEach((moduleStruct: Worker_Module, index: number) => {
+              service.worker.modules.forEach((module: WorkerModule) => {
+                if (module.name) {
+                  moduleStruct.setName(module.name)
+                }
+
+                let content = module.content
+                let data: Data = moduleStruct.initData(module.toUint8Array.byteLength)
+                data.copyBuffer(module.toUint8Array)
+                switch (module.type) {
+                  case 'esModule':
+                    moduleStruct.setEsModule(content)
+                    break
+                  case 'commonJsModule':
+                    moduleStruct.setCommonJsModule(content)
+                    break
+                  case 'text':
+                    moduleStruct.setText(content)
+                    break
+                  case 'data':
+                    moduleStruct.setData(data)
+                    break
+                  case 'json':
+                    moduleStruct.setJson(content)
+                    break
+                  case 'wasm':
+                    moduleStruct.setWasm(data)
+                    break
+                  default:
+                    throw new Error('Unknow module type')
+                }
+              })
+            })
+
+            structServiceWorker.setModules(structServiceWorkerModules)
+          }
+
+          if (service.worker.durableObjectUniqueKeyModifier) {
+            structServiceWorker.setDurableObjectUniqueKeyModifier(
+              service.worker.durableObjectUniqueKeyModifier
+            )
+          }
+
+          if (service.worker.durableObjectStorage) {
+            let structServiceWorkerDurableObjectStorage: Worker_DurableObjectStorage =
+              structServiceWorker.initDurableObjectStorage()
+            if (service.worker.durableObjectStorage.inMemory) {
+              structServiceWorkerDurableObjectStorage.setInMemory()
+            }
+
+            if (service.worker.durableObjectStorage.localDisk) {
+              structServiceWorkerDurableObjectStorage.setLocalDisk(
+                service.worker.durableObjectStorage.localDisk
+              )
+            }
+          }
+
+          if (service.worker.durableObjectNamespaces) {
+            let nameSpacesSize = service.worker.durableObjectNamespaces.size ?? 0
+            let structServiceWorkerDurableObjectNamespaces: List<Worker_DurableObjectNamespace> =
+              structServiceWorker.initDurableObjectNamespaces(nameSpacesSize)
+
+            structServiceWorkerDurableObjectNamespaces.forEach(
+              (namespaceStruct: Worker_DurableObjectNamespace, index: number) => {
+                service.worker.durableObjectNamespaces.forEach(
+                  (namespace: DurableObjectNamespace) => {
+                    if (namespace.className) {
+                      namespaceStruct.setClassName(namespace.className)
+                    }
+
+                    if (namespace.uniqueKey) {
+                      namespaceStruct.setUniqueKey(namespace.uniqueKey)
+                    }
+                  }
+                )
+              }
+            )
+
+            structServiceWorker.setDurableObjectNamespaces(
+              structServiceWorkerDurableObjectNamespaces
+            )
+          }
         }
       })
     })
@@ -491,7 +367,7 @@ export default class WorkerdOutput {
         if (socket.http) {
           let structSocketHttp: HttpOptions = structSocket.initHttp()
           if (socket.http.style) {
-            structSocketHttp.setStyle(socket.http.styleIndex)
+            structSocketHttp.setStyle(socket.http.style)
           }
 
           if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.size > 0) {
@@ -553,14 +429,15 @@ export default class WorkerdOutput {
   }
 
   private generate(): Buffer {
-    const message = new Message()
-    this.struct = message.initRoot(CapnpConfig)
+    try {
+      this.generateExtension()
+      this.generateServices()
+      this.generateSockets()
 
-    this.generateExtension()
-    this.generateServices()
-    this.generateSockets()
-
-    return Buffer.from(message.toArrayBuffer())
+      return Buffer.from(this.out.toArrayBuffer())
+    } catch (error) {
+      throw new Error('Workerd Config generation failed:', { cause: error })
+    }
   }
 
   toBuffer(): Buffer {

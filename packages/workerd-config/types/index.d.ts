@@ -8,9 +8,19 @@ export type IServiceModules = {
   name: string
   type: ModuleType
   path?: string
-  content?: Uint8Array | string
+  content?: string | Uint8Array
 }
 
+export enum IUsage {
+  ENCRYPT = 0,
+  DECRYPT = 1,
+  SIGN = 2,
+  VERIFY = 3,
+  DERIVE_KEY = 4,
+  DERIVE_BITS = 5,
+  WRAP_KEY = 6,
+  UNWRAP_KEY = 7,
+}
 export type ServiceBindingCrypto = {
   name?: string
   cryptoKey: {
@@ -21,9 +31,9 @@ export type ServiceBindingCrypto = {
     pkcs8?: string
     spki?: string
     algorithm?: {
-      json: JSON
+      json: string
     }
-    usages?: string[]
+    usages?: IUsage[]
     extractable: boolean
   }
 }
@@ -39,7 +49,7 @@ export type ServiceBindingService = {
 export type ServiceBindingBasic = {
   name?: string
   type?: 'text' | 'json' | 'wasm' | 'data'
-  content?: string | Uint8Array
+  content?: string
   path?: string
 }
 
@@ -97,7 +107,7 @@ export interface IServiceWorker {
   modules?: IServiceModules[]
   serviceWorkerScript?: {
     path?: string
-    content?: Uint8Array | string
+    content?: string
   }
   bindings?: IServiceBindings[]
   durableObjectNamespaces?: IDurableObjectNamespace[]
@@ -135,17 +145,22 @@ export type ISocketHttps = {
   [keypair: string]: {
     privateKey: {
       path?: string
-      content?: Uint8Array | string
+      content?: string
     }
     certificateChain: {
       path?: string
-      content?: Uint8Array | string
+      content?: string
     }
   }
 }
 
+export enum IHttpStyles {
+  HOST = 0,
+  PROXY = 1,
+}
+
 export type ISocketHttp = {
-  style?: 'proxy' | 'host'
+  style?: IHttpStyles
   injectRequestHeaders: IHttpHeaderInjectOptions[]
   injectResponseHeaders: IHttpHeaderInjectOptions[]
 }
@@ -159,7 +174,7 @@ export type IExtensionModule = {
   name: string
   internal?: boolean
   path?: string
-  content?: Uint8Array | string
+  content?: string
 }
 
 export interface IExtension {

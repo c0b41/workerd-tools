@@ -2,7 +2,7 @@ import DurableObjectStorage from './durable_object_storage'
 import DurableObjectNamespace from './durable_object_namespaces'
 import Module from './module'
 import WorkerModule from './worker_module'
-import { IBinding } from './binding'
+import { Binding } from './binding'
 
 export default class Worker {
   private _compatibilityDate: string
@@ -14,7 +14,7 @@ export default class Worker {
   private _globalOutbound: string
   private _durableObjectNamespaces: Set<DurableObjectNamespace>
   private _durableObjectStorage: DurableObjectStorage
-  private _bindings: Set<IBinding>
+  private _bindings: Set<Binding>
 
   get compatibilityDate(): string {
     return this._compatibilityDate
@@ -88,11 +88,11 @@ export default class Worker {
     this._durableObjectStorage = value
   }
 
-  get bindings(): Set<IBinding> {
+  get bindings(): Set<Binding> {
     return this._bindings
   }
 
-  setBindings(value: IBinding) {
+  setBindings(value: Binding) {
     this._bindings.add(value)
   }
 }

@@ -1,25 +1,42 @@
+import { IUsage } from '../../../types'
 import ServiceModule from './module'
 
-export type IBinding =
-  | ServiceBindingBasic
-  | ServiceBindingCrypto
-  | ServiceBindingService
-  | ServiceBindingDurableObjectNamespace
-  | ServiceBindingWrapped
-
-export type IServiceBindingTypes =
-  | 'crypto'
-  | 'service'
-  | 'wrapped'
-  | 'durableobjectnamespace'
+export type IBindingType =
   | 'text'
+  | 'data'
   | 'json'
   | 'wasm'
-  | 'data'
+  | 'crypto'
+  | 'service'
+  | 'durable_object_namespace'
+  | 'kv'
+  | 'r2_bucket'
+  //  | 'r2_admin'
+  | 'wrapped'
+  | 'queue'
 
-export class ServiceBindingBasic extends ServiceModule {
+export class Binding {
   private _name: string
-  private _type: 'text' | 'json' | 'wasm' | 'data'
+  private _which: IBindingType = 'text'
+  private _text: string
+  private _data: Data
+  private _json: string
+  private _wasm: Wasm
+  private _crypto: CryptoKey
+  private _service: string
+  private _durableObjectNamespace: string
+  private _kvNamespace: string
+  private _r2Bucket: string
+  private _queue: string
+  private _wrapped: Wrapped
+
+  get which(): string {
+    return this._which
+  }
+
+  setWhich(value: IBindingType) {
+    this._which = value
+  }
 
   get name(): string {
     return this._name
@@ -29,12 +46,103 @@ export class ServiceBindingBasic extends ServiceModule {
     this._name = value
   }
 
-  get type(): string {
-    return this._type
+  get text(): string {
+    return this._text
   }
 
-  setType(value: 'text' | 'json' | 'wasm' | 'data') {
-    this._type = value
+  setText(value: string) {
+    this._text = value
+    this.setWhich('text')
+  }
+
+  get data(): Data {
+    return this._data
+  }
+
+  setData(value: Data) {
+    this._data = value
+    this.setWhich('data')
+  }
+
+  get json(): string {
+    return this._json
+  }
+
+  setJson(value: string) {
+    this._json = value
+    this.setWhich('json')
+  }
+
+  get wasm(): Wasm {
+    return this._wasm
+  }
+
+  setWasm(value: Wasm) {
+    this._wasm = value
+    this.setWhich('wasm')
+  }
+
+  get crypto(): CryptoKey {
+    return this._crypto
+  }
+
+  setCrypto(value: CryptoKey) {
+    this._crypto = value
+    this.setWhich('crypto')
+  }
+
+  get service(): string {
+    return this._service
+  }
+
+  setService(value: string) {
+    this._service = value
+    this.setWhich('service')
+  }
+
+  get durableObjectNamespace(): string {
+    return this._durableObjectNamespace
+  }
+
+  setDurableObjectNamespace(value: string) {
+    this._durableObjectNamespace = value
+    this.setWhich('durable_object_namespace')
+  }
+
+  get kvNamespace(): string {
+    return this._kvNamespace
+  }
+
+  setKvNamespace(value: string) {
+    this._kvNamespace = value
+    this.setWhich('kv')
+  }
+
+  get r2Bucket(): string {
+    return this._r2Bucket
+  }
+
+  setR2Bucket(value: string) {
+    this._r2Bucket = value
+    this.setWhich('r2_bucket')
+  }
+
+  get queue(): string {
+    return this._queue
+  }
+
+  setQueue(value: string) {
+    this._queue = value
+    this.setWhich('queue')
+  }
+
+  get wrapped(): Wrapped {
+    return this._wrapped
+  }
+
+  setWrapped(value: Wrapped) {
+    this._wrapped = value
+    this.setWhich('wrapped')
   }
 }
 
@@ -45,8 +153,8 @@ export class CryptoKey {
   private _jwk?: string
   private _pkcs8?: string
   private _spki?: string
-  private _algorithm?: JSON
-  private _usages?: Set<string>
+  private _algorithm?: string
+  private _usages?: IUsage[]
   private _extractable: boolean
 
   get raw(): string {
@@ -97,20 +205,20 @@ export class CryptoKey {
     this._spki = value
   }
 
-  get algorithm(): JSON {
+  get algorithm(): string {
     return this._algorithm
   }
 
-  setalgorithm(value: JSON) {
+  setalgorithm(value: string) {
     this._algorithm = value
   }
 
-  get usages(): Set<string> {
+  get usages(): IUsage[] {
     return this._usages
   }
 
-  setUsages(value: string) {
-    this._usages.add(value)
+  setUsages(value: IUsage) {
+    this._usages.push(value)
   }
 
   get extractable(): boolean {
@@ -122,106 +230,10 @@ export class CryptoKey {
   }
 }
 
-export class ServiceBindingCrypto extends CryptoKey {
-  private _name: string
-  private _type: 'crypto'
-
-  get type(): string {
-    return this._type
-  }
-
-  get name(): string {
-    return this._name
-  }
-
-  setName(value: string) {
-    this._name = value
-  }
-}
-
-export class ServiceBindingService {
-  private _name: string
-  private _service?: string
-  private _kvNamespace?: string
-  private _r2Bucket?: string
-  private _queue?: string
-  private _type: 'service'
-
-  get type(): string {
-    return this._type
-  }
-
-  get name(): string {
-    return this._name
-  }
-
-  setName(value: string) {
-    this._name = value
-  }
-
-  get service(): string {
-    return this._service
-  }
-
-  setService(value: string) {
-    this._service = value
-  }
-
-  get kvNamespace(): string {
-    return this._kvNamespace
-  }
-
-  setKvNamespace(value: string) {
-    this._kvNamespace = value
-  }
-
-  get r2Bucket(): string {
-    return this._r2Bucket
-  }
-
-  setR2Bucket(value: string) {
-    this._r2Bucket = value
-  }
-
-  get queue(): string {
-    return this._queue
-  }
-
-  setQueue(value: string) {
-    this._queue = value
-  }
-}
-
-export class ServiceBindingDurableObjectNamespace {
-  private _name: string
-  private _durableObjectNamespace?: string
-  private _type: 'durableobjectnamespace'
-
-  get type(): string {
-    return this._type
-  }
-
-  get name(): string {
-    return this._name
-  }
-
-  setName(value: string) {
-    this._name = value
-  }
-
-  get durableObjectNamespace(): string {
-    return this._durableObjectNamespace
-  }
-
-  setDurableObjectNamespace(value: string) {
-    this._durableObjectNamespace = value
-  }
-}
-
-export class Wrapped {
+export class Wrapped extends ServiceModule {
   private _moduleName: string
   private _entrypoint?: string
-  private _innerBindings: Set<IBinding>
+  private _innerBindings: Set<Binding>
 
   get moduleName(): string {
     return this._moduleName
@@ -239,37 +251,15 @@ export class Wrapped {
     this._entrypoint = value
   }
 
-  get innerBindings(): Set<IBinding> {
+  get innerBindings(): Set<Binding> {
     return this._innerBindings
   }
 
-  setInnerBindings(value: IBinding) {
+  setInnerBindings(value: Binding) {
     this._innerBindings.add(value)
   }
 }
 
-export class ServiceBindingWrapped {
-  private _name: string
-  private _wrapped?: Wrapped
-  private _type: 'wrapped'
+export class Wasm extends ServiceModule {}
 
-  get type(): string {
-    return this._type
-  }
-
-  get name(): string {
-    return this._name
-  }
-
-  setName(value: string) {
-    this._name = value
-  }
-
-  get wrapped(): Wrapped {
-    return this._wrapped
-  }
-
-  setWrapped(value: Wrapped) {
-    this._wrapped = value
-  }
-}
+export class Data extends ServiceModule {}
