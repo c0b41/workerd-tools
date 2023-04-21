@@ -11,8 +11,16 @@ let defaults = {
 export default fp(async (app: FastifyInstance, opts: cachePluginOptions = defaults) => {
   const { path } = opts
 
-  let gateway = new CacheGateway(app)
+  const gateway = new CacheGateway(app)
   const routes = cacheService(gateway)
+
+  if ('onReady' in gateway) {
+    app.addHook('onReady', gateway.onReady)
+  }
+
+  if ('onClose' in gateway) {
+    app.addHook('onClose', gateway.onClose)
+  }
 
   app.register(
     async (service: FastifyInstance) => {

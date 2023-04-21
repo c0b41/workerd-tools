@@ -1,5 +1,5 @@
 import { RequestGenericInterface, RouteHandler } from 'fastify'
-import { Response } from '@whatwg-node/fetch'
+import { Response } from 'undici'
 
 export interface sqliteFunc {
   all: Function
@@ -61,19 +61,19 @@ export interface StoredMeta<Meta = unknown> {
 }
 
 export interface IEBaseGateway {
-  onReady?(): Promise<void>
-  onClose?(): Promise<void>
+  onReady(): Promise<void>
+  onClose(): Promise<void>
 }
 
 export interface IECacheGateway extends IEBaseGateway {
   getCache(cacheID: string, namespace: string, key: string): Promise<Response>
-  putCache(): void
-  deleteCache(): void
+  putCache(): Promise<Response>
+  deleteCache(): Promise<Response>
 }
 
 export interface IEKvGateway extends IEBaseGateway {
-  listKv(): void
-  getKv(): void
-  putKv(): void
-  deleteKv(): void
+  listKv(): Promise<Response>
+  getKv(): Promise<Response>
+  putKv(): Promise<Response>
+  deleteKv(): Promise<Response>
 }

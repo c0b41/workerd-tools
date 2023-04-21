@@ -1,5 +1,23 @@
 // https://www.npmjs.com/package/sqlite
 
+import { createServer, request } from 'http'
+import { PassThrough } from 'node:stream'
+
+export const parseRequest = (data) =>
+  new Promise((resolve) =>
+    createServer()
+      .on('request', resolve)
+      .on('connection', (stream) => stream.write(data))
+      .emit('connection', new PassThrough())
+  )
+export const parseResponse = (data) =>
+  new Promise((resolve) =>
+    // @ts-ignore
+    request({ createConnection: () => new PassThrough() })
+      .on('socket', (stream) => stream.write(data))
+      .on('response', resolve)
+  )
+
 import { sqliteFunc } from '../../types/index'
 
 export class DBHelper {

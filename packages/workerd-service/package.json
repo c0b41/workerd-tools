@@ -2,6 +2,7 @@
   "name": "@c0b41/workerd-fastify-service",
   "version": "0.0.1",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "dev": "node ./dist/index.js",
     "build": "node ./scripts/build"

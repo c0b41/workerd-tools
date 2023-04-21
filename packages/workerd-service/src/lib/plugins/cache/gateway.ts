@@ -1,5 +1,5 @@
-import { Response } from '@whatwg-node/fetch'
 import { FastifyInstance } from 'fastify'
+import { Response } from 'undici'
 import { IECacheGateway, StoredMeta } from '../../../../types/index'
 import { DBHelper } from '../../utils'
 
@@ -15,13 +15,21 @@ class CacheGateway implements IECacheGateway {
   private async parse(result) {
     if (!result) return null
 
-    let parsed = {} as StoredMeta
-
-    if (result.attributes) {
-      const json = JSON.parse(result.attributes)
-      parsed.expiration = json.expiration
-      parsed.metadata = json.metadata as Meta
+    const onParse = (result) => {
+      //let parsed = {} as StoredMeta
+      //if (result.attributes) {
+      //  const json = JSON.parse(result.attributes)
+      //  parsed.expiration = json.expiration
+      //  parsed.metadata = json.metadata as Meta
+      //}
+      //return parsed
     }
+
+    if (Array.isArray(result)) {
+      return result.map((item: any) => onParse(item))
+    }
+
+    let parsed = onParse(result)
 
     return parsed
   }
@@ -39,9 +47,13 @@ class CacheGateway implements IECacheGateway {
 
     return new Response('')
   }
-  putCache(): void {}
-  deleteCache(): void {}
-  async onReady() {
+  public async putCache() {
+    return new Response('')
+  }
+  public async deleteCache() {
+    return new Response('')
+  }
+  public async onReady() {
     // create db tables..
     //await this.db.run(`
     //  CREATE TABLE IF NOT EXISTS cache_list (
@@ -60,6 +72,7 @@ class CacheGateway implements IECacheGateway {
     //  )
     //`)
   }
+  public async onClose() {}
 }
 
 export default CacheGateway

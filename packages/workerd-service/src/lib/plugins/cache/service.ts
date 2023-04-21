@@ -25,12 +25,13 @@ export default (gateway: IECacheGateway): CacheServiceRoutes => ({
 
     // check request headers if everthing is ok return cached response
     //let result = await gateway.match()
-    //console.log(result)
+    console.log(result)
 
     return reply.send('')
   },
 
   putCache: async (request: FastifyRequest, reply: FastifyReply) => {
+    console.log(request)
     reply.send('')
   },
 
