@@ -1,4 +1,5 @@
-import { IUsage } from '../../../types'
+import { IUsage } from '@types'
+import { ObservedArray, observe } from '@utils'
 import ServiceModule from './module'
 
 export type IBindingType =
@@ -11,7 +12,7 @@ export type IBindingType =
   | 'durable_object_namespace'
   | 'kv'
   | 'r2_bucket'
-  //  | 'r2_admin'
+  | 'r2_admin'
   | 'wrapped'
   | 'queue'
 
@@ -27,6 +28,7 @@ export class Binding {
   private _durableObjectNamespace: string
   private _kvNamespace: string
   private _r2Bucket: string
+  private _r2Admin: string
   private _queue: string
   private _wrapped: Wrapped
 
@@ -127,6 +129,15 @@ export class Binding {
     this.setWhich('r2_bucket')
   }
 
+  get r2Admin(): string {
+    return this._r2Admin
+  }
+
+  setR2Admin(value: string) {
+    this._r2Admin = value
+    this.setWhich('r2_admin')
+  }
+
   get queue(): string {
     return this._queue
   }
@@ -154,7 +165,7 @@ export class CryptoKey {
   private _pkcs8?: string
   private _spki?: string
   private _algorithm?: string
-  private _usages?: IUsage[]
+  private _usages? = observe<IUsage>([])
   private _extractable: boolean
 
   get raw(): string {
@@ -213,12 +224,12 @@ export class CryptoKey {
     this._algorithm = value
   }
 
-  get usages(): IUsage[] {
+  get usages(): ObservedArray<IUsage> {
     return this._usages
   }
 
   setUsages(value: IUsage) {
-    this._usages.push(value)
+    this._usages.add(value)
   }
 
   get extractable(): boolean {
@@ -233,7 +244,7 @@ export class CryptoKey {
 export class Wrapped extends ServiceModule {
   private _moduleName: string
   private _entrypoint?: string
-  private _innerBindings: Set<Binding>
+  private _innerBindings = observe<Binding>([])
 
   get moduleName(): string {
     return this._moduleName
@@ -251,7 +262,7 @@ export class Wrapped extends ServiceModule {
     this._entrypoint = value
   }
 
-  get innerBindings(): Set<Binding> {
+  get innerBindings(): ObservedArray<Binding> {
     return this._innerBindings
   }
 

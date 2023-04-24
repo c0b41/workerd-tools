@@ -1,4 +1,4 @@
-import { Extension, Service, Socket } from '../src/lib/nodes'
+import { Extension, Service, Socket } from '@nodes'
 
 export interface WorkerdConfigOptions {}
 
@@ -8,7 +8,7 @@ export type IServiceModules = {
   name: string
   type: ModuleType
   path?: string
-  content?: string | Uint8Array
+  content?: string
 }
 
 export enum IUsage {

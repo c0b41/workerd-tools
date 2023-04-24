@@ -1,13 +1,14 @@
 import { Extension, ExtensionModule } from './extension'
 import Service from './service'
 import { Socket } from './socket'
+import { ObservedArray, observe } from '@utils'
 
 export default class WorkerConfigModule {
   private _extensions: Extension
-  private _services: Set<Service>
-  private _sockets: Set<Socket>
-  private _pre_services: Set<Service>
-  private _dev_services: Set<Service>
+  private _services = observe<Service>([])
+  private _sockets = observe<Socket>([])
+  private _pre_services = observe<Service>([])
+  private _dev_services = observe<Service>([])
 
   get extensions(): Extension {
     return this._extensions
@@ -17,7 +18,7 @@ export default class WorkerConfigModule {
     this._extensions.setModules(value)
   }
 
-  get services(): Set<Service> {
+  get services(): ObservedArray<Service> {
     return this._services
   }
 
@@ -25,7 +26,7 @@ export default class WorkerConfigModule {
     this._services.add(value)
   }
 
-  get sockets(): Set<Socket> {
+  get sockets(): ObservedArray<Socket> {
     return this._sockets
   }
 
@@ -33,7 +34,7 @@ export default class WorkerConfigModule {
     this._sockets.add(value)
   }
 
-  get preServices(): Set<Service> {
+  get preServices(): ObservedArray<Service> {
     return this._pre_services
   }
 
@@ -41,7 +42,7 @@ export default class WorkerConfigModule {
     this._pre_services.add(value)
   }
 
-  get devServices(): Set<Service> {
+  get devServices(): ObservedArray<Service> {
     return this._dev_services
   }
 

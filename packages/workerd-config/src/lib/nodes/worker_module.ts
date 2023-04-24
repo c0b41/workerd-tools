@@ -1,4 +1,4 @@
-import { ModuleType } from '../../../types'
+import { ModuleType } from '@types'
 import ServiceModule from './module'
 
 export default class WorkerModule extends ServiceModule {

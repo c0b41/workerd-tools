@@ -1,8 +1,10 @@
-export default class Network {
-  private _allow: Set<string>
-  private _deny: Set<string>
+import { ObservedArray, observe } from '@utils'
 
-  get allow(): Set<string> {
+export default class Network {
+  private _allow = observe<string>([])
+  private _deny = observe<string>([])
+
+  get allow(): ObservedArray<string> {
     return this._allow
   }
 
@@ -10,7 +12,7 @@ export default class Network {
     this._allow.add(value)
   }
 
-  get deny(): Set<string> {
+  get deny(): ObservedArray<string> {
     return this._deny
   }
 

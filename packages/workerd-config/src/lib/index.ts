@@ -6,8 +6,8 @@ import {
   IServiceModules,
   WorkerdConfigOptions,
   IServiceBindings,
-} from '../../types'
-import { createBinding } from './helper'
+} from '@types'
+import { createBinding } from '@utils'
 import {
   WorkerConfigModule,
   ExtensionModule,
@@ -24,7 +24,7 @@ import {
   WorkerModule,
   DurableObjectNamespace,
   DurableObjectStorage,
-} from './nodes'
+} from '@nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
   private options: WorkerdConfigOptions | null = {}
@@ -178,7 +178,7 @@ class WorkerdConfig extends WorkerConfigModule {
             durable_object_namespace.setUniqueKey(item.uniqueKey)
           }
 
-          worker.setDurableObjectNamespace(durable_object_namespace)
+          worker.setDurableObjectNamespaces(durable_object_namespace)
         })
       }
 

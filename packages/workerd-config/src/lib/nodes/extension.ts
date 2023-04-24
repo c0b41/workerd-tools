@@ -1,4 +1,5 @@
 import ServiceModule from './module'
+import { ObservedArray, observe } from '@utils'
 
 export class ExtensionModule extends ServiceModule {
   private _name: string
@@ -22,9 +23,9 @@ export class ExtensionModule extends ServiceModule {
 }
 
 export class Extension {
-  private _modules: Set<ExtensionModule>
+  private _modules = observe<ExtensionModule>([])
 
-  get modules(): Set<ExtensionModule> {
+  get modules(): ObservedArray<ExtensionModule> {
     return this._modules
   }
 

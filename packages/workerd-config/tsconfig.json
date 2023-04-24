@@ -5,11 +5,17 @@
       "declarationDir": "types",
       "declaration": true,
       "emitDeclarationOnly": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "paths": {
+         "@utils": ["./src/lib/utils"],
+         "@nodes": ["./src/lib/nodes"],
+         "@types": ["./types/index"]
+
+      }
    },
    "include": [
       "src/**/*.ts",
       "types/**/*.d.ts"
-, "../plugins/src/utils.ts"   ],
+   ],
    "exclude": ["node_modules", "dist", "src/lib/config/*.ts"]
 }

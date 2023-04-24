@@ -22,9 +22,9 @@ import {
   Worker_Module,
   Worker_DurableObjectStorage,
 } from './config/workerd.capnp.js'
-import { IHttpHeaderInjectOptions, toJson } from '../../types'
-import { DurableObjectNamespace, ExtensionModule, Service, Socket, WorkerModule } from './nodes'
-import { unionServices, createBinaryBinding } from './helper'
+import { IHttpHeaderInjectOptions, toJson } from '@types'
+import { DurableObjectNamespace, ExtensionModule, Service, Socket, WorkerModule } from '@nodes'
+import { unionServices, createBinaryBinding } from '@utils'
 
 export default class WorkerdOutput {
   private config: WorkerdConfig | null
@@ -37,12 +37,8 @@ export default class WorkerdOutput {
   }
 
   private generateServices() {
-    let services = unionServices([
-      this.config.preServices,
-      this.config.devServices,
-      this.config.services,
-    ])
-    let size = services.size ?? 0
+    let services = [...this.config.preServices, ...this.config.devServices, ...this.config.services]
+    let size = services.length ?? 0
     let structServices: List<CapService> = this.struct.initServices(size)
 
     structServices.forEach((structService: CapService, index: number) => {
@@ -55,7 +51,7 @@ export default class WorkerdOutput {
           let structServiceNetwork: CapNetwork = structService.initNetwork()
 
           if (service.network.allow) {
-            let allowsize = service.network.allow.size ?? 0
+            let allowsize = service.network.allow.length ?? 0
             let structServiceNetworkAllow: List<string> = structServiceNetwork.initAllow(allowsize)
 
             structServiceNetworkAllow.forEach((allow: string, index: number) => {
@@ -67,7 +63,7 @@ export default class WorkerdOutput {
           }
 
           if (service.network.deny) {
-            let denysize = service.network.deny.size ?? 0
+            let denysize = service.network.deny.length ?? 0
             let structServiceNetworkDeny: List<string> = structServiceNetwork.initDeny(denysize)
 
             structServiceNetworkDeny.forEach((deny: string, index: number) => {
@@ -110,9 +106,9 @@ export default class WorkerdOutput {
 
             if (
               service.external.http.injectRequestHeaders &&
-              service.external.http.injectRequestHeaders.size > 0
+              service.external.http.injectRequestHeaders.length > 0
             ) {
-              let size = service.external.http.injectRequestHeaders.size ?? 0
+              let size = service.external.http.injectRequestHeaders.length ?? 0
               let structServiceExternalHttpRequestHeaders: List<HttpOptions_Header> =
                 structServiceExternalHttp.initInjectRequestHeaders(size)
 
@@ -131,9 +127,9 @@ export default class WorkerdOutput {
 
             if (
               service.external.http.injectResponseHeaders &&
-              service.external.http.injectResponseHeaders.size > 0
+              service.external.http.injectResponseHeaders.length > 0
             ) {
-              let size = service.external.http.injectResponseHeaders.size ?? 0
+              let size = service.external.http.injectResponseHeaders.length ?? 0
               let structServiceExternalHttpResponseHeaders: List<HttpOptions_Header> =
                 structServiceExternalHttp.initInjectResponseHeaders(size)
 
@@ -186,7 +182,7 @@ export default class WorkerdOutput {
           }
 
           if (service.worker.compatibilityFlags) {
-            let flagsSize = service.worker.compatibilityFlags.size ?? 0
+            let flagsSize = service.worker.compatibilityFlags.length ?? 0
             let structServiceWorkerCompatibilityFlags: List<string> =
               structServiceWorker.initCompatibilityFlags(flagsSize)
 
@@ -212,7 +208,7 @@ export default class WorkerdOutput {
           }
 
           if (service.worker.bindings) {
-            let workerBindingSize = service.worker.bindings.size ?? 0
+            let workerBindingSize = service.worker.bindings.length ?? 0
             let structServiceWorkerBindings: List<Worker_Binding> =
               structServiceWorker.initBindings(workerBindingSize)
             createBinaryBinding(service.worker.bindings, structServiceWorkerBindings)
@@ -225,7 +221,7 @@ export default class WorkerdOutput {
           }
 
           if (service.worker.modules) {
-            let modulesSize = service.worker.modules.size ?? 0
+            let modulesSize = service.worker.modules.length ?? 0
             let structServiceWorkerModules: List<Worker_Module> =
               structServiceWorker.initModules(modulesSize)
 
@@ -287,7 +283,7 @@ export default class WorkerdOutput {
           }
 
           if (service.worker.durableObjectNamespaces) {
-            let nameSpacesSize = service.worker.durableObjectNamespaces.size ?? 0
+            let nameSpacesSize = service.worker.durableObjectNamespaces.length ?? 0
             let structServiceWorkerDurableObjectNamespaces: List<Worker_DurableObjectNamespace> =
               structServiceWorker.initDurableObjectNamespaces(nameSpacesSize)
 
@@ -317,7 +313,7 @@ export default class WorkerdOutput {
   }
 
   private generateSockets() {
-    let size = this.config.sockets.size ?? 0
+    let size = this.config.sockets.length ?? 0
     let sockets: List<CapSocket> = this.struct.initSockets(size)
 
     sockets.forEach((structSocket: CapSocket, index: number) => {
@@ -370,8 +366,8 @@ export default class WorkerdOutput {
             structSocketHttp.setStyle(socket.http.style)
           }
 
-          if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.size > 0) {
-            let size = socket.http.injectRequestHeaders.size ?? 0
+          if (socket.http.injectRequestHeaders && socket.http.injectRequestHeaders.length > 0) {
+            let size = socket.http.injectRequestHeaders.length ?? 0
             let structSocketHttpInjectRequestHeaders =
               structSocketHttp.initInjectRequestHeaders(size)
 
@@ -384,8 +380,8 @@ export default class WorkerdOutput {
             structSocketHttp.setInjectRequestHeaders(structSocketHttpInjectRequestHeaders)
           }
 
-          if (socket.http.injectResponseHeaders && socket.http.injectResponseHeaders.size > 0) {
-            let size = socket.http.injectResponseHeaders.size ?? 0
+          if (socket.http.injectResponseHeaders && socket.http.injectResponseHeaders.length > 0) {
+            let size = socket.http.injectResponseHeaders.length ?? 0
             let structSocketHttpInjectResponseHeaders =
               structSocketHttp.initInjectResponseHeaders(size)
 
@@ -408,7 +404,7 @@ export default class WorkerdOutput {
     let extension: List<Extension> = this.struct.initExtensions(1)
     let structExtension = extension.get(1)
 
-    let moduleSize = this.config.extensions.modules.size ?? 0
+    let moduleSize = this.config.extensions.modules.length ?? 0
     let structModulesList = structExtension.initModules(moduleSize)
 
     structModulesList.forEach((structModule: Extension_Module, index: number) => {

@@ -1,13 +1,13 @@
 import { List } from 'capnp-ts'
-import { IServiceBindings, IUsage } from '../../types'
-import { Wrapped, Binding, Service, CryptoKey } from './nodes'
+import { IServiceBindings, IUsage } from '@types'
+import { Wrapped, Binding, Service, CryptoKey } from '@nodes'
 import {
   ServiceDesignator,
   Worker_Binding,
   Worker_Binding_CryptoKey,
   Worker_Binding_CryptoKey_Usage,
-} from './config/workerd.capnp'
-import { Data, Wasm } from './nodes/binding'
+} from '../config/workerd.capnp.js'
+import { Data, Wasm } from '@nodes'
 
 function createBinding(binding: IServiceBindings): Binding {
   let worker_binding = new Binding()
@@ -140,7 +140,7 @@ function createBinding(binding: IServiceBindings): Binding {
 }
 
 function createBinaryBinding(
-  bindings: Set<Binding>,
+  bindings: ObservedArray<Binding>,
   structServiceWorkerBindings: List<Worker_Binding>
 ) {
   structServiceWorkerBindings.forEach(
@@ -209,7 +209,7 @@ function createBinaryBinding(
               let structServiceWorkerBindingCryptoUsages: List<Worker_Binding_CryptoKey_Usage> =
                 structServiceWorkerBindingCrypto.initUsages(usagesSize)
 
-              binding.crypto.usages.forEach((usage: IUsage, index: number) => {
+              binding.crypto.usages.forEach((usage: number, index: number) => {
                 structServiceWorkerBindingCryptoUsages.set(index, usage)
               })
 
@@ -267,7 +267,7 @@ function createBinaryBinding(
               structServiceWorkerBindingWrapped.setEntrypoint(binding.wrapped.entrypoint)
             }
             if (binding.wrapped.innerBindings) {
-              let wrappedBindingSize = binding.wrapped.innerBindings.size ?? 0
+              let wrappedBindingSize = binding.wrapped.innerBindings.length ?? 0
               let structServiceWorkerWrappedBindings =
                 structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
               //this.createBinaryBinding(
@@ -298,4 +298,50 @@ function toUint8Array(message: string): Uint8Array {
   return new TextEncoder().encode(message)
 }
 
-export { createBinding, createBinaryBinding, unionServices, toUint8Array }
+export type ObservedArray<T> = Array<T> & {
+  get: (index: number) => T
+
+  getAll: (rule: object, del_items?: boolean) => T[]
+
+  remove: (index: number) => T[]
+
+  first: () => T
+
+  add: (value: any) => T[]
+}
+
+const isObserved = Symbol('ObservedArray.isObserved')
+
+function observe<T>(obj: Array<T>): ObservedArray<T> {
+  return new Proxy(obj, {
+    get(target, prop) {
+      if (prop == isObserved) {
+        return true
+      }
+
+      if (prop == 'get') {
+        return (index: number) => target[index]
+      }
+
+      if (prop == 'getAll') {
+        return (rule: object, del_items: boolean) => target.filter((obj, index) => {})
+      }
+
+      if (prop == 'first') {
+        return () => target[0]
+      }
+
+      if (prop == 'remove') {
+        return (index: number): any => target.splice(index, 1)
+      }
+
+      if (prop == 'add') {
+        return (value: any): any => target.push(value)
+      }
+
+      return Reflect.get(target, prop)
+    },
+  }) as ObservedArray<T>
+}
+
+export { createBinding, createBinaryBinding, unionServices, toUint8Array, observe }

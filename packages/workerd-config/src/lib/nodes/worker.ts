@@ -3,18 +3,19 @@ import DurableObjectNamespace from './durable_object_namespaces'
 import Module from './module'
 import WorkerModule from './worker_module'
 import { Binding } from './binding'
+import { ObservedArray, observe } from '@utils'
 
 export default class Worker {
   private _compatibilityDate: string
-  private _compatibilityFlags: Set<string>
+  private _compatibilityFlags = observe<string>([])
   private _serviceWorkerScript: Module
-  private _modules: Set<WorkerModule>
+  private _modules = observe<WorkerModule>([])
   private _durableObjectUniqueKeyModifier: string
   private _cacheApiOutbound: string
   private _globalOutbound: string
-  private _durableObjectNamespaces: Set<DurableObjectNamespace>
+  private _durableObjectNamespaces = observe<DurableObjectNamespace>([])
   private _durableObjectStorage: DurableObjectStorage
-  private _bindings: Set<Binding>
+  private _bindings = observe<Binding>([])
 
   get compatibilityDate(): string {
     return this._compatibilityDate
@@ -24,7 +25,7 @@ export default class Worker {
     this._compatibilityDate = value
   }
 
-  get compatibilityFlags(): Set<string> {
+  get compatibilityFlags(): ObservedArray<string> {
     return this._compatibilityFlags
   }
 
@@ -40,7 +41,7 @@ export default class Worker {
     this._serviceWorkerScript = value
   }
 
-  get modules(): Set<WorkerModule> {
+  get modules(): ObservedArray<WorkerModule> {
     return this._modules
   }
 
@@ -72,7 +73,7 @@ export default class Worker {
     this._globalOutbound = value
   }
 
-  get durableObjectNamespaces(): Set<DurableObjectNamespace> {
+  get durableObjectNamespaces(): ObservedArray<DurableObjectNamespace> {
     return this._durableObjectNamespaces
   }
 
@@ -88,7 +89,7 @@ export default class Worker {
     this._durableObjectStorage = value
   }
 
-  get bindings(): Set<Binding> {
+  get bindings(): ObservedArray<Binding> {
     return this._bindings
   }
 
