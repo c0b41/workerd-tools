@@ -2,14 +2,16 @@ import * as dockerNames from 'docker-names'
 import fs from 'fs'
 import { KvOptions } from '../../types'
 import { WorkerdConfig } from '@c0b41/workerd-config'
-import { Service, ServiceBindings } from '@c0b41/workerd-config/types/index'
+import { IService, IServiceBindings } from '@c0b41/workerd-config/types/index'
+import { Binding, Service } from '@c0b41/workerd-config/lib/nodes/index'
 
 export default (options: KvOptions) => {
-  return (instance: WorkerdConfig) => {
+  return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
-    let kvExternalService: Service = {
-      name: `external:kv:[servicename]`,
+    // External Proxy service for internet access
+    let kvExternalService: IService = {
+      name: `external:kv:${service.name}`,
       external: {
         address: options.API.base,
       },
@@ -17,7 +19,7 @@ export default (options: KvOptions) => {
 
     instance.Service(kvExternalService)
 
-    let kvServiceBindings: ServiceBindings[] = [
+    let kvServiceBindings: IServiceBindings[] = [
       {
         name: 'PLUGIN',
         type: 'text',
@@ -41,8 +43,9 @@ export default (options: KvOptions) => {
 
     let moduleContent = fs.readFileSync('./dist/plugins/kv/index.esm.js', 'utf-8')
 
-    let kvService: Service = {
-      name: `int:kv:[servicename]:${dockerNames.getRandomName()}`,
+    // Workerd api <=> Int api service
+    let kvService: IService = {
+      name: `int:kv:${service.name}:${dockerNames.getRandomName()}`,
       worker: {
         compatibilityDate: compatibilityDate,
         modules: [
@@ -58,15 +61,11 @@ export default (options: KvOptions) => {
 
     instance.Service(kvService)
 
-    let serviceBindings: ServiceBindings[] = [
-      {
-        name: options.name,
-        kvNamespace: kvService.name,
-      },
-    ]
+    // Connect current service to kv service
+    let kvBinding = new Binding()
 
-    return {
-      bindings: serviceBindings,
-    }
+    kvBinding.setName(options.name)
+    kvBinding.setKvNamespace(kvService.name)
+    service.worker.setBindings(kvBinding)
   }
 }

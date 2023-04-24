@@ -1,14 +1,42 @@
+import { TlsOptionsVersion } from '@types'
 import ServiceModule from './module'
 
 export default class Https {
   private _keypair: Keypair
+  private _requireClientCerts: boolean
+  private _trustBrowserCas: boolean
+  private _minVersion: TlsOptionsVersion
 
   get keypair(): Keypair {
     return this._keypair
   }
 
-  set keypair(value: Keypair) {
+  setKeypair(value: Keypair) {
     this._keypair = value
+  }
+
+  get requireClientCerts(): boolean {
+    return this._requireClientCerts
+  }
+
+  setRequireClientCerts(value: boolean) {
+    this._requireClientCerts = value
+  }
+
+  get trustBrowserCas(): boolean {
+    return this._trustBrowserCas
+  }
+
+  setTrustBrowserCas(value: boolean) {
+    this._trustBrowserCas = value
+  }
+
+  get minVersion(): TlsOptionsVersion {
+    return this._minVersion
+  }
+
+  setMinVersion(value: TlsOptionsVersion) {
+    this._minVersion = value
   }
 }
 

@@ -1,21 +1,21 @@
-import { Extension, ExtensionModule } from './extension'
+import { Extension } from './extension'
 import Service from './service'
 import { Socket } from './socket'
 import { ObservedArray, observe } from '@utils'
 
 export default class WorkerConfigModule {
-  private _extensions: Extension
+  private _extensions = observe<Extension>([])
   private _services = observe<Service>([])
   private _sockets = observe<Socket>([])
   private _pre_services = observe<Service>([])
   private _dev_services = observe<Service>([])
 
-  get extensions(): Extension {
+  get extensions(): ObservedArray<Extension> {
     return this._extensions
   }
 
-  setExtensions(value: ExtensionModule) {
-    this._extensions.setModules(value)
+  setExtensions(value: Extension) {
+    this._extensions.add(value)
   }
 
   get services(): ObservedArray<Service> {

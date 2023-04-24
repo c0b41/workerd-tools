@@ -1,11 +1,13 @@
 import {
   IHttpHeaderInjectOptions,
   IDurableObjectNamespace,
-  IExtensionModule,
+  IExtension,
   IService,
   IServiceModules,
   WorkerdConfigOptions,
   IServiceBindings,
+  ISocket,
+  IExtensionModule,
 } from '@types'
 import { createBinding } from '@utils'
 import {
@@ -24,6 +26,8 @@ import {
   WorkerModule,
   DurableObjectNamespace,
   DurableObjectStorage,
+  Extension,
+  Keypair,
 } from '@nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
@@ -91,31 +95,48 @@ class WorkerdConfig extends WorkerConfigModule {
         let https = new Https()
 
         if (input.external.https.keypair) {
-          let module = new ServiceModule()
+          let keypair = new Keypair()
+          if (input.external.https.keypair.privateKey) {
+            let module = new ServiceModule()
 
-          if (input.external.https.keypair.privateKey.path) {
-            module.setPath(input.external.https.keypair.privateKey.path)
+            if (input.external.https.keypair.privateKey.path) {
+              module.setPath(input.external.https.keypair.privateKey.path)
+            }
+
+            if (input.external.https.keypair.privateKey.content) {
+              module.setContent(input.external.https.keypair.privateKey.content)
+            }
+
+            keypair.setPrivateKey(module)
           }
 
-          if (input.external.https.keypair.privateKey.content) {
-            module.setContent(input.external.https.keypair.privateKey.content)
+          if (input.external.https.keypair.certificateChain) {
+            let module = new ServiceModule()
+
+            if (input.external.https.keypair.certificateChain.path) {
+              module.setPath(input.external.https.keypair.certificateChain.path)
+            }
+
+            if (input.external.https.keypair.certificateChain.content) {
+              module.setContent(input.external.https.keypair.certificateChain.content)
+            }
+
+            keypair.setCertificateChain(module)
           }
 
-          https.keypair.setPrivateKey(module)
+          https.setKeypair(keypair)
         }
 
-        if (input.external.https.keypair.certificateChain) {
-          let module = new ServiceModule()
+        if (input.external.https.requireClientCerts) {
+          https.setRequireClientCerts(input.external.https.requireClientCerts)
+        }
 
-          if (input.external.https.keypair.certificateChain.path) {
-            module.setPath(input.external.https.keypair.certificateChain.path)
-          }
+        if (input.external.https.trustBrowserCas) {
+          https.setTrustBrowserCas(input.external.https.trustBrowserCas)
+        }
 
-          if (input.external.https.keypair.certificateChain.content) {
-            module.setContent(input.external.https.keypair.certificateChain.content)
-          }
-
-          https.keypair.setCertificateChain(module)
+        if (input.external.https.minVersion) {
+          https.setMinVersion(input.external.https.minVersion)
         }
 
         external.setHttps(https)
@@ -258,32 +279,35 @@ class WorkerdConfig extends WorkerConfigModule {
     return this
   }
 
-  Extension(modules: IExtensionModule[]) {
-    modules.forEach((module: IExtensionModule) => {
-      let extension = new ExtensionModule()
+  Extension(input: IExtension) {
+    let extension = new Extension()
+
+    input.modules.forEach((module: IExtensionModule) => {
+      let extensionModule = new ExtensionModule()
 
       if (module.name) {
-        extension.setName(module.name)
+        extensionModule.setName(module.name)
       }
 
       if (module.internal) {
-        extension.setInternal(module.internal)
+        extensionModule.setInternal(module.internal)
       }
 
       if (module.path) {
-        extension.setPath(module.path)
+        extensionModule.setPath(module.path)
       }
 
       if (module.content) {
-        extension.setContent(module.content)
+        extensionModule.setContent(module.content)
       }
-      this.extensions.setModules(extension)
+      extension.setModules(extensionModule)
     })
 
+    this.extensions.add(extension)
     return this
   }
 
-  Socket(input: Socket) {
+  Socket(input: ISocket) {
     let socket = new Socket()
 
     if (input.name) {
@@ -319,34 +343,49 @@ class WorkerdConfig extends WorkerConfigModule {
     if (input.https) {
       let https = new Https()
 
-      if (https.keypair) {
-        if (https.keypair.privateKey) {
+      if (input.https.keypair) {
+        let keypair = new Keypair()
+        if (input.https.keypair.privateKey) {
           let module = new ServiceModule()
 
-          if (https.keypair.privateKey.path) {
+          if (input.https.keypair.privateKey.path) {
             module.setPath(https.keypair.privateKey.path)
           }
 
-          if (https.keypair.privateKey.content) {
+          if (input.https.keypair.privateKey.content) {
             module.setContent(https.keypair.privateKey.content)
           }
 
-          https.keypair.setPrivateKey(module)
+          keypair.setPrivateKey(module)
         }
 
-        if (https.keypair.certificateChain) {
+        if (input.https.keypair.certificateChain) {
           let module = new ServiceModule()
 
-          if (https.keypair.certificateChain.path) {
-            module.setPath(https.keypair.certificateChain.path)
+          if (input.https.keypair.certificateChain.path) {
+            module.setPath(input.https.keypair.certificateChain.path)
           }
 
-          if (https.keypair.certificateChain.content) {
-            module.setContent(https.keypair.certificateChain.content)
+          if (input.https.keypair.certificateChain.content) {
+            module.setContent(input.https.keypair.certificateChain.content)
           }
 
-          https.keypair.setCertificateChain(module)
+          keypair.setCertificateChain(module)
         }
+
+        https.setKeypair(keypair)
+      }
+
+      if (input.https.requireClientCerts) {
+        https.setRequireClientCerts(input.https.requireClientCerts)
+      }
+
+      if (input.https.trustBrowserCas) {
+        https.setTrustBrowserCas(input.https.trustBrowserCas)
+      }
+
+      if (input.https.minVersion) {
+        https.setMinVersion(input.https.minVersion)
       }
 
       socket.setHttps(https)

@@ -43,6 +43,7 @@ export type ServiceBindingService = {
   service?: string
   kvNamespace?: string
   r2Bucket?: string
+  r2Admin?: string
   queue?: string
 }
 
@@ -141,8 +142,17 @@ export interface ISocket {
   }
 }
 
+export declare enum TlsOptionsVersion {
+  GOOD_DEFAULT = 0,
+  SSL3 = 1,
+  TLS1DOT0 = 2,
+  TLS1DOT1 = 3,
+  TLS1DOT2 = 4,
+  TLS1DOT3 = 5,
+}
+
 export type ISocketHttps = {
-  [keypair: string]: {
+  keypair: {
     privateKey: {
       path?: string
       content?: string
@@ -152,6 +162,11 @@ export type ISocketHttps = {
       content?: string
     }
   }
+  requireClientCerts?: boolean
+  trustBrowserCas?: boolean
+  // Todo: trustedCertificates
+  // todo: CipherList
+  minVersion?: TlsOptionsVersion
 }
 
 export enum IHttpStyles {
@@ -182,7 +197,7 @@ export interface IExtension {
 }
 
 export interface toJson {
-  extensions: Extension
+  extensions: IExtension[]
   services: Service[]
   sockets: Socket[]
   pre_services: Service[]

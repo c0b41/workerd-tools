@@ -20,6 +20,7 @@ export interface KvOptions {
 
 export interface DevOptions {
   autoReload: boolean
+  port: number
 }
 
 export interface ServiceDatabase {

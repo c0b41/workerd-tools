@@ -1,6 +1,6 @@
 const LIVE_RELOAD = `<script defer type="application/javascript">
 (function () {
-  var url = new URL("http://localhost:1336");
+  var url = new URL("http://localhost:1337");
   function reload() { location.reload(); }
   function connect(reconnected) {
     var ws = new WebSocket(url);
