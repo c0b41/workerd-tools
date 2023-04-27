@@ -28,6 +28,7 @@ import {
   DurableObjectStorage,
   Extension,
   Keypair,
+  Plugin,
 } from '@nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
@@ -265,13 +266,12 @@ class WorkerdConfig extends WorkerConfigModule {
       service.setWorker(worker)
     }
 
-    // Todo: write better.
-    if (input.worker?.plugins) {
-      let plugins = input.worker.plugins
-      if (plugins && plugins.length > 0) {
-        for (const plugin of plugins) {
-          service = plugin(this, service)
-        }
+    if (input.worker?.plugins && input.worker.plugins.length > 0) {
+      for (const plugin of input.worker.plugins) {
+        let _plugin = new Plugin()
+        _plugin.setName(service.name)
+        _plugin.setCall(plugin)
+        service.worker.setPlugins(_plugin)
       }
     }
 

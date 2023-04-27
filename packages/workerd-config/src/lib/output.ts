@@ -1,5 +1,6 @@
 import { default as WorkerdConfig } from '.'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
+import { IHttpHeaderInjectOptions, toJson } from '@types'
 import {
   Config as CapnpConfig,
   Extension as CapExtension,
@@ -22,7 +23,6 @@ import {
   Worker_Module,
   Worker_DurableObjectStorage,
 } from './config/workerd.capnp.js'
-import { IHttpHeaderInjectOptions, toJson } from '@types'
 import {
   DurableObjectNamespace,
   Extension,
@@ -30,6 +30,7 @@ import {
   Service,
   Socket,
   WorkerModule,
+  Plugin,
 } from '@nodes'
 import { createBinaryBinding } from '@utils'
 
@@ -44,7 +45,7 @@ export default class WorkerdOutput {
   }
 
   private generateServices() {
-    let services = [...this.config.preServices, ...this.config.devServices, ...this.config.services]
+    let services = [...this.config.services]
     let size = services.length ?? 0
     let structServices: List<CapService> = this.struct.initServices(size)
 
@@ -401,7 +402,7 @@ export default class WorkerdOutput {
     this.struct.setSockets(structSockets)
   }
 
-  private generateExtension() {
+  private generateExtensions() {
     let size = this.config.extensions.length ?? 0
     let structExtensions: List<CapExtension> = this.struct.initExtensions(size)
 
@@ -431,9 +432,22 @@ export default class WorkerdOutput {
     this.struct.setExtensions(structExtensions)
   }
 
+  private generatePlugins() {
+    let services = [...this.config.services]
+
+    services.forEach((service: Service, index: number) => {
+      if (service.worker.plugins && service.worker.plugins.length > 0) {
+        service.worker.plugins.forEach((plugin: Plugin, index: number) => {
+          plugin.create(this.config, Service)
+        })
+      }
+    })
+  }
+
   private generate(): Buffer {
     try {
-      this.generateExtension()
+      this.generatePlugins()
+      this.generateExtensions()
       this.generateServices()
       this.generateSockets()
 
@@ -451,9 +465,7 @@ export default class WorkerdOutput {
     return {
       extensions: this.config.extensions,
       services: this.config.services,
-      pre_services: this.config.preServices,
       sockets: this.config.sockets,
-      dev_services: this.config.devServices,
     }
   }
 }

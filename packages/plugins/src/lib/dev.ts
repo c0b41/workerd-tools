@@ -1,50 +1,52 @@
 import * as dockerNames from 'docker-names'
-import fs from 'fs'
 import { DevOptions } from '../../types'
 import { WorkerdConfig } from '@c0b41/workerd-config'
-import { IService, IServiceBindings } from '@c0b41/workerd-config/types/index'
-import { Service } from '@c0b41/workerd-config/lib/nodes/index'
+import {
+  Binding,
+  Service,
+  Socket,
+  SocketService,
+  WorkerModule,
+} from '@c0b41/workerd-config/lib/nodes/index'
 
 export default (options: DevOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
-    let devServiceBindings: IServiceBindings[] = [
-      {
-        name: 'SERVICE_RELOAD',
-        type: 'text',
-        content: options.autoReload ? 'true' : 'false',
-      },
-      {
-        name: 'WS_PORT',
-        type: 'text',
-        content: options.port ? options.port.toString() : '1337',
-      },
-      {
-        name: 'SERVICE',
-        service: service.name,
-      },
-    ]
+    // Dev service
+    let devService = new Service()
+    devService.setName(`dev:${service.name}:${dockerNames.getRandomName()}`)
+    devService.worker.setcompatibilityDate(compatibilityDate)
 
-    let moduleContent = fs.readFileSync('./dist/plugins/dev/index.esm.js', 'utf-8')
+    let devServiceModule = new WorkerModule()
+    devServiceModule.setName(`dev-worker.js`)
+    devServiceModule.setPath(`./dist/plugins/dev/index.esm.js`)
+    devServiceModule.setType('esModule')
+    devService.worker.setModules(devServiceModule)
 
-    let devService: IService = {
-      name: `dev:${service.name}:${dockerNames.getRandomName()}`,
-      worker: {
-        compatibilityDate: compatibilityDate,
-        modules: [
-          {
-            name: 'dev-worker.js',
-            type: 'esModule',
-            content: moduleContent,
-          },
-        ],
-        bindings: devServiceBindings,
-      },
-    }
+    // Plugin reload binding
+    let devServiceBindingPluginReload = new Binding()
+    devServiceBindingPluginReload.setText('cache')
+    devService.worker.setBindings(devServiceBindingPluginReload)
 
-    instance.Service(devService)
+    // Plugin port binding
+    let devServiceBindingPluginPort = new Binding()
+    devServiceBindingPluginPort.setText(options.port.toString())
+    devService.worker.setBindings(devServiceBindingPluginPort)
 
-    // TODO: find service name, service socket and replace with dev service
+    // Plugin service binding dev service <=> user service
+    let devServiceBindingPluginService = new Binding()
+    devServiceBindingPluginService.setService(service.name)
+    devService.worker.setBindings(devServiceBindingPluginService)
+
+    // instance.setService(devService)
+
+    instance.sockets.forEach((socket: Socket, index: number) => {
+      if (socket.service?.name && socket.service.name === service.name) {
+        let socketservice = new SocketService()
+        socketservice.setName(service.name)
+        socket.setService(socketservice)
+      }
+    })
   }
 }

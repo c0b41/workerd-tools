@@ -1,4 +1,5 @@
 import { Extension, Service, Socket } from '@nodes'
+import { WorkerdConfig } from '../src'
 
 export interface WorkerdConfigOptions {}
 
@@ -21,6 +22,7 @@ export enum IUsage {
   WRAP_KEY = 6,
   UNWRAP_KEY = 7,
 }
+
 export type ServiceBindingCrypto = {
   name?: string
   cryptoKey: {
@@ -120,7 +122,11 @@ export interface IServiceWorker {
 }
 
 export interface WorkerPlugin {
-  (options: any, service: Service): Service
+  (options: any): WorkerPluginCall
+}
+
+export interface WorkerPluginCall {
+  (instance: WorkerdConfig, service: Service): Promise<void>
 }
 
 export interface IService {
@@ -197,9 +203,7 @@ export interface IExtension {
 }
 
 export interface toJson {
-  extensions: IExtension[]
+  extensions: Extension[]
   services: Service[]
   sockets: Socket[]
-  pre_services: Service[]
-  dev_services: Service[]
 }

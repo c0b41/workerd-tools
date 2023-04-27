@@ -2,6 +2,7 @@ import DurableObjectStorage from './durable_object_storage'
 import DurableObjectNamespace from './durable_object_namespaces'
 import Module from './module'
 import WorkerModule from './worker_module'
+import Plugin from './plugin'
 import { Binding } from './binding'
 import { ObservedArray, observe } from '@utils'
 
@@ -16,6 +17,7 @@ export default class Worker {
   private _durableObjectNamespaces = observe<DurableObjectNamespace>([])
   private _durableObjectStorage: DurableObjectStorage
   private _bindings = observe<Binding>([])
+  private _plugins = observe<Plugin>([])
 
   get compatibilityDate(): string {
     return this._compatibilityDate
@@ -95,5 +97,13 @@ export default class Worker {
 
   setBindings(value: Binding) {
     this._bindings.add(value)
+  }
+
+  get plugins(): ObservedArray<Plugin> {
+    return this._plugins
+  }
+
+  setPlugins(value: Plugin) {
+    this._plugins.add(value)
   }
 }

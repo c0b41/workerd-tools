@@ -7,8 +7,6 @@ export default class WorkerConfigModule {
   private _extensions = observe<Extension>([])
   private _services = observe<Service>([])
   private _sockets = observe<Socket>([])
-  private _pre_services = observe<Service>([])
-  private _dev_services = observe<Service>([])
 
   get extensions(): ObservedArray<Extension> {
     return this._extensions
@@ -32,21 +30,5 @@ export default class WorkerConfigModule {
 
   setSockets(value: Socket) {
     this._sockets.add(value)
-  }
-
-  get preServices(): ObservedArray<Service> {
-    return this._pre_services
-  }
-
-  setPreServices(value: Service) {
-    this._pre_services.add(value)
-  }
-
-  get devServices(): ObservedArray<Service> {
-    return this._dev_services
-  }
-
-  setDevServices(value: Service) {
-    this._dev_services.add(value)
   }
 }

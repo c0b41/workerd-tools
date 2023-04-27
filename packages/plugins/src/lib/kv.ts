@@ -1,71 +1,63 @@
 import * as dockerNames from 'docker-names'
-import fs from 'fs'
 import { KvOptions } from '../../types'
 import { WorkerdConfig } from '@c0b41/workerd-config'
-import { IService, IServiceBindings } from '@c0b41/workerd-config/types/index'
-import { Binding, Service } from '@c0b41/workerd-config/lib/nodes/index'
+import { Binding, External, Service, WorkerModule } from '@c0b41/workerd-config/lib/nodes/index'
 
 export default (options: KvOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
     // External Proxy service for internet access
-    let kvExternalService: IService = {
-      name: `external:kv:${service.name}`,
-      external: {
-        address: options.API.base,
-      },
-    }
+    let kvExternalService = new Service()
+    kvExternalService.setName(`external:kv:${service.name}`)
+    let externalService = new External()
+    externalService.setAddress(options.API.base)
 
-    instance.Service(kvExternalService)
-
-    let kvServiceBindings: IServiceBindings[] = [
-      {
-        name: 'PLUGIN',
-        type: 'text',
-        content: 'kv',
-      },
-      {
-        name: 'PLUGIN_PATH',
-        type: 'text',
-        content: options.API.path,
-      },
-      {
-        name: 'NAMESPACE',
-        type: 'text',
-        content: options.kv_id,
-      },
-      {
-        name: 'SERVICE',
-        service: kvExternalService.name,
-      },
-    ]
-
-    let moduleContent = fs.readFileSync('./dist/plugins/kv/index.esm.js', 'utf-8')
+    // instance.setService(kvExternalService)
 
     // Workerd api <=> Int api service
-    let kvService: IService = {
-      name: `int:kv:${service.name}:${dockerNames.getRandomName()}`,
-      worker: {
-        compatibilityDate: compatibilityDate,
-        modules: [
-          {
-            name: 'kv-worker.js',
-            type: 'esModule',
-            content: moduleContent,
-          },
-        ],
-        bindings: kvServiceBindings,
-      },
+    let kvService = new Service()
+    kvService.setName(`int:kv:${service.name}:${dockerNames.getRandomName()}`)
+    kvService.worker.setcompatibilityDate(compatibilityDate)
+
+    // Plugin modules
+    let kvServiceModule = new WorkerModule()
+    kvServiceModule.setName(`kv-worker.js`)
+    kvServiceModule.setPath(`./dist/plugins/kv/index.esm.js`)
+    kvServiceModule.setType(`esModule`)
+    kvService.worker.modules.setModules(kvServiceModule)
+
+    let cacheServiceBindingPlugin = new Binding()
+    cacheServiceBindingPlugin.setText('kv')
+    kvService.worker.setBindings(cacheServiceBindingPlugin)
+
+    // Plugin path binding if exist
+    if (options.API.path) {
+      let kvServiceBindingPluginPath = new Binding()
+      kvServiceBindingPluginPath.setText(options.API.path)
+      kvService.worker.setBindings(kvServiceBindingPluginPath)
     }
 
-    instance.Service(kvService)
+    // Plugin kv id binding
+    if (options.kv_id) {
+      let kvServiceBindingPluginKvId = new Binding()
+      kvServiceBindingPluginKvId.setText(options.kv_id)
+      kvService.worker.setBindings(kvServiceBindingPluginKvId)
+    }
 
-    // Connect current service to kv service
-    let kvBinding = new Binding()
+    // Plugin external proxy service binding
+    if (kvExternalService.name) {
+      let kvServiceBindingPluginService = new Binding()
+      kvServiceBindingPluginService.setService(kvExternalService.name)
+      kvService.worker.setBindings(kvServiceBindingPluginService)
+    }
 
-    kvBinding.setName(options.name)
-    kvBinding.setKvNamespace(kvService.name)
-    service.worker.setBindings(kvBinding)
+    // instance.setService(kvService)
+
+    // Plugin service to use service env.$x.get()
+    let kvServiceBindingService = new Binding()
+    kvServiceBindingService.setName(options.name)
+    kvServiceBindingService.setKvNamespace(kvService.name)
+    service.worker.setBindings(kvServiceBindingService)
   }
 }
