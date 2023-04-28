@@ -65,7 +65,7 @@ config.Service({
             }
         ],
         plugins: [
-            Supabase({ xxx: false })
+            Supabase({ name: 'supa', supabaseKey: 'xxx', supabaseUrl: 'yyyy' })
         ]
     }
 })

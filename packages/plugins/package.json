@@ -18,8 +18,9 @@
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "docker-names": "^1.2.1",
-    "@c0b41/workerd-config": "0.0.3"
+    "@c0b41/workerd-config": "0.0.3",
+    "@supabase/supabase-js": "^2.21.0",
+    "docker-names": "^1.2.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230404.0",

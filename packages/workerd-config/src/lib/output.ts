@@ -462,6 +462,8 @@ export default class WorkerdOutput {
   }
 
   toJson(): toJson {
+    this.generatePlugins()
+
     return {
       extensions: this.config.extensions,
       services: this.config.services,

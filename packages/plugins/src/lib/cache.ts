@@ -1,3 +1,4 @@
+import { join } from 'path'
 import * as dockerNames from 'docker-names'
 import { External, Binding, Service, WorkerModule, WorkerdConfig } from '@c0b41/workerd-config'
 
@@ -32,7 +33,7 @@ export default (options: CacheOptions) => {
 
     // Plugin modules
     cacheExternalServiceModule.setName(`cache-worker.js`)
-    cacheExternalServiceModule.setPath(`./plugins/cache/index.esm.js`)
+    cacheExternalServiceModule.setPath(join(__dirname, 'plugins/cache/index.esm.js'))
     cacheExternalServiceModule.setType('esModule')
     cacheService.worker.setModules(cacheExternalServiceModule)
 

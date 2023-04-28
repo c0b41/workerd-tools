@@ -9,7 +9,7 @@ const sharedConfig = {
     bundle: true,
     minify: true,
     sourcemap: true,
-    external: external,
+    //external: external,
     format: 'esm',
     platform: 'browser',
     outfile: 'dist/plugins/supabase/index.esm.js',

@@ -1,3 +1,4 @@
+import { join } from 'path'
 import * as dockerNames from 'docker-names'
 import { WorkerdConfig, Binding, External, Service, WorkerModule } from '@c0b41/workerd-config'
 
@@ -31,7 +32,7 @@ export default (options: KvOptions) => {
     // Plugin modules
     let kvServiceModule = new WorkerModule()
     kvServiceModule.setName(`kv-worker.js`)
-    kvServiceModule.setPath(`./plugins/kv/index.esm.js`)
+    kvServiceModule.setPath(join(__dirname, 'plugins/kv/index.esm.js'))
     kvServiceModule.setType(`esModule`)
     kvService.worker.setModules(kvServiceModule)
 

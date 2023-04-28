@@ -1,4 +1,5 @@
 import * as dockerNames from 'docker-names'
+import { join } from 'path'
 import { WorkerdConfig, Binding, Service, WorkerModule } from '@c0b41/workerd-config'
 
 export interface DevOptions {
@@ -17,7 +18,7 @@ export default (options: DevOptions) => {
 
     let devServiceModule = new WorkerModule()
     devServiceModule.setName(`dev-worker.js`)
-    devServiceModule.setPath(`./plugins/dev/index.esm.js`)
+    devServiceModule.setPath(join(__dirname, 'plugins/dev/index.esm.js'))
     devServiceModule.setType('esModule')
     devService.worker.setModules(devServiceModule)
 

@@ -1,12 +1,86 @@
-import * as dockerNames from 'docker-names'
-import { WorkerdConfig, Service } from '@c0b41/workerd-config'
-import { External } from '@c0b41/workerd-config'
+import { join } from 'path'
+import {
+  WorkerdConfig,
+  Service,
+  Extension,
+  ExtensionModule,
+  Binding,
+  Wrapped,
+} from '@c0b41/workerd-config'
 
-export interface SupabaseOptions {}
+export interface SupabaseOptions {
+  name: string
+  supabaseUrl: string
+  supabaseKey: string
+  auth?: {}
+  db?: {
+    schema?: string
+  }
+  global?: {
+    headers: Record<string, string>
+  }
+}
 
 export default (options: SupabaseOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
-    //console.log(instance)
-    //console.log(service.name)
+    if (!options.name || !options.supabaseKey || !options.supabaseUrl) {
+      throw new Error(`name, supabaseKey, supabaseUrl, required! `)
+    }
+
+    // Supabase lib for workerd
+    let extension = new Extension()
+    let extensionModule = new ExtensionModule()
+    extensionModule.setName('c0b41:supabase')
+    extensionModule.setInternal(true)
+    extensionModule.setPath(join(__dirname, 'plugins/supabase/index.esm.js'))
+    extension.setModules(extensionModule)
+
+    instance.setExtensions(extension)
+
+    // Wrapped stuff for supabase namespace
+    let wrappedSupabase = new Wrapped()
+    wrappedSupabase.setModuleName('c0b41:supabase')
+
+    if (options.supabaseUrl) {
+      let supabaseUrl = new Binding()
+      supabaseUrl.setName('supabaseUrl')
+      supabaseUrl.setText(options.supabaseUrl)
+      wrappedSupabase.setInnerBindings(supabaseUrl)
+    }
+
+    if (options.supabaseKey) {
+      let supabasekey = new Binding()
+      supabasekey.setName('supabaseKey')
+      supabasekey.setText(options.supabaseKey)
+      wrappedSupabase.setInnerBindings(supabasekey)
+    }
+
+    if (options.auth || options.db || options.global) {
+      let bindingOptions = Object.assign(
+        {},
+        {
+          auth: options.auth,
+        },
+        {
+          db: options.db,
+        },
+        {
+          global: options.global,
+        }
+      )
+
+      let supabaseOptions = new Binding()
+      supabaseOptions.setName('options')
+      supabaseOptions.setJson(JSON.stringify(bindingOptions))
+      wrappedSupabase.setInnerBindings(supabaseOptions)
+    }
+
+    // Wrapped Binding
+    let extensionWrapped = new Binding()
+    extensionWrapped.setName(options.name)
+    extensionWrapped.setWrapped(wrappedSupabase)
+
+    // Put supase namespace to service extension <=> worker
+    service.worker.setBindings(extensionWrapped)
   }
 }

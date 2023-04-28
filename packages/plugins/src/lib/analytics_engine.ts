@@ -1,4 +1,5 @@
 import * as dockerNames from 'docker-names'
+import { join } from 'path'
 import { WorkerdConfig, Service } from '@c0b41/workerd-config'
 
 export interface AnalyticsEngineOptions {
