@@ -1,4 +1,4 @@
-import { ObservedArray, observe } from '@utils'
+import { ObservedArray, observe } from '../utils'
 
 export default class Network {
   private _allow = observe<string>([])

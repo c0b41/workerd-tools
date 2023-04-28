@@ -1,6 +1,6 @@
 import { default as WorkerdConfig } from '.'
 import { Data, List, Message, Struct, Void } from 'capnp-ts'
-import { IHttpHeaderInjectOptions, toJson } from '@types'
+import { IHttpHeaderInjectOptions, toJson } from '../../types'
 import {
   Config as CapnpConfig,
   Extension as CapExtension,
@@ -31,8 +31,8 @@ import {
   Socket,
   WorkerModule,
   Plugin,
-} from '@nodes'
-import { createBinaryBinding } from '@utils'
+} from './nodes'
+import { createBinaryBinding } from './utils'
 
 export default class WorkerdOutput {
   private config: WorkerdConfig | null
@@ -433,15 +433,15 @@ export default class WorkerdOutput {
   }
 
   private generatePlugins() {
-    let services = [...this.config.services]
+    let services = this.config.services
 
-    services.forEach((service: Service, index: number) => {
-      if (service.worker.plugins && service.worker.plugins.length > 0) {
+    for (const service of services) {
+      if (service.worker?.plugins && service.worker?.plugins.length > 0) {
         service.worker.plugins.forEach((plugin: Plugin, index: number) => {
-          plugin.create(this.config, Service)
+          plugin.create(this.config, service)
         })
       }
-    })
+    }
   }
 
   private generate(): Buffer {

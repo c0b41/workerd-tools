@@ -13,6 +13,7 @@ const sharedConfig = {
     external: external,
     platform: 'node',
     target: ['node16'],
+    tsconfig: './tsconfig.json',
 }
 
 const typesConfig = {

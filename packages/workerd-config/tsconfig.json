@@ -4,18 +4,10 @@
       "target": "ESNext",
       "declarationDir": "types",
       "declaration": true,
-      "emitDeclarationOnly": true,
-      "esModuleInterop": true,
-      "paths": {
-         "@utils": ["./src/lib/utils"],
-         "@nodes": ["./src/lib/nodes"],
-         "@types": ["./types/index"]
-
-      }
+      "esModuleInterop": true
    },
    "include": [
       "src/**/*.ts",
-      "types/**/*.d.ts"
-   ],
-   "exclude": ["node_modules", "dist", "src/lib/config/*.ts"]
+  ],
+   "exclude": ["node_modules", "dist", "src/lib/config"]
 }

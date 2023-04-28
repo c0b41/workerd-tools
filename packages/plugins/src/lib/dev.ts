@@ -1,13 +1,10 @@
 import * as dockerNames from 'docker-names'
-import { DevOptions } from '../../types'
-import { WorkerdConfig } from '@c0b41/workerd-config'
-import {
-  Binding,
-  Service,
-  Socket,
-  SocketService,
-  WorkerModule,
-} from '@c0b41/workerd-config/lib/nodes/index'
+import { WorkerdConfig, Binding, Service, WorkerModule } from '@c0b41/workerd-config'
+
+export interface DevOptions {
+  autoReload?: boolean
+  port?: number
+}
 
 export default (options: DevOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
@@ -20,7 +17,7 @@ export default (options: DevOptions) => {
 
     let devServiceModule = new WorkerModule()
     devServiceModule.setName(`dev-worker.js`)
-    devServiceModule.setPath(`./dist/plugins/dev/index.esm.js`)
+    devServiceModule.setPath(`./plugins/dev/index.esm.js`)
     devServiceModule.setType('esModule')
     devService.worker.setModules(devServiceModule)
 
@@ -41,12 +38,12 @@ export default (options: DevOptions) => {
 
     // instance.setService(devService)
 
-    instance.sockets.forEach((socket: Socket, index: number) => {
-      if (socket.service?.name && socket.service.name === service.name) {
-        let socketservice = new SocketService()
-        socketservice.setName(service.name)
-        socket.setService(socketservice)
-      }
-    })
+    //instance.sockets.forEach((socket: Socket, index: number) => {
+    //  if (socket.service?.name && socket.service.name === service.name) {
+    //    let socketservice = new SocketService()
+    //    socketservice.setName(service.name)
+    //    socket.setService(socketservice)
+    //  }
+    //})
   }
 }

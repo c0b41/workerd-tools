@@ -1,5 +1,5 @@
 import ServiceModule from './module'
-import { ObservedArray, observe } from '@utils'
+import { ObservedArray, observe } from '../utils'
 
 export class ExtensionModule extends ServiceModule {
   private _name: string

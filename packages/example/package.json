@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {},
   "devDependencies": {
     "@c0b41/workerd-config": "0.0.3",
+    "@c0b41/workerd-plugins": "0.0.3",
     "@c0b41/workerd-dev": "0.0.3"
   }
 }

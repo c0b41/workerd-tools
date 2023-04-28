@@ -4,12 +4,10 @@
       "target": "ESNext",
       "declarationDir": "types",
       "declaration": true,
-      "emitDeclarationOnly": true,
-      "esModuleInterop": true,
+      "esModuleInterop": true
    },
    "include": [
       "src/**/*.ts",
-      "types/**/*.d.ts"  
    ],
-   "exclude": ["node_modules", "dist", "src/plugins"]
+   "exclude": ["node_modules", "dist", "src/plugins" ]
 }

@@ -1,14 +1,8 @@
-import type {
+import {
   HttpOptions_Style,
   TlsOptions_Version,
   Worker_Binding_CryptoKey_Usage,
-} from './workerd.capnp.js'
-
-export {
-  HttpOptions_Style,
-  TlsOptions_Version,
-  Worker_Binding_CryptoKey_Usage,
-} from './workerd.capnp.js'
+} from './workerd.capnp'
 
 export const kVoid = Symbol('kVoid')
 export type Void = typeof kVoid

@@ -8,8 +8,8 @@ import {
   IServiceBindings,
   ISocket,
   IExtensionModule,
-} from '@types'
-import { createBinding } from '@utils'
+} from '../../types'
+import { createBinding } from './utils'
 import {
   WorkerConfigModule,
   ExtensionModule,
@@ -29,7 +29,7 @@ import {
   Extension,
   Keypair,
   Plugin,
-} from '@nodes'
+} from './nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
   private options: WorkerdConfigOptions | null = {}
@@ -263,16 +263,16 @@ class WorkerdConfig extends WorkerConfigModule {
         })
       }
 
-      service.setWorker(worker)
-    }
-
-    if (input.worker?.plugins && input.worker.plugins.length > 0) {
-      for (const plugin of input.worker.plugins) {
-        let _plugin = new Plugin()
-        _plugin.setName(service.name)
-        _plugin.setCall(plugin)
-        service.worker.setPlugins(_plugin)
+      if (input.worker?.plugins && input.worker.plugins.length > 0) {
+        for (const plugin of input.worker.plugins) {
+          let _plugin = new Plugin()
+          _plugin.setName(service.name)
+          _plugin.setCall(plugin)
+          worker.setPlugins(_plugin)
+        }
       }
+
+      service.setWorker(worker)
     }
 
     this.services.add(service)

@@ -1,7 +1,15 @@
 import * as dockerNames from 'docker-names'
-import { KvOptions } from '../../types'
-import { WorkerdConfig } from '@c0b41/workerd-config'
-import { Binding, External, Service, WorkerModule } from '@c0b41/workerd-config/lib/nodes/index'
+import { WorkerdConfig, Binding, External, Service, WorkerModule } from '@c0b41/workerd-config'
+
+export interface KvOptions {
+  name: string
+  kv_id: string
+  API?: {
+    base: string
+    path?: string
+    token?: string
+  }
+}
 
 export default (options: KvOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
@@ -23,9 +31,9 @@ export default (options: KvOptions) => {
     // Plugin modules
     let kvServiceModule = new WorkerModule()
     kvServiceModule.setName(`kv-worker.js`)
-    kvServiceModule.setPath(`./dist/plugins/kv/index.esm.js`)
+    kvServiceModule.setPath(`./plugins/kv/index.esm.js`)
     kvServiceModule.setType(`esModule`)
-    kvService.worker.modules.setModules(kvServiceModule)
+    kvService.worker.setModules(kvServiceModule)
 
     let cacheServiceBindingPlugin = new Binding()
     cacheServiceBindingPlugin.setText('kv')

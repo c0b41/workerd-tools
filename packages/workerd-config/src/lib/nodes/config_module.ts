@@ -1,7 +1,7 @@
 import { Extension } from './extension'
 import Service from './service'
 import { Socket } from './socket'
-import { ObservedArray, observe } from '@utils'
+import { ObservedArray, observe } from '../utils'
 
 export default class WorkerConfigModule {
   private _extensions = observe<Extension>([])

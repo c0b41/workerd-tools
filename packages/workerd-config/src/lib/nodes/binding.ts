@@ -1,5 +1,5 @@
-import { IUsage } from '@types'
-import { ObservedArray, observe } from '@utils'
+import { IUsage } from '../../../types'
+import { ObservedArray, observe } from '../utils'
 import ServiceModule from './module'
 
 export type IBindingType =

@@ -1,7 +1,15 @@
 import * as dockerNames from 'docker-names'
-import { CacheOptions } from '../../types'
-import { WorkerdConfig } from '@c0b41/workerd-config'
-import { Binding, External, Service, WorkerModule } from '@c0b41/workerd-config/lib/nodes/index'
+import { External, Binding, Service, WorkerModule, WorkerdConfig } from '@c0b41/workerd-config'
+
+export interface CacheOptions {
+  name: string
+  cache_id: string
+  API?: {
+    base: string
+    path?: string
+    token?: string
+  }
+}
 
 export default (options: CacheOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
@@ -24,9 +32,9 @@ export default (options: CacheOptions) => {
 
     // Plugin modules
     cacheExternalServiceModule.setName(`cache-worker.js`)
-    cacheExternalServiceModule.setPath(`./dist/plugins/cache/index.esm.js`)
+    cacheExternalServiceModule.setPath(`./plugins/cache/index.esm.js`)
     cacheExternalServiceModule.setType('esModule')
-    cacheService.worker.modules.setModules(cacheExternalServiceModule)
+    cacheService.worker.setModules(cacheExternalServiceModule)
 
     // Plugin service
     let cacheServiceBindingPlugin = new Binding()

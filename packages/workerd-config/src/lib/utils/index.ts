@@ -1,13 +1,12 @@
 import { List } from 'capnp-ts'
-import { IServiceBindings, IUsage } from '@types'
-import { Wrapped, Binding, CryptoKey } from '@nodes'
+import { IServiceBindings, IUsage } from '../../../types'
+import { Wrapped, Binding, CryptoKey, Data, Wasm } from '../nodes'
 import {
   ServiceDesignator,
   Worker_Binding,
   Worker_Binding_CryptoKey,
   Worker_Binding_CryptoKey_Usage,
-} from '../config/workerd.capnp.js'
-import { Data, Wasm } from '@nodes'
+} from '../config/workerd.capnp'
 
 function createBinding(binding: IServiceBindings): Binding {
   let worker_binding = new Binding()
@@ -145,10 +144,10 @@ function createBinding(binding: IServiceBindings): Binding {
 
 function createBinaryBinding(
   bindings: ObservedArray<Binding>,
-  structServiceWorkerBindings: List<Worker_Binding>
+  structServiceWorkerBindings: List<any>
 ) {
   bindings.forEach((binding: Binding, index: number) => {
-    let structServiceWorkerBinding = structServiceWorkerBindings.get(index)
+    let structServiceWorkerBinding: Worker_Binding = structServiceWorkerBindings.get(index)
     switch (binding.which) {
       case 'text':
         structServiceWorkerBinding.setText(binding.text)

@@ -1,6 +1,8 @@
+import { WorkerPluginCall } from '../../../types'
+
 export default class Plugin {
   private _name: string
-  private _call: Function
+  private _call: WorkerPluginCall
 
   get name(): string {
     return this._name
@@ -10,11 +12,11 @@ export default class Plugin {
     this._name = value
   }
 
-  get create(): Function {
+  get create(): WorkerPluginCall {
     return this._call
   }
 
-  setCall(value: Function) {
+  setCall(value: WorkerPluginCall) {
     this._call = value
   }
 }

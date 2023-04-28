@@ -1,4 +1,5 @@
 const { WorkerdConfig } = require('@c0b41/workerd-config')
+const { Supabase } = require('@c0b41/workerd-plugins')
 
 /** @type { import("@c0b41/workerd-config").WorkerdConfig } */
 let config = new WorkerdConfig()
@@ -62,6 +63,9 @@ config.Service({
                     ]
                 }
             }
+        ],
+        plugins: [
+            Supabase({ xxx: false })
         ]
     }
 })

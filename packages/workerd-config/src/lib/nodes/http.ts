@@ -1,5 +1,5 @@
-import { IHttpHeaderInjectOptions, IHttpStyles } from '@types'
-import { ObservedArray, observe } from '@utils'
+import { IHttpHeaderInjectOptions, IHttpStyles } from '../../../types'
+import { ObservedArray, observe } from '../utils'
 
 export default class Http {
   private _style: IHttpStyles

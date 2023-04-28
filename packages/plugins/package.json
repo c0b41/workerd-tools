@@ -6,17 +6,22 @@
     "build": "node ./scripts/build",
     "build:cache": "node ./scripts/plugins/cache",
     "build:kv": "node ./scripts/plugins/kv",
-    "build:dev": "node ./scripts/plugins/dev"
+    "build:dev": "node ./scripts/plugins/dev",
+    "build:analytics": "node ./scripts/plugins/analytics_engine",
+    "build:postgres": "node ./scripts/plugins/postgres_sql",
+    "build:supabase": "node ./scripts/plugins/supabase"
   },
-  "files": [],
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "docker-names": "^1.2.1"
+    "docker-names": "^1.2.1",
+    "@c0b41/workerd-config": "0.0.3"
   },
   "devDependencies": {
-    "@c0b41/workerd-config": "0.0.3",
     "@cloudflare/workers-types": "^4.20230404.0",
     "esbuild": "^0.16.10",
     "npm-dts": "^1.3.12"

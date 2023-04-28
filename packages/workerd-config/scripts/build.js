@@ -23,7 +23,7 @@ const typesConfig = {
     logLevel: 'debug'
 }
 
-new Generator(typesConfig, true, true).generate()
+new Generator(typesConfig, true, true).generate() // Doesn't support path mapping
 
 if (isDev) {
     build({

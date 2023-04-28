@@ -1,4 +1,4 @@
-import { Extension, Service, Socket } from '@nodes'
+import { Extension, Service, Socket } from '../src/lib/nodes'
 import { WorkerdConfig } from '../src'
 
 export interface WorkerdConfigOptions {}

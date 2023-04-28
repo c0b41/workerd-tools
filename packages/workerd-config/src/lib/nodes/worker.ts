@@ -4,7 +4,7 @@ import Module from './module'
 import WorkerModule from './worker_module'
 import Plugin from './plugin'
 import { Binding } from './binding'
-import { ObservedArray, observe } from '@utils'
+import { ObservedArray, observe } from '../utils'
 
 export default class Worker {
   private _compatibilityDate: string

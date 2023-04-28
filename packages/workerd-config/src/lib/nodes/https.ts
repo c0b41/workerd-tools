@@ -1,4 +1,4 @@
-import { TlsOptionsVersion } from '@types'
+import { TlsOptionsVersion } from '../../../types'
 import ServiceModule from './module'
 
 export default class Https {
