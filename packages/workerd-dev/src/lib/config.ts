@@ -1,9 +1,7 @@
 import { join } from 'path'
 import { existsSync, writeFileSync } from 'fs'
 import { ConfigOutput, WorkerdConfig } from '@c0b41/workerd-config'
-import { generateWorkerScript } from '@c0b41/workerd-config'
 import { WorkersOptions } from '../../types'
-import { Service } from '@c0b41/workerd-config/types/index'
 import { ProcessEvents } from './event'
 import { requireUncached } from './utils'
 
@@ -32,42 +30,8 @@ export class Config {
   }
 
   private generateDevServices() {
-    if (this.workersOptions.prettyErrors) {
-      let dev_services = []
-      this.instance.sockets = this.instance.sockets.map((socket) => {
-        if (socket.address && socket.service) {
-          let service: Service = {
-            name: `dev:${socket.service}`,
-          }
-          service.worker = {
-            serviceWorkerScript: {
-              content: generateWorkerScript('dev'),
-            },
-            compatibilityDate: '2022-09-16',
-            bindings: [
-              {
-                name: 'SERVICE',
-                service: socket.service.name,
-              },
-            ],
-          }
-
-          service.worker.bindings.push({
-            name: 'SERVICE_RELOAD',
-            type: 'text',
-            content: this.workersOptions.autoReload ? 'true' : 'false',
-          })
-          dev_services.push(service)
-          socket.service = {
-            name: `dev:${socket.service}`,
-          }
-        }
-
-        return socket
-      })
-
-      this.instance.dev_services = dev_services
-    }
+    let options = this.workersOptions
+    // Todo: write with new plugins system
   }
 
   private generateConfig() {

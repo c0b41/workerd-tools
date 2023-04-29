@@ -16,13 +16,17 @@ export default (options: KvOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
+    if(!options.name || !options.kv_id){
+      throw new Error('name, kv_id required!')
+    }
+
     // External Proxy service for internet access
     let kvExternalService = new Service()
     kvExternalService.setName(`external:kv:${service.name}`)
     let externalService = new External()
     externalService.setAddress(options.API.base)
 
-    // instance.setService(kvExternalService)
+    instance.setServices(kvExternalService)
 
     // Workerd api <=> Int api service
     let kvService = new Service()
@@ -37,12 +41,14 @@ export default (options: KvOptions) => {
     kvService.worker.setModules(kvServiceModule)
 
     let cacheServiceBindingPlugin = new Binding()
+    cacheServiceBindingPlugin.setName('PLUGIN')
     cacheServiceBindingPlugin.setText('kv')
     kvService.worker.setBindings(cacheServiceBindingPlugin)
 
     // Plugin path binding if exist
-    if (options.API.path) {
+    if (options.API?.path) {
       let kvServiceBindingPluginPath = new Binding()
+      kvServiceBindingPluginPath.setName('PLUGIN_PATH')
       kvServiceBindingPluginPath.setText(options.API.path)
       kvService.worker.setBindings(kvServiceBindingPluginPath)
     }
@@ -50,6 +56,7 @@ export default (options: KvOptions) => {
     // Plugin kv id binding
     if (options.kv_id) {
       let kvServiceBindingPluginKvId = new Binding()
+      kvServiceBindingPluginKvId.setName('NAMESPACE')
       kvServiceBindingPluginKvId.setText(options.kv_id)
       kvService.worker.setBindings(kvServiceBindingPluginKvId)
     }
@@ -57,16 +64,18 @@ export default (options: KvOptions) => {
     // Plugin external proxy service binding
     if (kvExternalService.name) {
       let kvServiceBindingPluginService = new Binding()
+      kvServiceBindingPluginService.setName('SERVICE')
       kvServiceBindingPluginService.setService(kvExternalService.name)
       kvService.worker.setBindings(kvServiceBindingPluginService)
     }
 
-    // instance.setService(kvService)
+    instance.setServices(kvService)
 
     // Plugin service to use service env.$x.get()
     let kvServiceBindingService = new Binding()
     kvServiceBindingService.setName(options.name)
     kvServiceBindingService.setKvNamespace(kvService.name)
+
     service.worker.setBindings(kvServiceBindingService)
   }
 }

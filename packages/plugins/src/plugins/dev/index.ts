@@ -13,6 +13,8 @@ const LIVE_RELOAD = `<script defer type="application/javascript">
 })();
 </script>`
 
+// TODO: ws port support env.WS_PORT
+
 async function handleEvent(req, env, ctx) {
   const request = new Request(req)
   try {

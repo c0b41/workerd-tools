@@ -1,10 +1,14 @@
 ## workerd-tools
 
-Some workerd tools for self hosted.
+Some workerd tools for self hosting.
 
 [workerd-config](https://github.com/c0b41/workerd-tools/tree/master/packages/workerd-config)
 
 workerd config generator, javascript to capnp binary format
+
+[workerd-plugins](https://github.com/c0b41/workerd-tools/tree/master/packages/plugins)
+
+some builtin workerd-config plugins. 
 
 [workerd-dev](https://github.com/c0b41/workerd-tools/tree/master/packages/workerd-dev)
 
