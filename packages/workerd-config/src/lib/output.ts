@@ -229,13 +229,10 @@ export default class WorkerdOutput {
 
           service.worker.modules.forEach((module: WorkerModule, index: number) => {
             let moduleStruct: Worker_Module = structServiceWorkerModules.get(index)
-            if (module.name) {
-              moduleStruct.setName(module.name)
-            }
 
+            moduleStruct.setName(module.name)
             let content = module.content
-            let data: Data = moduleStruct.initData(module.toUint8Array.byteLength)
-            data.copyBuffer(module.toUint8Array)
+
             switch (module.type) {
               case 'esModule':
                 moduleStruct.setEsModule(content)
@@ -247,13 +244,17 @@ export default class WorkerdOutput {
                 moduleStruct.setText(content)
                 break
               case 'data':
+                var data: Data = moduleStruct.initData(module.toUint8Array.byteLength)
+                data.copyBuffer(module.toUint8Array)
                 moduleStruct.setData(data)
                 break
               case 'json':
                 moduleStruct.setJson(content)
                 break
               case 'wasm':
-                moduleStruct.setWasm(data)
+                var wasm_data: Data = moduleStruct.initData(module.toUint8Array.byteLength)
+                wasm_data.copyBuffer(module.toUint8Array)
+                moduleStruct.setWasm(wasm_data)
                 break
               default:
                 throw new Error('Unknow module type')

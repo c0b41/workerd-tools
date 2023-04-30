@@ -1,11 +1,19 @@
 import { join } from 'path'
 import * as dockerNames from 'docker-names'
-import { WorkerdConfig, Binding, External, Service, WorkerModule } from '@c0b41/workerd-config'
+import {
+  WorkerdConfig,
+  Binding,
+  External,
+  Service,
+  WorkerModule,
+  Worker,
+  Http,
+} from '@c0b41/workerd-config'
 
 export interface KvOptions {
   name: string
   kv_id: string
-  API?: {
+  API: {
     base: string
     path?: string
     token?: string
@@ -16,8 +24,8 @@ export default (options: KvOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
     let compatibilityDate = '2023-03-21'
 
-    if(!options.name || !options.kv_id){
-      throw new Error('name, kv_id required!')
+    if (!options.name || !options.kv_id || !options.API?.base) {
+      throw new Error('name, kv_id, base required!')
     }
 
     // External Proxy service for internet access
@@ -25,32 +33,38 @@ export default (options: KvOptions) => {
     kvExternalService.setName(`external:kv:${service.name}`)
     let externalService = new External()
     externalService.setAddress(options.API.base)
+    let externalServiceHttp = new Http()
+    externalServiceHttp.setStyle(1)
+    externalService.setHttp(externalServiceHttp)
+    kvExternalService.setExternal(externalService)
 
     instance.setServices(kvExternalService)
 
     // Workerd api <=> Int api service
     let kvService = new Service()
     kvService.setName(`int:kv:${service.name}:${dockerNames.getRandomName()}`)
-    kvService.worker.setcompatibilityDate(compatibilityDate)
+
+    let kvServiceWorker = new Worker()
+    kvServiceWorker.setcompatibilityDate(compatibilityDate)
 
     // Plugin modules
     let kvServiceModule = new WorkerModule()
     kvServiceModule.setName(`kv-worker.js`)
     kvServiceModule.setPath(join(__dirname, 'plugins/kv/index.esm.js'))
     kvServiceModule.setType(`esModule`)
-    kvService.worker.setModules(kvServiceModule)
+    kvServiceWorker.setModules(kvServiceModule)
 
     let cacheServiceBindingPlugin = new Binding()
     cacheServiceBindingPlugin.setName('PLUGIN')
     cacheServiceBindingPlugin.setText('kv')
-    kvService.worker.setBindings(cacheServiceBindingPlugin)
+    kvServiceWorker.setBindings(cacheServiceBindingPlugin)
 
     // Plugin path binding if exist
     if (options.API?.path) {
       let kvServiceBindingPluginPath = new Binding()
       kvServiceBindingPluginPath.setName('PLUGIN_PATH')
       kvServiceBindingPluginPath.setText(options.API.path)
-      kvService.worker.setBindings(kvServiceBindingPluginPath)
+      kvServiceWorker.setBindings(kvServiceBindingPluginPath)
     }
 
     // Plugin kv id binding
@@ -58,7 +72,7 @@ export default (options: KvOptions) => {
       let kvServiceBindingPluginKvId = new Binding()
       kvServiceBindingPluginKvId.setName('NAMESPACE')
       kvServiceBindingPluginKvId.setText(options.kv_id)
-      kvService.worker.setBindings(kvServiceBindingPluginKvId)
+      kvServiceWorker.setBindings(kvServiceBindingPluginKvId)
     }
 
     // Plugin external proxy service binding
@@ -66,9 +80,12 @@ export default (options: KvOptions) => {
       let kvServiceBindingPluginService = new Binding()
       kvServiceBindingPluginService.setName('SERVICE')
       kvServiceBindingPluginService.setService(kvExternalService.name)
-      kvService.worker.setBindings(kvServiceBindingPluginService)
+      kvServiceWorker.setBindings(kvServiceBindingPluginService)
     }
 
+    kvServiceWorker.setGlobalOutbound('internet')
+
+    kvService.setWorker(kvServiceWorker)
     instance.setServices(kvService)
 
     // Plugin service to use service env.$x.get()

@@ -5,4 +5,4 @@ import { default as AnalyticsEngine } from './lib/analytics_engine'
 import { default as PostgresSql } from './lib/postgres_sql'
 import { default as Supabase } from './lib/supabase'
 
-export { Cache, Kv, DEV, AnalyticsEngine, PostgresSql, Supabase }
+export { Cache, Kv, Dev, AnalyticsEngine, PostgresSql, Supabase }
