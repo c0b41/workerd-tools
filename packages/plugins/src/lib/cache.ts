@@ -66,7 +66,7 @@ export default (options: CacheOptions) => {
     cacheServiceWorker.setBindings(cacheServiceBindingPlugin)
 
     // Plugin path binding if exist
-    if (options.API?.base) {
+    if (options.API?.path) {
       let cacheServiceBindingPluginPath = new Binding()
       cacheServiceBindingPluginPath.setName('PLUGIN_PATH')
       cacheServiceBindingPluginPath.setText(options.API.path)
@@ -78,7 +78,7 @@ export default (options: CacheOptions) => {
       let cacheServiceBindingPluginCacheId = new Binding()
       cacheServiceBindingPluginCacheId.setName('CACHE_ID')
       cacheServiceBindingPluginCacheId.setText(options.cache_id)
-      cacheService.worker.setBindings(cacheServiceBindingPluginCacheId)
+      cacheServiceWorker.setBindings(cacheServiceBindingPluginCacheId)
     }
 
     // Plugin external proxy service binding

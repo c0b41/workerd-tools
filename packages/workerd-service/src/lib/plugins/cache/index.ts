@@ -26,7 +26,9 @@ export default fp(async (app: FastifyInstance, opts: cachePluginOptions = defaul
     async (service: FastifyInstance) => {
       service.get('/cache/:uri', routes.getCache)
       service.put('/cache/:uri', routes.putCache)
-      service.delete('/cache/:uri', routes.deleteCache) // https://github.com/fastify/fastify/issues/9
+      service.delete('/cache/:uri', routes.deleteCache)
+      // workerd using old http purge method.
+      // https://github.com/fastify/fastify/issues/9
     },
     { prefix: path }
   )
