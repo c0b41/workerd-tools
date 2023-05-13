@@ -222,6 +222,7 @@ var Worker_Module_Which;
     Worker_Module_Which[Worker_Module_Which["DATA"] = 3] = "DATA";
     Worker_Module_Which[Worker_Module_Which["WASM"] = 4] = "WASM";
     Worker_Module_Which[Worker_Module_Which["JSON"] = 5] = "JSON";
+    Worker_Module_Which[Worker_Module_Which["NODE_JS_COMPAT_MODULE"] = 6] = "NODE_JS_COMPAT_MODULE";
 })(Worker_Module_Which = exports.Worker_Module_Which || (exports.Worker_Module_Which = {}));
 class Worker_Module extends capnp_ts_1.Struct {
     getName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -300,6 +301,15 @@ class Worker_Module extends capnp_ts_1.Struct {
         capnp_ts_1.Struct.setUint16(0, 5, this);
         capnp_ts_1.Struct.setText(1, value, this);
     }
+    getNodeJsCompatModule() {
+        capnp_ts_1.Struct.testWhich("nodeJsCompatModule", capnp_ts_1.Struct.getUint16(0, this), 6, this);
+        return capnp_ts_1.Struct.getText(1, this);
+    }
+    isNodeJsCompatModule() { return capnp_ts_1.Struct.getUint16(0, this) === 6; }
+    setNodeJsCompatModule(value) {
+        capnp_ts_1.Struct.setUint16(0, 6, this);
+        capnp_ts_1.Struct.setText(1, value, this);
+    }
     toString() { return "Worker_Module_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -310,6 +320,7 @@ Worker_Module.TEXT = Worker_Module_Which.TEXT;
 Worker_Module.DATA = Worker_Module_Which.DATA;
 Worker_Module.WASM = Worker_Module_Which.WASM;
 Worker_Module.JSON = Worker_Module_Which.JSON;
+Worker_Module.NODE_JS_COMPAT_MODULE = Worker_Module_Which.NODE_JS_COMPAT_MODULE;
 Worker_Module._capnp = { displayName: "Module", id: "d9d87a63770a12f3", size: new capnp_ts_1.ObjectSize(8, 2) };
 var Worker_Binding_Type_Which;
 (function (Worker_Binding_Type_Which) {

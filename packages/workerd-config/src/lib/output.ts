@@ -256,6 +256,9 @@ export default class WorkerdOutput {
                 wasm_data.copyBuffer(module.toUint8Array)
                 moduleStruct.setWasm(wasm_data)
                 break
+              case 'nodeJsCompatModule':
+                moduleStruct.setNodeJsCompatModule(content)
+                break
               default:
                 throw new Error('Unknow module type')
             }

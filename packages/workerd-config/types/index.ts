@@ -3,7 +3,14 @@ import { WorkerdConfig } from '../src'
 
 export interface WorkerdConfigOptions {}
 
-export type ModuleType = 'esModule' | 'commonJsModule' | 'text' | 'data' | 'wasm' | 'json'
+export type ModuleType =
+  | 'esModule'
+  | 'commonJsModule'
+  | 'text'
+  | 'data'
+  | 'wasm'
+  | 'json'
+  | 'nodeJsCompatModule'
 
 export type IServiceModules = {
   name: string

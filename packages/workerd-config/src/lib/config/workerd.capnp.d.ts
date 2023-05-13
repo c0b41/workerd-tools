@@ -166,7 +166,8 @@ export declare enum Worker_Module_Which {
     TEXT = 2,
     DATA = 3,
     WASM = 4,
-    JSON = 5
+    JSON = 5,
+    NODE_JS_COMPAT_MODULE = 6
 }
 export declare class Worker_Module extends __S {
     static readonly ES_MODULE = Worker_Module_Which.ES_MODULE;
@@ -175,6 +176,7 @@ export declare class Worker_Module extends __S {
     static readonly DATA = Worker_Module_Which.DATA;
     static readonly WASM = Worker_Module_Which.WASM;
     static readonly JSON = Worker_Module_Which.JSON;
+    static readonly NODE_JS_COMPAT_MODULE = Worker_Module_Which.NODE_JS_COMPAT_MODULE;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -208,6 +210,9 @@ export declare class Worker_Module extends __S {
     getJson(): string;
     isJson(): boolean;
     setJson(value: string): void;
+    getNodeJsCompatModule(): string;
+    isNodeJsCompatModule(): boolean;
+    setNodeJsCompatModule(value: string): void;
     toString(): string;
     which(): Worker_Module_Which;
 }

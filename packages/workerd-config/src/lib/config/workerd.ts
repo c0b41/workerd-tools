@@ -75,6 +75,7 @@ export type Worker_Module = {
   | { data?: Uint8Array }
   | { wasm?: Uint8Array }
   | { json?: string }
+  | { nodeJsCompatModule?: string }
 )
 
 export type Worker_Binding = {
