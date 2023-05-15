@@ -16,13 +16,18 @@ export interface DevOptions {
 
 export default (options: DevOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
-    let compatibilityDate = '2023-03-21'
+    let minCompatibilityDate = '2023-03-21'
+
+    if (!service?.worker) {
+      // only run for worker services
+      return
+    }
 
     // Dev service
     let devService = new Service()
     devService.setName(`dev:${service.name}:${dockerNames.getRandomName()}`)
     let devServiceWorker = new Worker()
-    devServiceWorker.setcompatibilityDate(compatibilityDate)
+    devServiceWorker.setcompatibilityDate(minCompatibilityDate)
 
     let devServiceModule = new WorkerModule()
     devServiceModule.setName(`dev-worker.js`)

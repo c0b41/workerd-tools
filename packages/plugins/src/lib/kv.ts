@@ -22,10 +22,15 @@ export interface KvOptions {
 
 export default (options: KvOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
-    let compatibilityDate = '2023-03-21'
+    let minCompatibilityDate = '2023-05-12'
 
     if (!options.name || !options.kv_id || !options.API?.base) {
       throw new Error('name, kv_id, base required!')
+    }
+
+    if (!service?.worker) {
+      // only run for worker services
+      return
     }
 
     // External Proxy service for internet access
@@ -45,7 +50,7 @@ export default (options: KvOptions) => {
     kvService.setName(`int:kv:${service.name}:${dockerNames.getRandomName()}`)
 
     let kvServiceWorker = new Worker()
-    kvServiceWorker.setcompatibilityDate(compatibilityDate)
+    kvServiceWorker.setcompatibilityDate(minCompatibilityDate)
 
     // Plugin modules
     let kvServiceModule = new WorkerModule()

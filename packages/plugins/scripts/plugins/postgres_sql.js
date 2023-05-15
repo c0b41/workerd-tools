@@ -2,7 +2,7 @@ const { build } = require("esbuild");
 const { dependencies } = require('../../package.json')
 
 const isDev = process.env.NODE_ENV !== 'production'
-const external = Object.keys(dependencies)
+const external = ['cloudflare:sockets']
 
 const sharedConfig = {
     entryPoints: ["src/plugins/postgres_sql/index.ts"],
@@ -11,7 +11,7 @@ const sharedConfig = {
     sourcemap: true,
     external: external,
     format: 'esm',
-    platform: 'browser',
+    platform: 'node',
     outfile: 'dist/plugins/postgres_sql/index.esm.js',
     tsconfig: './module.tsconfig.json',
 }

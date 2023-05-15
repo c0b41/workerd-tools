@@ -22,10 +22,15 @@ export interface CacheOptions {
 
 export default (options: CacheOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
-    let compatibilityDate = '2023-03-21'
+    let minCompatibilityDate = '2023-03-21'
 
     if (!options.name || !options.cache_id || !options.API?.base) {
       throw new Error('name, cache_id, base required!')
+    }
+
+    if (!service?.worker) {
+      // only run for worker services
+      return
     }
 
     //  TODO: check CacheApiOutbound is already exist?
@@ -50,7 +55,7 @@ export default (options: CacheOptions) => {
     let cacheService = new Service()
     cacheService.setName(`int:cache:${service.name}:${dockerNames.getRandomName()}`)
     let cacheServiceWorker = new Worker()
-    cacheServiceWorker.setcompatibilityDate(compatibilityDate)
+    cacheServiceWorker.setcompatibilityDate(minCompatibilityDate)
 
     // Plugin modules
     let cacheExternalServiceModule = new WorkerModule()

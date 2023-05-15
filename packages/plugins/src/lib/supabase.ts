@@ -27,7 +27,13 @@ export default (options: SupabaseOptions) => {
       throw new Error(`name, supabaseKey, supabaseUrl, required! `)
     }
 
+    if (!service?.worker) {
+      // only run for worker services
+      return
+    }
+
     // Supabase lib for workerd
+    // TODO: check already exist maybe?
     let extension = new Extension()
     let extensionModule = new ExtensionModule()
     extensionModule.setName('c0b41:supabase')
@@ -80,7 +86,7 @@ export default (options: SupabaseOptions) => {
     extensionWrapped.setName(options.name)
     extensionWrapped.setWrapped(wrappedSupabase)
 
-    // Put supase namespace to service extension <=> worker
+    // Put supabase namespace to service extension <=> worker
     service.worker.setBindings(extensionWrapped)
   }
 }
