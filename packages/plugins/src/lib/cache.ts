@@ -25,7 +25,7 @@ export default (options: CacheOptions) => {
     let minCompatibilityDate = '2023-03-21'
 
     if (!options.name || !options.cache_id || !options.API?.base) {
-      throw new Error('name, cache_id, base required!')
+      throw new Error('name, cache_id, API.base required!')
     }
 
     if (!service?.worker) {
