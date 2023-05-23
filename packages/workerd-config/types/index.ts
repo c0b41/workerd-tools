@@ -3,6 +3,59 @@ import { WorkerdConfig } from '../src'
 
 export interface WorkerdConfigOptions {}
 
+// Https Options
+export type IHttpsOptions = {
+  options: IHttpOptions
+  tlsOptions: ITlsOptions
+}
+
+// Tls Options
+export type ITlsOptions = {
+  keypair: {
+    privateKey: {
+      path?: string
+      content?: string
+    }
+    certificateChain: {
+      path?: string
+      content?: string
+    }
+  }
+  requireClientCerts?: boolean
+  trustBrowserCas?: boolean
+  trustedCertificates: string[]
+  cipherList?: string
+  minVersion?: TlsOptionsVersion
+}
+
+// Tls Option version
+export declare enum TlsOptionsVersion {
+  GOOD_DEFAULT = 0,
+  SSL3 = 1,
+  TLS1DOT0 = 2,
+  TLS1DOT1 = 3,
+  TLS1DOT2 = 4,
+  TLS1DOT3 = 5,
+}
+
+// Http options
+export type IHttpOptions = {
+  style?: IHttpStyles
+  injectRequestHeaders: IHttpHeaderInjectOptions[]
+  injectResponseHeaders: IHttpHeaderInjectOptions[]
+}
+
+export enum IHttpStyles {
+  HOST = 0,
+  PROXY = 1,
+}
+
+export type IHttpHeaderInjectOptions = {
+  name: string
+  value: string
+}
+
+// Module types & Modules
 export type ModuleType =
   | 'esModule'
   | 'commonJsModule'
@@ -19,33 +72,13 @@ export type IServiceModules = {
   content?: string
 }
 
-export enum IUsage {
-  ENCRYPT = 0,
-  DECRYPT = 1,
-  SIGN = 2,
-  VERIFY = 3,
-  DERIVE_KEY = 4,
-  DERIVE_BITS = 5,
-  WRAP_KEY = 6,
-  UNWRAP_KEY = 7,
-}
-
-export type ServiceBindingCrypto = {
-  name?: string
-  cryptoKey: {
-    raw?: string
-    hex?: string
-    base64?: string
-    jwk?: string
-    pkcs8?: string
-    spki?: string
-    algorithm?: {
-      json: string
-    }
-    usages?: IUsage[]
-    extractable: boolean
-  }
-}
+// Bindings
+export type IServiceBindings =
+  | ServiceBindingBasic
+  | ServiceBindingCrypto
+  | ServiceBindingService
+  | ServiceBindingDurableObjectNamespace
+  | ServiceBindingWrapped
 
 export type ServiceBindingService = {
   name?: string
@@ -77,40 +110,56 @@ export type ServiceBindingWrapped = {
   }
 }
 
-export type IServiceBindings =
-  | ServiceBindingBasic
-  | ServiceBindingCrypto
-  | ServiceBindingService
-  | ServiceBindingDurableObjectNamespace
-  | ServiceBindingWrapped
-
-export interface IServiceExternal {
-  address: string
-  http?: ISocketHttp
-  https?: ISocketHttps
+export enum ICryptoUsage {
+  ENCRYPT = 0,
+  DECRYPT = 1,
+  SIGN = 2,
+  VERIFY = 3,
+  DERIVE_KEY = 4,
+  DERIVE_BITS = 5,
+  WRAP_KEY = 6,
+  UNWRAP_KEY = 7,
 }
 
+export type ServiceBindingCrypto = {
+  name?: string
+  cryptoKey: {
+    raw?: string
+    hex?: string
+    base64?: string
+    jwk?: string
+    pkcs8?: string
+    spki?: string
+    algorithm?: {
+      json: string
+    }
+    usages?: ICryptoUsage[]
+    extractable: boolean
+  }
+}
+
+// Service External
+export interface IServiceExternal {
+  address: string
+  http?: IHttpOptions
+  https?: IHttpsOptions
+}
+
+// Service Disk
 export interface IServiceDisk {
   writable?: boolean
   allowDotfiles?: boolean
   path: string
 }
 
+// Service Network
 export interface IServiceNetWork {
   allow?: string[]
   deny?: string[]
+  tlsOptions: ITlsOptions
 }
 
-export interface IDurableObjectNamespace {
-  className: string
-  uniqueKey: string
-}
-
-export interface DurableObjectStorage {
-  inMemory?: boolean
-  localDisk?: string
-}
-
+// Service Worker
 export interface IServiceWorker {
   compatibilityDate?: string
   compatibilityFlags?: string[]
@@ -121,21 +170,24 @@ export interface IServiceWorker {
   }
   bindings?: IServiceBindings[]
   durableObjectNamespaces?: IDurableObjectNamespace[]
-  durableObjectStorage?: DurableObjectStorage
+  durableObjectStorage?: IDurableObjectStorage
   durableObjectUniqueKeyModifier?: string
   cacheApiOutbound?: string
   globalOutbound?: string
   plugins?: WorkerPlugin[]
 }
 
-export interface WorkerPlugin {
-  (options: any): WorkerPluginCall
+export interface IDurableObjectNamespace {
+  className: string
+  uniqueKey: string
 }
 
-export interface WorkerPluginCall {
-  (instance: WorkerdConfig, service: Service): Promise<void>
+export interface IDurableObjectStorage {
+  inMemory?: boolean
+  localDisk?: string
 }
 
+// Service
 export interface IService {
   name: string
   worker?: IServiceWorker
@@ -144,58 +196,30 @@ export interface IService {
   disk?: IServiceDisk
 }
 
+// Socket
 export interface ISocket {
   name: string
   address: string
-  https?: ISocketHttps
-  http?: ISocketHttp
+  https?: IHttpsOptions
+  http?: IHttpOptions
   service?: {
     name?: string
     entrypoint?: string
   }
 }
 
-export declare enum TlsOptionsVersion {
-  GOOD_DEFAULT = 0,
-  SSL3 = 1,
-  TLS1DOT0 = 2,
-  TLS1DOT1 = 3,
-  TLS1DOT2 = 4,
-  TLS1DOT3 = 5,
+// workerd-config plugin func
+export interface WorkerPlugin {
+  (options: any): WorkerPluginCall
 }
 
-export type ISocketHttps = {
-  keypair: {
-    privateKey: {
-      path?: string
-      content?: string
-    }
-    certificateChain: {
-      path?: string
-      content?: string
-    }
-  }
-  requireClientCerts?: boolean
-  trustBrowserCas?: boolean
-  // Todo: trustedCertificates
-  // todo: CipherList
-  minVersion?: TlsOptionsVersion
+export interface WorkerPluginCall {
+  (instance: WorkerdConfig, service: Service): Promise<void>
 }
 
-export enum IHttpStyles {
-  HOST = 0,
-  PROXY = 1,
-}
-
-export type ISocketHttp = {
-  style?: IHttpStyles
-  injectRequestHeaders: IHttpHeaderInjectOptions[]
-  injectResponseHeaders: IHttpHeaderInjectOptions[]
-}
-
-export type IHttpHeaderInjectOptions = {
-  name: string
-  value: string
+// Extension
+export interface IExtension {
+  modules?: IExtensionModule[]
 }
 
 export type IExtensionModule = {
@@ -205,10 +229,7 @@ export type IExtensionModule = {
   content?: string
 }
 
-export interface IExtension {
-  modules?: IExtensionModule[]
-}
-
+// Output schema
 export interface toJson {
   extensions: Extension[]
   services: Service[]
