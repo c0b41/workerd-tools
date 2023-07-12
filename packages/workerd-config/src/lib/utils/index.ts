@@ -139,6 +139,10 @@ function createBinding(binding: IServiceBindings): Binding {
     worker_binding.setWrapped(wrapped)
   }
 
+  if ('fromEnvironment' in binding) {
+    worker_binding.setFromEnvironment(binding.fromEnvironment)
+  }
+
   return worker_binding
 }
 
@@ -285,6 +289,9 @@ function createBinaryBinding(
         }
 
         structServiceWorkerBinding.setWrapped(structServiceWorkerBindingWrapped)
+        break
+      case 'from_environment':
+        structServiceWorkerBinding.setFromEnvironment(binding.fromEnvironment)
         break
       default:
         break

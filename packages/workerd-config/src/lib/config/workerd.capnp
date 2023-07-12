@@ -343,6 +343,12 @@ struct Worker {
       # namespace will be converted into HTTP requests targetting the given
       # service name.
 
+      fromEnvironment @16 :Text;
+      # Takes the value of an environment variable from the system. The value specified here is
+      # the name of a system environment variable. The value of the binding is obtained by invoking
+      # `getenv()` with that name. If the environment variable isn't set, the binding value is
+      # `null`.
+
       # TODO(someday): dispatch, analyticsEngine, other new features
     }
 
@@ -789,7 +795,7 @@ struct TlsOptions {
 
   minVersion @4 :Version = goodDefault;
   # Minimum TLS version that will be allowed. Generally you should not override this unless you
-  # have unusual backwards-compatibilty needs.
+  # have unusual backwards-compatibility needs.
 
   enum Version {
     goodDefault @0;

@@ -430,7 +430,8 @@ export declare enum Worker_Binding_Which {
     R2BUCKET = 10,
     R2ADMIN = 11,
     WRAPPED = 12,
-    QUEUE = 13
+    QUEUE = 13,
+    FROM_ENVIRONMENT = 14
 }
 export declare class Worker_Binding extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Which.UNSPECIFIED;
@@ -447,6 +448,7 @@ export declare class Worker_Binding extends __S {
     static readonly R2ADMIN = Worker_Binding_Which.R2ADMIN;
     static readonly WRAPPED = Worker_Binding_Which.WRAPPED;
     static readonly QUEUE = Worker_Binding_Which.QUEUE;
+    static readonly FROM_ENVIRONMENT = Worker_Binding_Which.FROM_ENVIRONMENT;
     static readonly Type: typeof Worker_Binding_Type;
     static readonly DurableObjectNamespaceDesignator: typeof Worker_Binding_DurableObjectNamespaceDesignator;
     static readonly CryptoKey: typeof Worker_Binding_CryptoKey;
@@ -540,6 +542,9 @@ export declare class Worker_Binding extends __S {
     initQueue(): ServiceDesignator;
     isQueue(): boolean;
     setQueue(value: ServiceDesignator): void;
+    getFromEnvironment(): string;
+    isFromEnvironment(): boolean;
+    setFromEnvironment(value: string): void;
     toString(): string;
     which(): Worker_Binding_Which;
 }

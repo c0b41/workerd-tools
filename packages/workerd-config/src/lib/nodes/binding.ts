@@ -15,6 +15,7 @@ export type IBindingType =
   | 'r2_admin'
   | 'wrapped'
   | 'queue'
+  | 'from_environment'
 
 export class Binding {
   private _name: string
@@ -30,6 +31,7 @@ export class Binding {
   private _r2Bucket: string
   private _r2Admin: string
   private _queue: string
+  private _from_environment: string
   private _wrapped: Wrapped
 
   get which(): string {
@@ -145,6 +147,15 @@ export class Binding {
   setQueue(value: string) {
     this._queue = value
     this.setWhich('queue')
+  }
+
+  get fromEnvironment(): string {
+    return this._from_environment
+  }
+
+  setFromEnvironment(value: string) {
+    this._from_environment = value
+    this.setWhich('from_environment')
   }
 
   get wrapped(): Wrapped {

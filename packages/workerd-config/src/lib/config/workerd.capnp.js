@@ -587,6 +587,7 @@ var Worker_Binding_Which;
     Worker_Binding_Which[Worker_Binding_Which["R2ADMIN"] = 11] = "R2ADMIN";
     Worker_Binding_Which[Worker_Binding_Which["WRAPPED"] = 12] = "WRAPPED";
     Worker_Binding_Which[Worker_Binding_Which["QUEUE"] = 13] = "QUEUE";
+    Worker_Binding_Which[Worker_Binding_Which["FROM_ENVIRONMENT"] = 14] = "FROM_ENVIRONMENT";
 })(Worker_Binding_Which = exports.Worker_Binding_Which || (exports.Worker_Binding_Which = {}));
 class Worker_Binding extends capnp_ts_1.Struct {
     getName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -811,6 +812,15 @@ class Worker_Binding extends capnp_ts_1.Struct {
         capnp_ts_1.Struct.setUint16(0, 13, this);
         capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(1, this));
     }
+    getFromEnvironment() {
+        capnp_ts_1.Struct.testWhich("fromEnvironment", capnp_ts_1.Struct.getUint16(0, this), 14, this);
+        return capnp_ts_1.Struct.getText(1, this);
+    }
+    isFromEnvironment() { return capnp_ts_1.Struct.getUint16(0, this) === 14; }
+    setFromEnvironment(value) {
+        capnp_ts_1.Struct.setUint16(0, 14, this);
+        capnp_ts_1.Struct.setText(1, value, this);
+    }
     toString() { return "Worker_Binding_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -829,6 +839,7 @@ Worker_Binding.R2BUCKET = Worker_Binding_Which.R2BUCKET;
 Worker_Binding.R2ADMIN = Worker_Binding_Which.R2ADMIN;
 Worker_Binding.WRAPPED = Worker_Binding_Which.WRAPPED;
 Worker_Binding.QUEUE = Worker_Binding_Which.QUEUE;
+Worker_Binding.FROM_ENVIRONMENT = Worker_Binding_Which.FROM_ENVIRONMENT;
 Worker_Binding.Type = Worker_Binding_Type;
 Worker_Binding.DurableObjectNamespaceDesignator = Worker_Binding_DurableObjectNamespaceDesignator;
 Worker_Binding.CryptoKey = Worker_Binding_CryptoKey;

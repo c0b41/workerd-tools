@@ -94,6 +94,7 @@ export type Worker_Binding = {
   | { r2Admin?: ServiceDesignator }
   | { wrapped?: Worker_Binding_Wrapped }
   | { queue?: ServiceDesignator }
+  | { fromEnvironment?: string }
 )
 
 export interface Worker_Binding_Wrapped {
