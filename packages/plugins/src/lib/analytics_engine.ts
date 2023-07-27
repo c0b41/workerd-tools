@@ -91,11 +91,9 @@ export default (options: AnalyticsEngineOptions) => {
     analyticsService.setWorker(analyticsServiceWorker)
     instance.setServices(analyticsService)
 
-    // TODO: https://github.com/cloudflare/workerd/issues/536 wait for this or write wrapped module?
-    // Plugin service to use service env.$x.writeDataPoint()
-    // let analyticsServiceBindingService = new Binding()
-    // analyticsServiceBindingService.setName(options.name)
-    // analyticsServiceBindingService.setAnalyticsEngineNamespace(analyticsService.name)
-    // service.worker.setBindings(analyticsServiceBindingService)
+    let analyticsServiceBindingService = new Binding()
+    analyticsServiceBindingService.setName(options.name)
+    analyticsServiceBindingService.setAnalyticsEngine(analyticsService.name)
+    service.worker.setBindings(analyticsServiceBindingService)
   }
 }

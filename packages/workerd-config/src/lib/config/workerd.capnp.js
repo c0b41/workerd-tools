@@ -336,6 +336,7 @@ var Worker_Binding_Type_Which;
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["R2BUCKET"] = 9] = "R2BUCKET";
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["R2ADMIN"] = 10] = "R2ADMIN";
     Worker_Binding_Type_Which[Worker_Binding_Type_Which["QUEUE"] = 11] = "QUEUE";
+    Worker_Binding_Type_Which[Worker_Binding_Type_Which["ANALYTICS_ENGINE"] = 12] = "ANALYTICS_ENGINE";
 })(Worker_Binding_Type_Which = exports.Worker_Binding_Type_Which || (exports.Worker_Binding_Type_Which = {}));
 class Worker_Binding_Type extends capnp_ts_1.Struct {
     isUnspecified() { return capnp_ts_1.Struct.getUint16(0, this) === 0; }
@@ -379,6 +380,8 @@ class Worker_Binding_Type extends capnp_ts_1.Struct {
     setR2Admin() { capnp_ts_1.Struct.setUint16(0, 10, this); }
     isQueue() { return capnp_ts_1.Struct.getUint16(0, this) === 11; }
     setQueue() { capnp_ts_1.Struct.setUint16(0, 11, this); }
+    isAnalyticsEngine() { return capnp_ts_1.Struct.getUint16(0, this) === 12; }
+    setAnalyticsEngine() { capnp_ts_1.Struct.setUint16(0, 12, this); }
     toString() { return "Worker_Binding_Type_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -395,6 +398,7 @@ Worker_Binding_Type.KV_NAMESPACE = Worker_Binding_Type_Which.KV_NAMESPACE;
 Worker_Binding_Type.R2BUCKET = Worker_Binding_Type_Which.R2BUCKET;
 Worker_Binding_Type.R2ADMIN = Worker_Binding_Type_Which.R2ADMIN;
 Worker_Binding_Type.QUEUE = Worker_Binding_Type_Which.QUEUE;
+Worker_Binding_Type.ANALYTICS_ENGINE = Worker_Binding_Type_Which.ANALYTICS_ENGINE;
 Worker_Binding_Type._capnp = { displayName: "Type", id: "8906a1296519bf8a", size: new capnp_ts_1.ObjectSize(8, 1) };
 class Worker_Binding_DurableObjectNamespaceDesignator extends capnp_ts_1.Struct {
     getClassName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -588,6 +592,7 @@ var Worker_Binding_Which;
     Worker_Binding_Which[Worker_Binding_Which["WRAPPED"] = 12] = "WRAPPED";
     Worker_Binding_Which[Worker_Binding_Which["QUEUE"] = 13] = "QUEUE";
     Worker_Binding_Which[Worker_Binding_Which["FROM_ENVIRONMENT"] = 14] = "FROM_ENVIRONMENT";
+    Worker_Binding_Which[Worker_Binding_Which["ANALYTICS_ENGINE"] = 15] = "ANALYTICS_ENGINE";
 })(Worker_Binding_Which = exports.Worker_Binding_Which || (exports.Worker_Binding_Which = {}));
 class Worker_Binding extends capnp_ts_1.Struct {
     getName() { return capnp_ts_1.Struct.getText(0, this); }
@@ -821,6 +826,25 @@ class Worker_Binding extends capnp_ts_1.Struct {
         capnp_ts_1.Struct.setUint16(0, 14, this);
         capnp_ts_1.Struct.setText(1, value, this);
     }
+    adoptAnalyticsEngine(value) {
+        capnp_ts_1.Struct.setUint16(0, 15, this);
+        capnp_ts_1.Struct.adopt(value, capnp_ts_1.Struct.getPointer(1, this));
+    }
+    disownAnalyticsEngine() { return capnp_ts_1.Struct.disown(this.getAnalyticsEngine()); }
+    getAnalyticsEngine() {
+        capnp_ts_1.Struct.testWhich("analyticsEngine", capnp_ts_1.Struct.getUint16(0, this), 15, this);
+        return capnp_ts_1.Struct.getStruct(1, ServiceDesignator, this);
+    }
+    hasAnalyticsEngine() { return !capnp_ts_1.Struct.isNull(capnp_ts_1.Struct.getPointer(1, this)); }
+    initAnalyticsEngine() {
+        capnp_ts_1.Struct.setUint16(0, 15, this);
+        return capnp_ts_1.Struct.initStructAt(1, ServiceDesignator, this);
+    }
+    isAnalyticsEngine() { return capnp_ts_1.Struct.getUint16(0, this) === 15; }
+    setAnalyticsEngine(value) {
+        capnp_ts_1.Struct.setUint16(0, 15, this);
+        capnp_ts_1.Struct.copyFrom(value, capnp_ts_1.Struct.getPointer(1, this));
+    }
     toString() { return "Worker_Binding_" + super.toString(); }
     which() { return capnp_ts_1.Struct.getUint16(0, this); }
 }
@@ -840,6 +864,7 @@ Worker_Binding.R2ADMIN = Worker_Binding_Which.R2ADMIN;
 Worker_Binding.WRAPPED = Worker_Binding_Which.WRAPPED;
 Worker_Binding.QUEUE = Worker_Binding_Which.QUEUE;
 Worker_Binding.FROM_ENVIRONMENT = Worker_Binding_Which.FROM_ENVIRONMENT;
+Worker_Binding.ANALYTICS_ENGINE = Worker_Binding_Which.ANALYTICS_ENGINE;
 Worker_Binding.Type = Worker_Binding_Type;
 Worker_Binding.DurableObjectNamespaceDesignator = Worker_Binding_DurableObjectNamespaceDesignator;
 Worker_Binding.CryptoKey = Worker_Binding_CryptoKey;

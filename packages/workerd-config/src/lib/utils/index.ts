@@ -143,6 +143,10 @@ function createBinding(binding: IServiceBindings): Binding {
     worker_binding.setFromEnvironment(binding.fromEnvironment)
   }
 
+  if ('analyticsEngine' in binding) {
+    worker_binding.setAnalyticsEngine(binding.analyticsEngine)
+  }
+
   return worker_binding
 }
 
@@ -292,6 +296,12 @@ function createBinaryBinding(
         break
       case 'from_environment':
         structServiceWorkerBinding.setFromEnvironment(binding.fromEnvironment)
+        break
+      case 'analytics_engine':
+        let structServiceWorkerBindingAnalyticsEngine: ServiceDesignator =
+          structServiceWorkerBinding.initAnalyticsEngine()
+        structServiceWorkerBindingAnalyticsEngine.setName(binding.analyticsEngine)
+        structServiceWorkerBinding.setAnalyticsEngine(structServiceWorkerBindingAnalyticsEngine)
         break
       default:
         break

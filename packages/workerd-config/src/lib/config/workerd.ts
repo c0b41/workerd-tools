@@ -95,6 +95,7 @@ export type Worker_Binding = {
   | { wrapped?: Worker_Binding_Wrapped }
   | { queue?: ServiceDesignator }
   | { fromEnvironment?: string }
+  | { analyticsEngine?: ServiceDesignator }
 )
 
 export interface Worker_Binding_Wrapped {

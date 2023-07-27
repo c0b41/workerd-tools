@@ -16,6 +16,7 @@ export type IBindingType =
   | 'wrapped'
   | 'queue'
   | 'from_environment'
+  | 'analytics_engine'
 
 export class Binding {
   private _name: string
@@ -33,6 +34,7 @@ export class Binding {
   private _queue: string
   private _from_environment: string
   private _wrapped: Wrapped
+  private _analytics_engine: string
 
   get which(): string {
     return this._which
@@ -165,6 +167,15 @@ export class Binding {
   setWrapped(value: Wrapped) {
     this._wrapped = value
     this.setWhich('wrapped')
+  }
+
+  get analyticsEngine(): string {
+    return this._analytics_engine
+  }
+
+  setAnalyticsEngine(value: string) {
+    this._analytics_engine = value
+    this.setWhich('analytics_engine')
   }
 }
 

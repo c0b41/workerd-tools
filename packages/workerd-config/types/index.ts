@@ -88,6 +88,7 @@ export type ServiceBindingService = {
   r2Admin?: string
   queue?: string
   fromEnvironment?: string
+  analyticsEngine?: string
 }
 
 export type ServiceBindingBasic = {
