@@ -37,6 +37,12 @@ export declare class Config extends __S {
     hasExtensions(): boolean;
     initExtensions(length: number): capnp.List<Extension>;
     setExtensions(value: capnp.List<Extension>): void;
+    adoptAutogates(value: capnp.Orphan<capnp.List<string>>): void;
+    disownAutogates(): capnp.Orphan<capnp.List<string>>;
+    getAutogates(): capnp.List<string>;
+    hasAutogates(): boolean;
+    initAutogates(length: number): capnp.List<string>;
+    setAutogates(value: capnp.List<string>): void;
     toString(): string;
 }
 export declare class Socket_Https extends __S {
@@ -167,7 +173,9 @@ export declare enum Worker_Module_Which {
     DATA = 3,
     WASM = 4,
     JSON = 5,
-    NODE_JS_COMPAT_MODULE = 6
+    NODE_JS_COMPAT_MODULE = 6,
+    PYTHON_MODULE = 7,
+    PYTHON_REQUIREMENT = 8
 }
 export declare class Worker_Module extends __S {
     static readonly ES_MODULE = Worker_Module_Which.ES_MODULE;
@@ -177,6 +185,8 @@ export declare class Worker_Module extends __S {
     static readonly WASM = Worker_Module_Which.WASM;
     static readonly JSON = Worker_Module_Which.JSON;
     static readonly NODE_JS_COMPAT_MODULE = Worker_Module_Which.NODE_JS_COMPAT_MODULE;
+    static readonly PYTHON_MODULE = Worker_Module_Which.PYTHON_MODULE;
+    static readonly PYTHON_REQUIREMENT = Worker_Module_Which.PYTHON_REQUIREMENT;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -213,6 +223,12 @@ export declare class Worker_Module extends __S {
     getNodeJsCompatModule(): string;
     isNodeJsCompatModule(): boolean;
     setNodeJsCompatModule(value: string): void;
+    getPythonModule(): string;
+    isPythonModule(): boolean;
+    setPythonModule(value: string): void;
+    getPythonRequirement(): string;
+    isPythonRequirement(): boolean;
+    setPythonRequirement(value: string): void;
     toString(): string;
     which(): Worker_Module_Which;
 }
@@ -229,7 +245,8 @@ export declare enum Worker_Binding_Type_Which {
     R2BUCKET = 9,
     R2ADMIN = 10,
     QUEUE = 11,
-    ANALYTICS_ENGINE = 12
+    ANALYTICS_ENGINE = 12,
+    HYPERDRIVE = 13
 }
 export declare class Worker_Binding_Type extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Type_Which.UNSPECIFIED;
@@ -245,6 +262,7 @@ export declare class Worker_Binding_Type extends __S {
     static readonly R2ADMIN = Worker_Binding_Type_Which.R2ADMIN;
     static readonly QUEUE = Worker_Binding_Type_Which.QUEUE;
     static readonly ANALYTICS_ENGINE = Worker_Binding_Type_Which.ANALYTICS_ENGINE;
+    static readonly HYPERDRIVE = Worker_Binding_Type_Which.HYPERDRIVE;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -281,6 +299,8 @@ export declare class Worker_Binding_Type extends __S {
     setQueue(): void;
     isAnalyticsEngine(): boolean;
     setAnalyticsEngine(): void;
+    isHyperdrive(): boolean;
+    setHyperdrive(): void;
     toString(): string;
     which(): Worker_Binding_Type_Which;
 }
@@ -420,6 +440,28 @@ export declare class Worker_Binding_Parameter extends __S {
     setOptional(value: boolean): void;
     toString(): string;
 }
+export declare class Worker_Binding_Hyperdrive extends __S {
+    static readonly _capnp: {
+        displayName: string;
+        id: string;
+        size: capnp.ObjectSize;
+    };
+    adoptDesignator(value: capnp.Orphan<ServiceDesignator>): void;
+    disownDesignator(): capnp.Orphan<ServiceDesignator>;
+    getDesignator(): ServiceDesignator;
+    hasDesignator(): boolean;
+    initDesignator(): ServiceDesignator;
+    setDesignator(value: ServiceDesignator): void;
+    getDatabase(): string;
+    setDatabase(value: string): void;
+    getUser(): string;
+    setUser(value: string): void;
+    getPassword(): string;
+    setPassword(value: string): void;
+    getScheme(): string;
+    setScheme(value: string): void;
+    toString(): string;
+}
 export declare enum Worker_Binding_Which {
     UNSPECIFIED = 0,
     PARAMETER = 1,
@@ -436,7 +478,9 @@ export declare enum Worker_Binding_Which {
     WRAPPED = 12,
     QUEUE = 13,
     FROM_ENVIRONMENT = 14,
-    ANALYTICS_ENGINE = 15
+    ANALYTICS_ENGINE = 15,
+    HYPERDRIVE = 16,
+    UNSAFE_EVAL = 17
 }
 export declare class Worker_Binding extends __S {
     static readonly UNSPECIFIED = Worker_Binding_Which.UNSPECIFIED;
@@ -455,6 +499,8 @@ export declare class Worker_Binding extends __S {
     static readonly QUEUE = Worker_Binding_Which.QUEUE;
     static readonly FROM_ENVIRONMENT = Worker_Binding_Which.FROM_ENVIRONMENT;
     static readonly ANALYTICS_ENGINE = Worker_Binding_Which.ANALYTICS_ENGINE;
+    static readonly HYPERDRIVE = Worker_Binding_Which.HYPERDRIVE;
+    static readonly UNSAFE_EVAL = Worker_Binding_Which.UNSAFE_EVAL;
     static readonly Type: typeof Worker_Binding_Type;
     static readonly DurableObjectNamespaceDesignator: typeof Worker_Binding_DurableObjectNamespaceDesignator;
     static readonly CryptoKey: typeof Worker_Binding_CryptoKey;
@@ -558,6 +604,12 @@ export declare class Worker_Binding extends __S {
     initAnalyticsEngine(): ServiceDesignator;
     isAnalyticsEngine(): boolean;
     setAnalyticsEngine(value: ServiceDesignator): void;
+    getHyperdrive(): Worker_Binding_Hyperdrive;
+    initHyperdrive(): Worker_Binding_Hyperdrive;
+    isHyperdrive(): boolean;
+    setHyperdrive(): void;
+    isUnsafeEval(): boolean;
+    setUnsafeEval(): void;
     toString(): string;
     which(): Worker_Binding_Which;
 }
@@ -580,6 +632,8 @@ export declare class Worker_DurableObjectNamespace extends __S {
     setUniqueKey(value: string): void;
     isEphemeralLocal(): boolean;
     setEphemeralLocal(): void;
+    getPreventEviction(): boolean;
+    setPreventEviction(value: boolean): void;
     toString(): string;
     which(): Worker_DurableObjectNamespace_Which;
 }
@@ -677,6 +731,8 @@ export declare class Worker extends __S {
     setDurableObjectUniqueKeyModifier(value: string): void;
     getDurableObjectStorage(): Worker_DurableObjectStorage;
     initDurableObjectStorage(): Worker_DurableObjectStorage;
+    getModuleFallback(): string;
+    setModuleFallback(value: string): void;
     toString(): string;
     which(): Worker_Which;
 }
@@ -702,13 +758,31 @@ export declare class ExternalServer_Https extends __S {
     setCertificateHost(value: string): void;
     toString(): string;
 }
+export declare class ExternalServer_Tcp extends __S {
+    static readonly _capnp: {
+        displayName: string;
+        id: string;
+        size: capnp.ObjectSize;
+    };
+    adoptTlsOptions(value: capnp.Orphan<TlsOptions>): void;
+    disownTlsOptions(): capnp.Orphan<TlsOptions>;
+    getTlsOptions(): TlsOptions;
+    hasTlsOptions(): boolean;
+    initTlsOptions(): TlsOptions;
+    setTlsOptions(value: TlsOptions): void;
+    getCertificateHost(): string;
+    setCertificateHost(value: string): void;
+    toString(): string;
+}
 export declare enum ExternalServer_Which {
     HTTP = 0,
-    HTTPS = 1
+    HTTPS = 1,
+    TCP = 2
 }
 export declare class ExternalServer extends __S {
     static readonly HTTP = ExternalServer_Which.HTTP;
     static readonly HTTPS = ExternalServer_Which.HTTPS;
+    static readonly TCP = ExternalServer_Which.TCP;
     static readonly _capnp: {
         displayName: string;
         id: string;
@@ -727,6 +801,10 @@ export declare class ExternalServer extends __S {
     initHttps(): ExternalServer_Https;
     isHttps(): boolean;
     setHttps(): void;
+    getTcp(): ExternalServer_Tcp;
+    initTcp(): ExternalServer_Tcp;
+    isTcp(): boolean;
+    setTcp(): void;
     toString(): string;
     which(): ExternalServer_Which;
 }
