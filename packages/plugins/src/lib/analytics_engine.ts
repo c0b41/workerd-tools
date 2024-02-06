@@ -1,14 +1,6 @@
 import * as dockerNames from 'docker-names'
 import { join } from 'path'
-import {
-  External,
-  Binding,
-  Service,
-  WorkerModule,
-  WorkerdConfig,
-  Http,
-  Worker,
-} from '@c0b41/workerd-config'
+import { External, Binding, Service, WorkerModule, WorkerdConfig, Http, Worker } from '@c0b41/workerd-config'
 
 export interface AnalyticsEngineOptions {
   name: string
@@ -22,7 +14,7 @@ export interface AnalyticsEngineOptions {
 
 export default (options: AnalyticsEngineOptions) => {
   return (instance: WorkerdConfig, service: Service) => {
-    let minCompatibilityDate = '2023-03-21'
+    let minCompatibilityDate = '2023-12-18'
 
     if (!options.name || !options.dataset_id || !options.API?.base) {
       throw new Error('name, dataset_id, API.base required!')

@@ -293,6 +293,7 @@ export default class WorkerdOutput {
 
   private generateSockets() {
     let size = this.config.sockets.length ?? 0
+
     let structSockets: List<CapSocket> = this.struct.initSockets(size)
 
     this.config.sockets.forEach((socket: Socket, index) => {
@@ -420,20 +421,26 @@ export default class WorkerdOutput {
   }
 
   private generateOptions() {
-    if (this.config.options.v8Flags) {
-      let size = this.config.options.v8Flags.length ?? 0
-      let structV8Flags: List<string> = this.struct.initV8Flags(size)
-      this.config.options.v8Flags.forEach((flag: string, index: number) => {
-        structV8Flags.set(index, flag)
-      })
-    }
+    if (this.config.options) {
+      if (this.config.options.v8Flags) {
+        if (this.config.options.v8Flags.length > 0) {
+          let size = this.config.options.v8Flags.length ?? 0
+          let structV8Flags: List<string> = this.struct.initV8Flags(size)
+          this.config.options.v8Flags.forEach((flag: string, index: number) => {
+            structV8Flags.set(index, flag)
+          })
+        }
+      }
 
-    if (this.config.options.autoGates) {
-      let size = this.config.options.autoGates.length ?? 0
-      let structAutoGates: List<string> = this.struct.initAutogates(size)
-      this.config.options.autoGates.forEach((gate: string, index: number) => {
-        structAutoGates.set(index, gate)
-      })
+      if (this.config.options.autoGates) {
+        if (this.config.options.autoGates.length > 0) {
+          let size = this.config.options.autoGates.length ?? 0
+          let structAutoGates: List<string> = this.struct.initAutogates(size)
+          this.config.options.autoGates.forEach((gate: string, index: number) => {
+            structAutoGates.set(index, gate)
+          })
+        }
+      }
     }
   }
 
@@ -459,6 +466,7 @@ export default class WorkerdOutput {
     this.generatePlugins()
 
     return {
+      options: this.config.options,
       extensions: this.config.extensions,
       services: this.config.services,
       sockets: this.config.sockets,

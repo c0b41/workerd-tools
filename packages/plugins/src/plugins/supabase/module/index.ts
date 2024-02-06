@@ -10,6 +10,7 @@ export default (env) => {
     },
     env.options
   )
+  // TODO:try catch block for createClient
   const supabase = createClient(env.supabaseUrl, env.supabaseKey, options)
 
   return supabase

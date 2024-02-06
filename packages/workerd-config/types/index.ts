@@ -252,6 +252,7 @@ export type IExtensionModule = {
 
 // Output schema
 export interface toJson {
+  options: WorkerdConfigOptions
   extensions: Extension[]
   services: Service[]
   sockets: Socket[]

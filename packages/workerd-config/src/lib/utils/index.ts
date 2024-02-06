@@ -289,10 +289,7 @@ function createBinaryBinding(bindings: ObservedArray<Binding>, structServiceWork
         if (binding.wrapped.innerBindings) {
           let wrappedBindingSize = binding.wrapped.innerBindings.length ?? 0
           let structServiceWorkerWrappedBindings = structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
-          //this.createBinaryBinding(
-          //  binding.wrapped.innerBindings,
-          //  structServiceWorkerWrappedBindings
-          //)
+          createBinaryBinding(binding.wrapped.innerBindings, structServiceWorkerWrappedBindings)
         }
 
         structServiceWorkerBinding.setWrapped(structServiceWorkerBindingWrapped)

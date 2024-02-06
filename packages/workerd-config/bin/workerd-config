@@ -1,53 +1,48 @@
 #! /usr/bin/env node
-const { ConfigOutput } = require('../dist');
-const fs = require('fs');
-const path = require('path');
-const argv = require('minimist')(process.argv.slice(2));
+const { ConfigOutput } = require('../dist')
+const fs = require('fs')
+const path = require('path')
+const argv = require('minimist')(process.argv.slice(2))
 let format = 'binary'
 let config = './workerd.config.js'
 let dest = './'
 
 if (process.argv.length === 0) {
-    console.log(`--file --dest --format`)
+  console.log(`--file --dest --format`)
 }
-
 
 if (!argv.dest) {
-    console.log('Some Destination required')
-    process.exit(1)
+  console.log('Some Destination required')
+  process.exit(1)
 }
 
-
 if (argv.format) {
-
-    if (['binary', 'json'].includes(argv.format)) {
-        format = argv.format
-    }
+  if (['binary', 'json'].includes(argv.format)) {
+    format = argv.format
+  }
 }
 
 if (argv.file) {
-    config = argv.file
+  config = argv.file
 }
 
 if (argv.dest) {
-    dest = argv.dest
+  dest = argv.dest
 }
-
 
 try {
-    const configPath = path.join(process.cwd(), config)
-    const instance = require(configPath)
-    const output = new ConfigOutput(instance)
+  const configPath = path.join(process.cwd(), config)
+  const instance = require(configPath)
+  const output = new ConfigOutput(instance)
 
-    const ext = format === 'binary' ? 'bin' : 'json'
-    const destPath = path.join(process.cwd(), dest, `config.${ext}`)
-    const outputBuffer = format === 'binary' ? output.toBuffer() : JSON.stringify(output.toJson(), null, 2)
-    fs.writeFileSync(destPath, outputBuffer, 'utf-8')
-    console.log(`${destPath} Generated.`)
-    process.exit(0)
+  const ext = format === 'binary' ? 'bin' : 'json'
+  const destPath = path.join(process.cwd(), dest, `config.${ext}`)
+  const outputBuffer = format === 'binary' ? output.toBuffer() : JSON.stringify(output.toJson(), null, 2)
+  fs.writeFileSync(destPath, outputBuffer, 'utf-8')
+  console.log(`${destPath} Generated.`)
+  process.exit(0)
 } catch (error) {
-    console.log('Config generation failed')
-    console.log(error)
-    process.exit(1)
+  console.log('Config generation failed')
+  console.log(error)
+  process.exit(1)
 }
-

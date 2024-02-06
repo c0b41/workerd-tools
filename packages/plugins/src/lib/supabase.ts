@@ -1,12 +1,5 @@
 import { join } from 'path'
-import {
-  WorkerdConfig,
-  Service,
-  Extension,
-  ExtensionModule,
-  Binding,
-  Wrapped,
-} from '@c0b41/workerd-config'
+import { WorkerdConfig, Service, Extension, ExtensionModule, Binding, Wrapped } from '@c0b41/workerd-config'
 
 export interface SupabaseOptions {
   name: string
