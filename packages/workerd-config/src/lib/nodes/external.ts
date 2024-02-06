@@ -36,7 +36,7 @@ export default class External {
     return this._tcp
   }
 
-  setTcp(value: Https) {
+  setTcp(value: Tcp) {
     this._tcp = value
   }
 }

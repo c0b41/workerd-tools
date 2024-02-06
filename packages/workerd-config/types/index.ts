@@ -1,11 +1,18 @@
 import { Extension, Service, Socket } from '../src/lib/nodes'
 import { WorkerdConfig } from '../src'
 
-export interface WorkerdConfigOptions {}
+export type WorkerdConfigOptions = {
+  v8Flags?: string[]
+  autoGates?: string[]
+}
 
 // Https Options
 export type IHttpsOptions = {
   options: IHttpOptions
+  tlsOptions: ITlsOptions
+}
+
+export type ITcpOptions = {
   tlsOptions: ITlsOptions
 }
 
@@ -66,7 +73,14 @@ export type IServiceModules = {
 }
 
 // Bindings
-export type IServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService | ServiceBindingDurableObjectNamespace | ServiceBindingWrapped
+export type IServiceBindings =
+  | ServiceBindingBasic
+  | ServiceBindingCrypto
+  | ServiceBindingService
+  | ServiceBindingDurableObjectNamespace
+  | ServiceBindingWrapped
+  | ServiceBindingUnsafeEval
+  | ServiceBindingHyperDrive
 
 export type ServiceBindingService = {
   name?: string
@@ -97,6 +111,22 @@ export type ServiceBindingWrapped = {
     moduleName: string
     entrypoint?: string
     innerBindings: IServiceBindings[]
+  }
+}
+
+export type ServiceBindingUnsafeEval = {
+  name?: string
+  unsafeEval?: boolean
+}
+
+export type ServiceBindingHyperDrive = {
+  name?: string
+  hyperDrive?: {
+    designator: string // this can be name
+    database: string
+    user: string
+    password: string
+    scheme: string
   }
 }
 
@@ -133,6 +163,7 @@ export interface IServiceExternal {
   address: string
   http?: IHttpOptions
   https?: IHttpsOptions
+  tcp?: ITcpOptions
 }
 
 // Service Disk

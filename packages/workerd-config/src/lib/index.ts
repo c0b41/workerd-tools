@@ -32,10 +32,9 @@ import {
 } from './nodes'
 
 class WorkerdConfig extends WorkerConfigModule {
-  private options: WorkerdConfigOptions | null = {}
   constructor(options?: WorkerdConfigOptions) {
     super()
-    this.options = options
+    this.setOptions(options)
   }
 
   Service(input: IService) {
@@ -95,50 +94,50 @@ class WorkerdConfig extends WorkerConfigModule {
       if (input.external.https) {
         let https = new Https()
 
-        if (input.external.https.keypair) {
-          let keypair = new Keypair()
-          if (input.external.https.keypair.privateKey) {
-            let module = new ServiceModule()
-
-            if (input.external.https.keypair.privateKey.path) {
-              module.setPath(input.external.https.keypair.privateKey.path)
-            }
-
-            if (input.external.https.keypair.privateKey.content) {
-              module.setContent(input.external.https.keypair.privateKey.content)
-            }
-
-            keypair.setPrivateKey(module)
-          }
-
-          if (input.external.https.keypair.certificateChain) {
-            let module = new ServiceModule()
-
-            if (input.external.https.keypair.certificateChain.path) {
-              module.setPath(input.external.https.keypair.certificateChain.path)
-            }
-
-            if (input.external.https.keypair.certificateChain.content) {
-              module.setContent(input.external.https.keypair.certificateChain.content)
-            }
-
-            keypair.setCertificateChain(module)
-          }
-
-          https.setKeypair(keypair)
-        }
-
-        if (input.external.https.requireClientCerts) {
-          https.setRequireClientCerts(input.external.https.requireClientCerts)
-        }
-
-        if (input.external.https.trustBrowserCas) {
-          https.setTrustBrowserCas(input.external.https.trustBrowserCas)
-        }
-
-        if (input.external.https.minVersion) {
-          https.setMinVersion(input.external.https.minVersion)
-        }
+        //if (input.external.https.keypair) {
+        //  let keypair = new Keypair()
+        //  if (input.external.https.keypair.privateKey) {
+        //    let module = new ServiceModule()
+        //
+        //    if (input.external.https.keypair.privateKey.path) {
+        //      module.setPath(input.external.https.keypair.privateKey.path)
+        //    }
+        //
+        //    if (input.external.https.keypair.privateKey.content) {
+        //      module.setContent(input.external.https.keypair.privateKey.content)
+        //    }
+        //
+        //    keypair.setPrivateKey(module)
+        //  }
+        //
+        //  if (input.external.https.keypair.certificateChain) {
+        //    let module = new ServiceModule()
+        //
+        //    if (input.external.https.keypair.certificateChain.path) {
+        //      module.setPath(input.external.https.keypair.certificateChain.path)
+        //    }
+        //
+        //    if (input.external.https.keypair.certificateChain.content) {
+        //      module.setContent(input.external.https.keypair.certificateChain.content)
+        //    }
+        //
+        //    keypair.setCertificateChain(module)
+        //  }
+        //
+        //  https.setKeypair(keypair)
+        //}
+        //
+        //if (input.external.https.requireClientCerts) {
+        //  https.setRequireClientCerts(input.external.https.requireClientCerts)
+        //}
+        //
+        //if (input.external.https.trustBrowserCas) {
+        //  https.setTrustBrowserCas(input.external.https.trustBrowserCas)
+        //}
+        //
+        //if (input.external.https.minVersion) {
+        //  https.setMinVersion(input.external.https.minVersion)
+        //}
 
         external.setHttps(https)
       }
@@ -340,56 +339,56 @@ class WorkerdConfig extends WorkerConfigModule {
       socket.setHttp(http)
     }
 
-    if (input.https) {
-      let https = new Https()
+    //if (input.https) {
+    //let https = new Https()
+    //
+    //if (input.https.keypair) {
+    //  let keypair = new Keypair()
+    //  if (input.https.keypair.privateKey) {
+    //    let module = new ServiceModule()
+    //
+    //    if (input.https.keypair.privateKey.path) {
+    //      module.setPath(https.keypair.privateKey.path)
+    //    }
+    //
+    //    if (input.https.keypair.privateKey.content) {
+    //      module.setContent(https.keypair.privateKey.content)
+    //    }
+    //
+    //    keypair.setPrivateKey(module)
+    //  }
+    //
+    //  if (input.https.keypair.certificateChain) {
+    //    let module = new ServiceModule()
+    //
+    //    if (input.https.keypair.certificateChain.path) {
+    //      module.setPath(input.https.keypair.certificateChain.path)
+    //    }
+    //
+    //    if (input.https.keypair.certificateChain.content) {
+    //      module.setContent(input.https.keypair.certificateChain.content)
+    //    }
+    //
+    //    keypair.setCertificateChain(module)
+    //  }
+    //
+    //  https.setKeypair(keypair)
+    //}
+    //
+    //if (input.https.requireClientCerts) {
+    //  https.setRequireClientCerts(input.https.requireClientCerts)
+    //}
+    //
+    //if (input.https.trustBrowserCas) {
+    //  https.setTrustBrowserCas(input.https.trustBrowserCas)
+    //}
+    //
+    //if (input.https.minVersion) {
+    //  https.setMinVersion(input.https.minVersion)
+    //}
 
-      if (input.https.keypair) {
-        let keypair = new Keypair()
-        if (input.https.keypair.privateKey) {
-          let module = new ServiceModule()
-
-          if (input.https.keypair.privateKey.path) {
-            module.setPath(https.keypair.privateKey.path)
-          }
-
-          if (input.https.keypair.privateKey.content) {
-            module.setContent(https.keypair.privateKey.content)
-          }
-
-          keypair.setPrivateKey(module)
-        }
-
-        if (input.https.keypair.certificateChain) {
-          let module = new ServiceModule()
-
-          if (input.https.keypair.certificateChain.path) {
-            module.setPath(input.https.keypair.certificateChain.path)
-          }
-
-          if (input.https.keypair.certificateChain.content) {
-            module.setContent(input.https.keypair.certificateChain.content)
-          }
-
-          keypair.setCertificateChain(module)
-        }
-
-        https.setKeypair(keypair)
-      }
-
-      if (input.https.requireClientCerts) {
-        https.setRequireClientCerts(input.https.requireClientCerts)
-      }
-
-      if (input.https.trustBrowserCas) {
-        https.setTrustBrowserCas(input.https.trustBrowserCas)
-      }
-
-      if (input.https.minVersion) {
-        https.setMinVersion(input.https.minVersion)
-      }
-
-      socket.setHttps(https)
-    }
+    //socket.setHttps(https)
+    //}
 
     if (input.service) {
       let service = new SocketService()

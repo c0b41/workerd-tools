@@ -1,12 +1,7 @@
 import { List } from 'capnp-ts'
-import { IServiceBindings, IUsage } from '../../../types'
-import { Wrapped, Binding, CryptoKey, Data, Wasm } from '../nodes'
-import {
-  ServiceDesignator,
-  Worker_Binding,
-  Worker_Binding_CryptoKey,
-  Worker_Binding_CryptoKey_Usage,
-} from '../config/workerd.capnp'
+import { IServiceBindings, ICryptoUsage } from '../../../types'
+import { Wrapped, Binding, CryptoKey, Data, Wasm, HyperDrive } from '../nodes'
+import { ServiceDesignator, Worker_Binding, Worker_Binding_CryptoKey, Worker_Binding_CryptoKey_Usage, Worker_Binding_Hyperdrive } from '../config/workerd.capnp'
 
 function createBinding(binding: IServiceBindings): Binding {
   let worker_binding = new Binding()
@@ -102,7 +97,7 @@ function createBinding(binding: IServiceBindings): Binding {
     }
 
     if (binding.cryptoKey.usages) {
-      binding.cryptoKey.usages.forEach((usage: IUsage) => {
+      binding.cryptoKey.usages.forEach((usage: ICryptoUsage) => {
         worker_binding_crypto.setUsages(usage)
       })
     }
@@ -147,13 +142,39 @@ function createBinding(binding: IServiceBindings): Binding {
     worker_binding.setAnalyticsEngine(binding.analyticsEngine)
   }
 
+  if ('unsafeEval' in binding) {
+    worker_binding.setUnsafeEval(binding.unsafeEval)
+  }
+
+  if ('hyperDrive' in binding) {
+    let hyperDrive = new HyperDrive()
+
+    if (binding.hyperDrive.designator) {
+      hyperDrive.setDesignator(binding.hyperDrive.designator)
+    }
+
+    if (binding.hyperDrive.database) {
+      hyperDrive.setDatabase(binding.hyperDrive.database)
+    }
+
+    if (binding.hyperDrive.user) {
+      hyperDrive.setUser(binding.hyperDrive.user)
+    }
+
+    if (binding.hyperDrive.password) {
+      hyperDrive.setPassword(binding.hyperDrive.password)
+    }
+
+    if (binding.hyperDrive.scheme) {
+      hyperDrive.setScheme(binding.hyperDrive.scheme)
+    }
+
+    worker_binding.setHyperDrive(hyperDrive)
+  }
   return worker_binding
 }
 
-function createBinaryBinding(
-  bindings: ObservedArray<Binding>,
-  structServiceWorkerBindings: List<any>
-) {
+function createBinaryBinding(bindings: ObservedArray<Binding>, structServiceWorkerBindings: List<any>) {
   bindings.forEach((binding: Binding, index: number) => {
     let structServiceWorkerBinding: Worker_Binding = structServiceWorkerBindings.get(index)
     switch (binding.which) {
@@ -161,9 +182,7 @@ function createBinaryBinding(
         structServiceWorkerBinding.setText(binding.text)
         break
       case 'data':
-        let structServiceWorkerBindingData = structServiceWorkerBinding.initData(
-          binding.data.toUint8Array.byteLength
-        )
+        let structServiceWorkerBindingData = structServiceWorkerBinding.initData(binding.data.toUint8Array.byteLength)
         structServiceWorkerBindingData.copyBuffer(binding.data.toUint8Array)
         structServiceWorkerBinding.setData(structServiceWorkerBindingData)
         break
@@ -171,15 +190,12 @@ function createBinaryBinding(
         structServiceWorkerBinding.setJson(binding.json)
         break
       case 'wasm':
-        let structServiceWorkerBindingWasm = structServiceWorkerBinding.initData(
-          binding.wasm.toUint8Array.byteLength
-        )
+        let structServiceWorkerBindingWasm = structServiceWorkerBinding.initData(binding.wasm.toUint8Array.byteLength)
         structServiceWorkerBindingWasm.copyBuffer(binding.wasm.toUint8Array)
         structServiceWorkerBinding.setWasmModule(structServiceWorkerBindingWasm)
         break
       case 'crypto':
-        let structServiceWorkerBindingCrypto: Worker_Binding_CryptoKey =
-          structServiceWorkerBinding.initCryptoKey()
+        let structServiceWorkerBindingCrypto: Worker_Binding_CryptoKey = structServiceWorkerBinding.initCryptoKey()
 
         if (binding.crypto.raw) {
           let raw8Array = toUint8Array(binding.crypto.raw)
@@ -209,15 +225,13 @@ function createBinaryBinding(
         }
 
         if (binding.crypto.algorithm && binding.crypto.algorithm) {
-          let structServiceWorkerBindingCryptoAlgo =
-            structServiceWorkerBindingCrypto.initAlgorithm()
+          let structServiceWorkerBindingCryptoAlgo = structServiceWorkerBindingCrypto.initAlgorithm()
           structServiceWorkerBindingCryptoAlgo.setJson(binding.crypto.algorithm)
         }
 
         if (binding.crypto.usages && binding.crypto.usages.length > 0) {
           let usagesSize = binding.crypto.usages.length ?? 0
-          let structServiceWorkerBindingCryptoUsages: List<Worker_Binding_CryptoKey_Usage> =
-            structServiceWorkerBindingCrypto.initUsages(usagesSize)
+          let structServiceWorkerBindingCryptoUsages: List<Worker_Binding_CryptoKey_Usage> = structServiceWorkerBindingCrypto.initUsages(usagesSize)
 
           binding.crypto.usages.forEach((usage: number, index: number) => {
             structServiceWorkerBindingCryptoUsages.set(index, usage)
@@ -233,45 +247,35 @@ function createBinaryBinding(
         structServiceWorkerBinding.setCryptoKey(structServiceWorkerBindingCrypto)
         break
       case 'service':
-        let structServiceWorkerBindingService: ServiceDesignator =
-          structServiceWorkerBinding.initService()
+        let structServiceWorkerBindingService: ServiceDesignator = structServiceWorkerBinding.initService()
         structServiceWorkerBindingService.setName(binding.service)
         structServiceWorkerBinding.setService(structServiceWorkerBindingService)
         break
       case 'kv':
-        let structServiceWorkerBindingKV: ServiceDesignator =
-          structServiceWorkerBinding.initKvNamespace()
+        let structServiceWorkerBindingKV: ServiceDesignator = structServiceWorkerBinding.initKvNamespace()
         structServiceWorkerBindingKV.setName(binding.kvNamespace)
         structServiceWorkerBinding.setKvNamespace(structServiceWorkerBindingKV)
         break
       case 'r2_bucket':
-        let structServiceWorkerBindingR2: ServiceDesignator =
-          structServiceWorkerBinding.initR2Bucket()
+        let structServiceWorkerBindingR2: ServiceDesignator = structServiceWorkerBinding.initR2Bucket()
         structServiceWorkerBindingR2.setName(binding.r2Bucket)
         structServiceWorkerBinding.setR2Bucket(structServiceWorkerBindingR2)
         break
       case 'r2_admin':
-        let structServiceWorkerBindingR2Admin: ServiceDesignator =
-          structServiceWorkerBinding.initR2Admin()
+        let structServiceWorkerBindingR2Admin: ServiceDesignator = structServiceWorkerBinding.initR2Admin()
         structServiceWorkerBindingR2.setName(binding.r2Admin)
         structServiceWorkerBinding.setR2Admin(structServiceWorkerBindingR2Admin)
         break
       case 'queue':
-        let structServiceWorkerBindingQueue: ServiceDesignator =
-          structServiceWorkerBinding.initQueue()
+        let structServiceWorkerBindingQueue: ServiceDesignator = structServiceWorkerBinding.initQueue()
         structServiceWorkerBindingQueue.setName(binding.queue)
         structServiceWorkerBinding.setQueue(structServiceWorkerBindingQueue)
         break
       case 'durable_object_namespace':
-        let structServiceWorkerBindingDurableObjectNamespace =
-          structServiceWorkerBinding.initDurableObjectNamespace()
+        let structServiceWorkerBindingDurableObjectNamespace = structServiceWorkerBinding.initDurableObjectNamespace()
 
-        structServiceWorkerBindingDurableObjectNamespace.setClassName(
-          binding.durableObjectNamespace
-        )
-        structServiceWorkerBinding.setDurableObjectNamespace(
-          structServiceWorkerBindingDurableObjectNamespace
-        )
+        structServiceWorkerBindingDurableObjectNamespace.setClassName(binding.durableObjectNamespace)
+        structServiceWorkerBinding.setDurableObjectNamespace(structServiceWorkerBindingDurableObjectNamespace)
       case 'wrapped':
         let structServiceWorkerBindingWrapped = structServiceWorkerBinding.initWrapped()
 
@@ -284,8 +288,7 @@ function createBinaryBinding(
         }
         if (binding.wrapped.innerBindings) {
           let wrappedBindingSize = binding.wrapped.innerBindings.length ?? 0
-          let structServiceWorkerWrappedBindings =
-            structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
+          let structServiceWorkerWrappedBindings = structServiceWorkerBindingWrapped.initInnerBindings(wrappedBindingSize)
           //this.createBinaryBinding(
           //  binding.wrapped.innerBindings,
           //  structServiceWorkerWrappedBindings
@@ -298,10 +301,22 @@ function createBinaryBinding(
         structServiceWorkerBinding.setFromEnvironment(binding.fromEnvironment)
         break
       case 'analytics_engine':
-        let structServiceWorkerBindingAnalyticsEngine: ServiceDesignator =
-          structServiceWorkerBinding.initAnalyticsEngine()
+        let structServiceWorkerBindingAnalyticsEngine: ServiceDesignator = structServiceWorkerBinding.initAnalyticsEngine()
         structServiceWorkerBindingAnalyticsEngine.setName(binding.analyticsEngine)
         structServiceWorkerBinding.setAnalyticsEngine(structServiceWorkerBindingAnalyticsEngine)
+        break
+      case 'hyper_drive':
+        let structServiceWorkerBindingHyperDrive: Worker_Binding_Hyperdrive = structServiceWorkerBinding.initHyperdrive()
+        structServiceWorkerBindingHyperDrive.setDatabase(binding.hyperDrive.database)
+        structServiceWorkerBindingHyperDrive.setUser(binding.hyperDrive.user)
+        structServiceWorkerBindingHyperDrive.setPassword(binding.hyperDrive.password)
+        structServiceWorkerBindingHyperDrive.setScheme(binding.hyperDrive.scheme)
+        let structServiceWorkerBindingHyperDriveDesignator: ServiceDesignator = structServiceWorkerBindingHyperDrive.initDesignator()
+        structServiceWorkerBindingHyperDriveDesignator.setName(binding.hyperDrive.designator)
+        //structServiceWorkerBinding.setHyperdrive(structServiceWorkerBindingHyperDrive) // TODO: Dosen't exist
+        break
+      case 'unsafe_eval':
+        structServiceWorkerBinding.setUnsafeEval()
         break
       default:
         break

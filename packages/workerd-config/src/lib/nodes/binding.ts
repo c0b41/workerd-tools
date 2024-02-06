@@ -1,4 +1,4 @@
-import { IUsage } from '../../../types'
+import { ICryptoUsage } from '../../../types'
 import { ObservedArray, observe } from '../utils'
 import ServiceModule from './module'
 
@@ -17,6 +17,8 @@ export type IBindingType =
   | 'queue'
   | 'from_environment'
   | 'analytics_engine'
+  | 'hyper_drive'
+  | 'unsafe_eval'
 
 export class Binding {
   private _name: string
@@ -35,6 +37,8 @@ export class Binding {
   private _from_environment: string
   private _wrapped: Wrapped
   private _analytics_engine: string
+  private _hyper_drive: HyperDrive
+  private _unsafe_eval: Boolean
 
   get which(): string {
     return this._which
@@ -177,6 +181,24 @@ export class Binding {
     this._analytics_engine = value
     this.setWhich('analytics_engine')
   }
+
+  get hyperDrive(): HyperDrive {
+    return this._hyper_drive
+  }
+
+  setHyperDrive(value: HyperDrive) {
+    this._hyper_drive = value
+    this.setWhich('hyper_drive')
+  }
+
+  get unsafeEval(): Boolean {
+    return this._unsafe_eval
+  }
+
+  setUnsafeEval(value: Boolean) {
+    this._unsafe_eval = value
+    this.setWhich('unsafe_eval')
+  }
 }
 
 export class CryptoKey {
@@ -187,7 +209,7 @@ export class CryptoKey {
   private _pkcs8?: string
   private _spki?: string
   private _algorithm?: string
-  private _usages? = observe<IUsage>([])
+  private _usages? = observe<ICryptoUsage>([])
   private _extractable: boolean
 
   get raw(): string {
@@ -246,11 +268,11 @@ export class CryptoKey {
     this._algorithm = value
   }
 
-  get usages(): ObservedArray<IUsage> {
+  get usages(): ObservedArray<ICryptoUsage> {
     return this._usages
   }
 
-  setUsages(value: IUsage) {
+  setUsages(value: ICryptoUsage) {
     this._usages.add(value)
   }
 
@@ -296,3 +318,51 @@ export class Wrapped extends ServiceModule {
 export class Wasm extends ServiceModule {}
 
 export class Data extends ServiceModule {}
+
+export class HyperDrive {
+  private _designator: string
+  private _database: string
+  private _user: string
+  private _password: string
+  private _scheme: string
+
+  get designator(): string {
+    return this._designator
+  }
+
+  setDesignator(value: string) {
+    this._designator = value
+  }
+
+  get database(): string {
+    return this._database
+  }
+
+  setDatabase(value: string) {
+    this._database = value
+  }
+
+  get user(): string {
+    return this._user
+  }
+
+  setUser(value: string) {
+    this._user = value
+  }
+
+  get password(): string {
+    return this._password
+  }
+
+  setPassword(value: string) {
+    this._password = value
+  }
+
+  get scheme(): string {
+    return this._scheme
+  }
+
+  setScheme(value: string) {
+    this._scheme = value
+  }
+}
