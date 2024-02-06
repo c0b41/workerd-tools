@@ -1,8 +1,4 @@
-import {
-  HttpOptions_Style,
-  TlsOptions_Version,
-  Worker_Binding_CryptoKey_Usage,
-} from './workerd.capnp'
+import { HttpOptions_Style, TlsOptions_Version, Worker_Binding_CryptoKey_Usage } from './workerd.capnp'
 
 export const kVoid = Symbol('kVoid')
 export type Void = typeof kVoid
@@ -10,6 +6,7 @@ export type Void = typeof kVoid
 export interface Config {
   services?: Service[]
   sockets?: Socket[]
+  v8Flags?: string[]
   extensions?: Extension[]
 }
 
@@ -34,23 +31,14 @@ export interface Socket_Https {
 
 export type Service = {
   name?: string
-} & (
-  | { worker?: Worker }
-  | { network?: Network }
-  | { external?: ExternalServer }
-  | { disk?: DiskDirectory }
-)
+} & ({ worker?: Worker } | { network?: Network } | { external?: ExternalServer } | { disk?: DiskDirectory })
 
 export interface ServiceDesignator {
   name?: string
   entrypoint?: string
 }
 
-export type Worker = (
-  | { modules?: Worker_Module[] }
-  | { serviceWorkerScript?: string }
-  | { inherit?: string }
-) & {
+export type Worker = ({ modules?: Worker_Module[] } | { serviceWorkerScript?: string } | { inherit?: string }) & {
   compatibilityDate?: string
   compatibilityFlags?: string[]
   bindings?: Worker_Binding[]
@@ -61,10 +49,7 @@ export type Worker = (
   durableObjectStorage?: Worker_DurableObjectStorage
 }
 
-export type Worker_DurableObjectStorage =
-  | { none?: Void }
-  | { inMemory?: Void }
-  | { localDisk?: string }
+export type Worker_DurableObjectStorage = { none?: Void } | { inMemory?: Void } | { localDisk?: string }
 
 export type Worker_Module = {
   name?: string
@@ -76,6 +61,8 @@ export type Worker_Module = {
   | { wasm?: Uint8Array }
   | { json?: string }
   | { nodeJsCompatModule?: string }
+  | { pythonModule?: string }
+  | { pythonRequirement?: string }
 )
 
 export type Worker_Binding = {
@@ -96,6 +83,7 @@ export type Worker_Binding = {
   | { queue?: ServiceDesignator }
   | { fromEnvironment?: string }
   | { analyticsEngine?: ServiceDesignator }
+  | { hyperDrive?: Worker_Binding_Hyperdrive }
 )
 
 export interface Worker_Binding_Wrapped {
@@ -120,20 +108,16 @@ export type Worker_Binding_Type =
   | { kvNamespace?: Void }
   | { r2Bucket?: Void }
   | { r2Admin?: Void }
+  | { queue?: Void }
+  | { analyticsEngine?: Void }
+  | { hyperdrive?: Void }
 
 export type Worker_Binding_DurableObjectNamespaceDesignator = {
   className?: string
   serviceName?: string
 }
 
-export type Worker_Binding_CryptoKey = (
-  | { raw?: Uint8Array }
-  | { hex?: string }
-  | { base64?: string }
-  | { pkcs8?: string }
-  | { spki?: string }
-  | { jwk?: string }
-) & {
+export type Worker_Binding_CryptoKey = ({ raw?: Uint8Array } | { hex?: string } | { base64?: string } | { pkcs8?: string } | { spki?: string } | { jwk?: string }) & {
   algorithm?: Worker_Binding_CryptoKey_Algorithm
   extractable?: boolean
   usages?: Worker_Binding_CryptoKey_Usage[]
@@ -141,18 +125,25 @@ export type Worker_Binding_CryptoKey = (
 
 export type Worker_Binding_CryptoKey_Algorithm = { name?: string } | { json?: string }
 
-export type Worker_DurableObjectNamespace = { className?: string } & (
-  | { uniqueKey?: string }
-  | { ephemeralLocal?: Void }
-)
+export interface Worker_Binding_Hyperdrive {
+  designator?: ServiceDesignator
+  database?: string
+  user?: string
+  password?: string
+  scheme?: string
+}
 
-export type ExternalServer = { address?: string } & (
-  | { http: HttpOptions }
-  | { https: ExternalServer_Https }
-)
+export type Worker_DurableObjectNamespace = { className?: string; preventEviction?: boolean } & ({ uniqueKey?: string } | { ephemeralLocal?: Void })
+
+export type ExternalServer = { address?: string } & ({ http: HttpOptions } | { https: ExternalServer_Https } | { tcp: ExternalServer_Tcp })
 
 export interface ExternalServer_Https {
   options?: HttpOptions
+  tlsOptions?: TlsOptions
+  certificateHost?: string
+}
+
+export interface ExternalServer_Tcp {
   tlsOptions?: TlsOptions
   certificateHost?: string
 }

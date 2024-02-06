@@ -56,14 +56,7 @@ export type IHttpHeaderInjectOptions = {
 }
 
 // Module types & Modules
-export type ModuleType =
-  | 'esModule'
-  | 'commonJsModule'
-  | 'text'
-  | 'data'
-  | 'wasm'
-  | 'json'
-  | 'nodeJsCompatModule'
+export type ModuleType = 'esModule' | 'commonJsModule' | 'text' | 'data' | 'wasm' | 'json' | 'nodeJsCompatModule' | 'pythonModule' | 'pythonRequirement'
 
 export type IServiceModules = {
   name: string
@@ -73,12 +66,7 @@ export type IServiceModules = {
 }
 
 // Bindings
-export type IServiceBindings =
-  | ServiceBindingBasic
-  | ServiceBindingCrypto
-  | ServiceBindingService
-  | ServiceBindingDurableObjectNamespace
-  | ServiceBindingWrapped
+export type IServiceBindings = ServiceBindingBasic | ServiceBindingCrypto | ServiceBindingService | ServiceBindingDurableObjectNamespace | ServiceBindingWrapped
 
 export type ServiceBindingService = {
   name?: string
